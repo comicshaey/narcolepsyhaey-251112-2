@@ -3,12 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>단시간 근로자 인건비 계산기</title>
+  <title>단기 근로계약자 인건비 소요액 계산기 </title>
 
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
-  <!-- 중복 방지: 공용 스크립트 제거 -->
-  <!-- <script src="/static/script.js" defer></script> -->
   <script src="./script.js" defer></script>
 
   <style>
@@ -56,21 +54,21 @@
 
 <body>
   <main>
-    <h1>단시간 근로자 인건비 계산기</h1>
+    <h1>단기 근로계약자 인건비 소요액 계산기</h1>
 
     <div class="section">
       <div class="field-row">
-        <label for="startDate">계약 시작일</label>
+        <label for="startDate">근로계약 시작일자</label>
         <input type="date" id="startDate" />
       </div>
 
       <div class="field-row">
-        <label for="endDate">계약 종료일</label>
+        <label for="endDate">근로계약 종료료일자</label>
         <input type="date" id="endDate" />
       </div>
 
       <div class="field-row">
-        <label for="hourlyWage">시급</label>
+        <label for="hourlyWage">시급 (통상임금)</label>
         <div class="inline">
           <input type="number" id="hourlyWage" value="11000" />
           <small>원</small>
@@ -78,7 +76,7 @@
       </div>
 
       <div class="field-row">
-        <label for="hoursPerDay">하루 근무시간</label>
+        <label for="hoursPerDay">일일 소정 근로시간</label>
         <div class="inline">
           <input type="number" id="hoursPerDay" value="4" step="0.5" />
           <small>시간</small>
@@ -90,11 +88,11 @@
         <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
         <small>분</small>
         <label for="breakEnabled"><span>차감</span><input type="checkbox" id="breakEnabled" /></label>
-        <small>(예: 30 → 하루 30분 차감)</small>
+        <small>분단위로 입력</small>
       </div>
 
       <div class="field-row day-row">
-        <label>근무 요일</label>
+        <label>근무 요일 (기본값: 월~금 주 5일)</label>
         <label><input type="checkbox" id="mon" checked /> 월</label>
         <label><input type="checkbox" id="tue" checked /> 화</label>
         <label><input type="checkbox" id="wed" checked /> 수</label>
@@ -105,26 +103,22 @@
       </div>
 
       <div class="field-row">
-        <label for="budget">예산</label>
+        <label for="budget">예산 잔액 (원단위)</label>
         <div class="inline">
           <input type="number" id="budget" placeholder="예: 1000000" />
-          <small>원</small>
         </div>
       </div>
 
-      <button id="btnCalc">계산하기</button>
-
       <div class="result-box">
-        <!-- 한 줄 요약만 표시 -->
         <div id="outDaysLine" style="margin-bottom:8px; font-weight:600; color:#333;"></div>
 
         <hr style="margin:10px 0;" />
-        <div>기본급: <span id="outBase">0</span> 원</div>
-        <div>주휴수당: <span id="outJhu">0</span> 원</div>
+        <div>기본급: <id="outJhu">0</> 원</div>
+        <div>주휴수당: <id="outJhu">0</> 원</div>
 
         <hr style="margin:10px 0;" />
-        <div>총액: <span id="outTotal">0</span> 원</div>
-        <div>예산 잔액: <span id="outRemain">0</span> 원</div>
+        <div>총 인건비 소요액: <sid="outTotal">0</> 원</div>
+        <div>예산 잔액: <id="outRemain">0</> 원</div>
         <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
       </div>
 
