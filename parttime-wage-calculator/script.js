@@ -105,7 +105,11 @@ function calc() {
       paidHours,
     })
   }
-
+  
+<div>실근로일: <span id="outWorkDays">0</span> 일</div>
+<div>유급주휴일: <span id="outJhuDays">0</span> 일</div>
+<div style="margin-bottom:8px;">총 지급일수: <span id="outPaidDays">0</span> 일</div>
+  
   // --- 기본급 ---
   const baseHours = daysArr.reduce((s, it) => s + it.paidHours, 0)
   const basePayRaw = baseHours * hourly
