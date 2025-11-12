@@ -5,252 +5,184 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>단시간 근로자 인건비 계산기</title>
 
-  <!-- 공통 리소스(static) 유지 -->
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="/static/script.js" defer></script>
-
   <script src="./script.js" defer></script>
 
-  <!-- 레이아웃 보정 -->
   <style>
-    /* 네임 스페이스 */
-    #ptw {
-      --gap: 12px;
-      --radius: 12px;
-      --border: #e5e5e5;
-      --fg: #222;
-      --sub: #666;
-      --bg-soft: #f7f7f8;
-      color: var(--fg);
+    body {
       font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
-      margin: 16px;
-    }
-
-    #ptw h1 {
-      font-size: 1.25rem;
-      margin: 4px 0 14px;
-    }
-
-    /* 카드 */
-    #ptw .card {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
       background: #fff;
-      padding: 16px;
+      color: #222;
+      margin: 0;
+      padding: 0;
     }
-
-    /* 폼 그리드: 모바일 1열 → 넓은 화면 2열 */
-    #ptw .form-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: var(--gap);
+    main {
+      max-width: 720px;   /* 📏 폭 줄임 */
+      margin: 20px auto;
+      padding: 0 16px;
     }
-    @media (min-width: 860px) {
-      #ptw .form-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 16px;
+      text-align: center;
     }
-
-    /* 필드 공통 */
-    #ptw .field label {
-      display: inline-block;
+    .section {
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafa;
+    }
+    .field-row {
+      margin-bottom: 14px;
+    }
+    label {
       font-weight: 600;
-      margin-bottom: 6px;
+      display: block;
+      margin-bottom: 4px;
     }
-    #ptw .field input[type="number"],
-    #ptw .field input[type="date"] {
+    input[type="number"], input[type="date"] {
       width: 100%;
       box-sizing: border-box;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 16px;
-      line-height: 1.2;
-      background: #fff;
+      border-radius: 6px;
+      font-size: 15px;
     }
-    #ptw .inline {
+    .inline {
       display: flex;
       align-items: center;
       gap: 8px;
       flex-wrap: nowrap;
     }
-    #ptw .sub {
-      color: var(--sub);
-      font-size: 0.9rem;
-      white-space: nowrap;
-    }
-
-    /* 휴게시간 행: 입력칸 + 체크박스 한 덩어리 */
-    #ptw .break-row .minutes {
-      width: 90px;            /* 모바일에서도 과하게 넓지 않게 */
-      text-align: right;
-    }
-    #ptw .break-row .toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    /* 요일 체크: 반응형 그리드 */
-    #ptw .days {
-      display: grid;
-      grid-template-columns: repeat(7, minmax(0, 1fr));
-      gap: 6px 10px;
-      padding: 10px 12px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      background: #fff;
-    }
-    @media (max-width: 520px) {
-      #ptw .days { grid-template-columns: repeat(4, 1fr); }
-    }
-    @media (max-width: 360px) {
-      #ptw .days { grid-template-columns: repeat(3, 1fr); }
-    }
-    #ptw .days label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .inline small { color: #555; white-space: nowrap; }
+    .day-row label {
+      margin-right: 10px;
       font-weight: 500;
     }
-
-    /* 버튼 */
-    #ptw .actions {
-      margin-top: 4px;
-      display: flex;
-      justify-content: flex-start;
-    }
-    #ptw button {
-      padding: 10px 16px;
-      border-radius: 10px;
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
       border: 1px solid #111;
       background: #111;
       color: #fff;
-      font-weight: 700;
-    }
-
-    /* 결과 카드 */
-    #ptw .result {
-      margin-top: 14px;
-      background: var(--bg-soft);
-      border-radius: var(--radius);
-      padding: 14px;
-      line-height: 1.7;
+      font-weight: 600;
+      cursor: pointer;
       font-size: 1rem;
     }
-    #ptw .result .row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
+    button:hover { opacity: 0.9; }
+    .result-box {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 18px;
+      line-height: 1.6;
     }
-    #ptw .result strong { font-weight: 800; }
-
-    #ptw .hr {
-      height: 1px; background: var(--border);
-      margin: 10px 0;
+    .result-box span {
+      font-weight: bold;
+      font-size: 1.05rem;
     }
 
-    /* 푸터 */
-    #ptw footer {
+    /* ✅ 메인으로 돌아가기 버튼 */
+    .btn-home {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 16px;
+      border: 1px solid #111;
+      border-radius: 10px;
+      background: #111;
+      color: #fff;
+      font-weight: 600;
+      text-decoration: none;
       text-align: center;
-      margin: 18px 0 8px;
+    }
+    .btn-home:hover { opacity: 0.9; }
+
+    footer {
+      text-align: center;
+      margin-top: 24px;
       color: #555;
-      font-size: 0.86rem;
+      font-size: 0.85rem;
+      line-height: 1.5;
     }
   </style>
 </head>
+
 <body>
-  <div id="ptw">
+  <main>
     <h1>단시간 근로자 인건비 계산기</h1>
 
-    <div class="card">
-      <div class="form-grid">
-        <!-- 계약 시작/종료 -->
-        <div class="field">
-          <label for="startDate">계약 시작일</label>
-          <input type="date" id="startDate" />
-        </div>
-        <div class="field">
-          <label for="endDate">계약 종료일</label>
-          <input type="date" id="endDate" />
-        </div>
-
-        <!-- 시급 / 하루 근무시간 -->
-        <div class="field">
-          <label for="hourlyWage">시급</label>
-          <div class="inline">
-            <input type="number" id="hourlyWage" value="11000" />
-            <span class="sub">원</span>
-          </div>
-        </div>
-        <div class="field">
-          <label for="hoursPerDay">하루 근무시간</label>
-          <div class="inline">
-            <input type="number" id="hoursPerDay" value="4" step="0.5" />
-            <span class="sub">시간</span>
-          </div>
-        </div>
-
-        <!-- 휴게시간 -->
-        <div class="field" style="grid-column: 1 / -1;">
-          <label>휴게시간</label>
-          <div class="inline break-row">
-            <input type="number" id="breakMinutes" class="minutes" min="0" step="5" value="30" />
-            <span class="sub">분</span>
-            <label for="breakEnabled" class="toggle">
-              <span>차감</span>
-              <input type="checkbox" id="breakEnabled" />
-            </label>
-            <span class="sub">(예: 30 → 하루 30분 차감)</span>
-          </div>
-        </div>
-
-        <!-- 근무 요일 -->
-        <div class="field" style="grid-column: 1 / -1;">
-          <label>근무 요일</label>
-          <div class="days">
-            <label><input type="checkbox" id="mon" checked /> 월</label>
-            <label><input type="checkbox" id="tue" checked /> 화</label>
-            <label><input type="checkbox" id="wed" checked /> 수</label>
-            <label><input type="checkbox" id="thu" checked /> 목</label>
-            <label><input type="checkbox" id="fri" checked /> 금</label>
-            <label><input type="checkbox" id="sat" /> 토</label>
-            <label><input type="checkbox" id="sun" /> 일</label>
-          </div>
-        </div>
-
-        <!-- 예산 -->
-        <div class="field" style="grid-column: 1 / -1;">
-          <label for="budget">예산</label>
-          <div class="inline">
-            <input type="number" id="budget" placeholder="예: 1000000" />
-            <span class="sub">원</span>
-          </div>
-        </div>
+    <div class="section">
+      <div class="field-row">
+        <label for="startDate">계약 시작일</label>
+        <input type="date" id="startDate" />
       </div>
 
-      <div class="actions">
-        <button id="btnCalc">계산하기</button>
+      <div class="field-row">
+        <label for="endDate">계약 종료일</label>
+        <input type="date" id="endDate" />
       </div>
 
-      <div class="result">
-        <div class="row"><span>기본급</span><strong><span id="outBase">0</span> 원</strong></div>
-        <div class="row"><span>주휴수당</span><strong><span id="outJhu">0</span> 원</strong></div>
-        <div class="row"><span>총액</span><strong><span id="outTotal">0</span> 원</strong></div>
-        <div class="hr"></div>
-        <div class="row"><span>예산 잔액</span><strong><span id="outRemain">0</span> 원</strong></div>
-        <div id="outMsg" class="sub" style="margin-top:6px;"></div>
+      <div class="field-row">
+        <label for="hourlyWage">시급</label>
+        <input type="number" id="hourlyWage" value="11000" /> 원
+      </div>
+
+      <div class="field-row">
+        <label for="hoursPerDay">하루 근무시간</label>
+        <input type="number" id="hoursPerDay" value="4" step="0.5" /> 시간
+      </div>
+
+      <div class="field-row inline">
+        <label for="breakMinutes">휴게시간</label>
+        <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
+        <small>분</small>
+        <label style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <span>차감</span>
+          <input type="checkbox" id="breakEnabled" />
+        </label>
+        <small>(예: 30 → 하루 30분 차감)</small>
+      </div>
+
+      <div class="field-row day-row">
+        <label>근무 요일</label>
+        <label><input type="checkbox" id="mon" checked /> 월</label>
+        <label><input type="checkbox" id="tue" checked /> 화</label>
+        <label><input type="checkbox" id="wed" checked /> 수</label>
+        <label><input type="checkbox" id="thu" checked /> 목</label>
+        <label><input type="checkbox" id="fri" checked /> 금</label>
+        <label><input type="checkbox" id="sat" /> 토</label>
+        <label><input type="checkbox" id="sun" /> 일</label>
+      </div>
+
+      <div class="field-row">
+        <label for="budget">예산</label>
+        <input type="number" id="budget" placeholder="예: 1000000" /> 원
+      </div>
+
+      <button id="btnCalc">계산하기</button>
+
+      <div class="result-box">
+        <div>기본급: <span id="outBase">0</span> 원</div>
+        <div>주휴수당: <span id="outJhu">0</span> 원</div>
+        <div>총액: <span id="outTotal">0</span> 원</div>
+        <hr style="margin:10px 0;" />
+        <div>예산 잔액: <span id="outRemain">0</span> 원</div>
+        <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
+      </div>
+
+      <!-- ✅ 메인으로 돌아가기 버튼 -->
+      <div style="text-align:center;">
+        <a href="/" class="btn-home">⬅ 메인으로 돌아가기</a>
       </div>
     </div>
-    </script>
-    <p><a class="btn" href="../index.html">메인으로 돌아가기</a></p>
 
-
-  <footer style="text-align:center; margin-top:15px; color:#444;">
-  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
-</footer>
+    <footer>
+      제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+    </footer>
+  </main>
 </body>
 </html>
