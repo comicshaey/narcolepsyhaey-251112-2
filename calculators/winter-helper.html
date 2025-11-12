@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>겨울방학 도우미 인건비 계산기 (주휴수당 분리)</title>
+  <title>근로기준법 상 근로자 인건비 계산기 (인건비 기본급 및 주휴수당 예산 구분)</title>
   <link rel="stylesheet" href="/static/style.css" />
   <style>
     .wrap{max-width:960px;margin:24px auto;padding:0 12px}
@@ -25,52 +25,52 @@
 <body>
   <div class="wrap">
     <div class="row" style="justify-content:space-between;align-items:center">
-      <div class="h1">겨울방학 도우미 인건비 계산기 (주휴수당 분리)</div>
+      <div class="h1">근로기준법 상 근로자 인건비 계산기 (인건비 기본급 및 주휴수당 예산 구분)</div>
       <a href="/" class="btn">메인으로 돌아가기</a>
     </div>
 
     <div class="section">
       <div class="grid">
         <div>
-          <label>주중 인건비 예산(원)</label>
+          <label>기본급 예산 (원단위)</label>
           <input id="budgetBase" type="number" value="0" />
         </div>
         <div>
-          <label>주휴수당 예산(원)</label>
+          <label>주휴수당 예산 (원단위)</label>
           <input id="budgetHoliday" type="number" value="0" />
         </div>
         <div>
-          <label>시급(원)</label>
+          <label>시급 (원단위)</label>
           <input id="wage" type="number" value="10000" />
         </div>
         <div>
-          <label>총 주 수(예: 방학 주 수)</label>
+          <label>총 몇 주 근무하는지</label>
           <input id="weeks" type="number" value="4" />
         </div>
         <div>
-          <label>주 소정근로시간(예: 14)</label>
+          <label>주 소정 근로 시간 (예: 14)</label>
           <input id="weeklyHours" type="number" value="14" />
         </div>
         <div>
-          <label>주 소정근로일수(예: 5)</label>
+          <label>주 소정 근로 일수 (예: 5)</label>
           <input id="weeklyDays" type="number" value="5" />
         </div>
         <div>
-          <label>자원봉사 시간도 유급처리(Y/N)</label>
+          <label>자원봉사 시간을 근로계약 상 근로시간에 포함하십니까? (Y/N)</label>
           <select id="volPaid">
             <option value="N">N</option>
             <option value="Y">Y</option>
           </select>
         </div>
         <div>
-          <label>자원봉사 시간(주당, 시간)</label>
+          <label>주당 자원봉사활동 시간</label>
           <input id="volHours" type="number" value="0" />
         </div>
       </div>
-      <p class="muted">※ 일반적으로 주 15시간 이상이면 유급 주휴일이 인정되어 주휴수당(평균 1일분)이 발생할 수 있습니다. 본 계산기는 <span class="mono">weeklyHours + (volPaid?volHours:0) ≥ 15</span>인 경우에 한 주당 주휴수당 시간을 <span class="mono">((weeklyHours + 유급처리된 자원봉사시간) / weeklyDays)</span>로 산정합니다.</p>
+      <p class="muted">주 소정 근로시간이 15시간 이상일 경우 근로기준법에 따라 주휴수당 부여해야 함.</p>
       <div class="row">
         <button class="btn" onclick="calc()">계산하기</button>
-        <a class="btn" href="./winter-helper.xlsx" download>엑셀 템플릿 받기</a>
+        <a class="btn" href="./winter-helper.xlsx" download> 엑셀 파일로 저장 </a>
       </div>
     </div>
 
@@ -79,9 +79,9 @@
         <thead>
           <tr>
             <th>구분</th>
-            <th>주중 합계(원)</th>
-            <th>주휴수당 합계(원)</th>
-            <th>총합(원)</th>
+            <th>주중 기본급 합계 (원단위)</th>
+            <th>주휴수당 합계 (원단위)</th>
+            <th>총 금액 (원단위)</th>
           </tr>
         </thead>
         <tbody>
@@ -99,7 +99,7 @@
           </tr>
         </tbody>
       </table>
-      <p id="warn" class="warn" style="display:none">예산을 초과했습니다. 입력값을 조정하세요.</p>
+      <p id="warn" class="warn" style="display:none">예산 잔액 초과됨</p>
     </div>
 
     <div class="section">
