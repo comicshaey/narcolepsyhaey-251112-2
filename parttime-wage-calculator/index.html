@@ -22,43 +22,20 @@
       width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #ccc; border-radius:6px; font-size:15px;
     }
 
-    /* 요일별 입력 그리드 */
-    .days-grid {
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    .day-item {
-      display:flex; align-items:center; justify-content:space-between;
-      border:1px solid #e6e6e6; border-radius:10px; background:#fff; padding:8px 10px;
-    }
-    .day-left {
-      display:flex; align-items:center; gap:8px;
-      font-weight:600;
-    }
-    .day-right {
-      display:flex; align-items:center; gap:8px;
-      min-width: 160px;
-    }
-    .day-right input[type="number"]{
-      width:90px;
-    }
+    .days-grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .day-item { display:flex; align-items:center; justify-content:space-between; border:1px solid #e6e6e6; border-radius:10px; background:#fff; padding:8px 10px; }
+    .day-left { display:flex; align-items:center; gap:8px; font-weight:600; }
+    .day-right { display:flex; align-items:center; gap:8px; min-width: 160px; }
+    .day-right input[type="number"]{ width:90px; }
     .hint { color:#666; font-size:.85rem; margin-top:6px; }
 
-    button {
-      display:block; width:100%; padding:10px; border-radius:8px;
-      border:1px solid #111; background:#111; color:#fff;
-      font-weight:600; cursor:pointer; font-size:1rem;
-    }
+    button { display:block; width:100%; padding:10px; border-radius:8px; border:1px solid #111; background:#111; color:#fff; font-weight:600; cursor:pointer; font-size:1rem; }
     button:hover { opacity:.9; }
 
     .result-box { background:#f8f8f8; border-radius:10px; padding:14px; margin-top:18px; line-height:1.6; }
     .result-box span { font-weight:bold; font-size:1.05rem; }
 
-    .btn-home {
-      display:inline-block; margin-top:20px; padding:8px 16px; border:1px solid #111; border-radius:10px;
-      background:#111; color:#fff; font-weight:600; text-decoration:none; text-align:center;
-    }
+    .btn-home { display:inline-block; margin-top:20px; padding:8px 16px; border:1px solid #111; border-radius:10px; background:#111; color:#fff; font-weight:600; text-decoration:none; text-align:center; }
     .btn-home:hover { opacity:.9; }
 
     footer { text-align:center; margin-top:24px; color:#555; font-size:.85rem; line-height:1.5; }
@@ -85,39 +62,17 @@
         <input type="number" id="hourlyWage" value="11000" />
       </div>
 
-      <!-- 요일별 소정 근로시간 입력 -->
+      <!-- 요일별 소정 근로시간 -->
       <div class="field-row">
         <label>요일별 소정 근로시간 (시간) <span style="font-weight:500;">· 기본값: 월~금 4시간</span></label>
         <div class="days-grid">
-          <!-- 월~일: 체크 + 시간 -->
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="mon" checked /><span>월</span></div>
-            <div class="day-right"><input type="number" id="monHours" step="0.5" value="4" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="tue" checked /><span>화</span></div>
-            <div class="day-right"><input type="number" id="tueHours" step="0.5" value="4" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="wed" checked /><span>수</span></div>
-            <div class="day-right"><input type="number" id="wedHours" step="0.5" value="4" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="thu" checked /><span>목</span></div>
-            <div class="day-right"><input type="number" id="thuHours" step="0.5" value="4" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="fri" checked /><span>금</span></div>
-            <div class="day-right"><input type="number" id="friHours" step="0.5" value="4" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="sat" /><span>토</span></div>
-            <div class="day-right"><input type="number" id="satHours" step="0.5" value="0" /></div>
-          </div>
-          <div class="day-item">
-            <div class="day-left"><input type="checkbox" id="sun" /><span>일</span></div>
-            <div class="day-right"><input type="number" id="sunHours" step="0.5" value="0" /></div>
-          </div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="mon" checked /><span>월</span></div><div class="day-right"><input type="number" id="monHours" step="0.5" value="4" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="tue" checked /><span>화</span></div><div class="day-right"><input type="number" id="tueHours" step="0.5" value="4" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="wed" checked /><span>수</span></div><div class="day-right"><input type="number" id="wedHours" step="0.5" value="4" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="thu" checked /><span>목</span></div><div class="day-right"><input type="number" id="thuHours" step="0.5" value="4" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="fri" checked /><span>금</span></div><div class="day-right"><input type="number" id="friHours" step="0.5" value="4" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="sat" /><span>토</span></div><div class="day-right"><input type="number" id="satHours" step="0.5" value="0" /></div></div>
+          <div class="day-item"><div class="day-left"><input type="checkbox" id="sun" /><span>일</span></div><div class="day-right"><input type="number" id="sunHours" step="0.5" value="0" /></div></div>
         </div>
         <div class="hint">체크 해제 시 해당 요일은 근무하지 않는 것으로 처리. 휴게시간은 아래 옵션으로 일괄 차감.</div>
       </div>
@@ -142,6 +97,10 @@
 
       <div class="result-box">
         <div id="outDaysLine" style="margin-bottom:8px; font-weight:600; color:#333;"></div>
+
+        <!-- 주 소정 근무시간 합계 -->
+        <div>주 소정 근무시간 합계 (휴게 전): <span id="outWeeklyRaw">0</span> 시간</div>
+        <div>주 소정 근무시간 합계 (유급 기준): <span id="outWeeklyPaid">0</span> 시간</div>
 
         <hr style="margin:10px 0;" />
         <div>기본급: <span id="outBase">0</span> 원</div>
