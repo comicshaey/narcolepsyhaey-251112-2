@@ -3,52 +3,45 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>단기 근로계약자 인건비 소요액 계산기 </title>
+  <title>단기 근로계약자 인건비 소요액 계산기</title>
 
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="./script.js" defer></script>
 
   <style>
-    body {
-      font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
-      background: #fff; color: #222; margin: 0; padding: 0;
-    }
+    body { font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif; background:#fff; color:#222; margin:0; padding:0; }
     main { max-width: 720px; margin: 20px auto; padding: 0 16px; }
     h1 { font-size: 1.4rem; margin-bottom: 16px; text-align: center; }
-    .section { border: 1px solid #e5e5e5; border-radius: 12px; padding: 16px 18px; background: #fafafa; }
-    .field-row { margin-bottom: 14px; }
-    label { font-weight: 600; display: block; margin-bottom: 4px; }
+
+    .section { border:1px solid #e5e5e5; border-radius:12px; padding:16px 18px; background:#fafafa; }
+    .field-row { margin-bottom:14px; }
+    label { font-weight:600; display:block; margin-bottom:4px; }
     input[type="number"], input[type="date"] {
-      width: 100%; box-sizing: border-box; padding: 8px 10px;
-      border: 1px solid #ccc; border-radius: 6px; font-size: 15px;
+      width:100%; box-sizing:border-box; padding:8px 10px; border:1px solid #ccc; border-radius:6px; font-size:15px;
     }
-    .inline { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
-    .inline small { color: #555; white-space: nowrap; }
-    /* inline 내부 label은 가로 배열 */
-    .inline > label { display: inline-flex; align-items: center; gap: 4px; margin: 0; }
-    .day-row label { margin-right: 10px; font-weight: 500; }
+    .inline { display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+    .inline small { color:#555; white-space:nowrap; }
+    .inline > label { display:inline-flex; align-items:center; gap:4px; margin:0; }
+    .day-row label { margin-right:10px; font-weight:500; }
 
     button {
-      display: block; width: 100%; padding: 10px; border-radius: 8px;
-      border: 1px solid #111; background: #111; color: #fff;
-      font-weight: 600; cursor: pointer; font-size: 1rem;
+      display:block; width:100%; padding:10px; border-radius:8px;
+      border:1px solid #111; background:#111; color:#fff;
+      font-weight:600; cursor:pointer; font-size:1rem;
     }
-    button:hover { opacity: 0.9; }
+    button:hover { opacity:.9; }
 
-    .result-box {
-      background: #f8f8f8; border-radius: 10px; padding: 14px; margin-top: 18px; line-height: 1.6;
-    }
-    .result-box span { font-weight: bold; font-size: 1.05rem; }
+    .result-box { background:#f8f8f8; border-radius:10px; padding:14px; margin-top:18px; line-height:1.6; }
+    .result-box span { font-weight:bold; font-size:1.05rem; }
 
     .btn-home {
-      display: inline-block; margin-top: 20px; padding: 8px 16px;
-      border: 1px solid #111; border-radius: 10px; background: #111; color: #fff;
-      font-weight: 600; text-decoration: none; text-align: center;
+      display:inline-block; margin-top:20px; padding:8px 16px; border:1px solid #111; border-radius:10px;
+      background:#111; color:#fff; font-weight:600; text-decoration:none; text-align:center;
     }
-    .btn-home:hover { opacity: 0.9; }
+    .btn-home:hover { opacity:.9; }
 
-    footer { text-align: center; margin-top: 24px; color: #555; font-size: 0.85rem; line-height: 1.5; }
+    footer { text-align:center; margin-top:24px; color:#555; font-size:.85rem; line-height:1.5; }
   </style>
 </head>
 
@@ -63,36 +56,32 @@
       </div>
 
       <div class="field-row">
-        <label for="endDate">근로계약 종료료일자</label>
+        <label for="endDate">근로계약 종료일자</label>
         <input type="date" id="endDate" />
       </div>
 
       <div class="field-row">
-        <label for="hourlyWage">시급 (통상임금)</label>
+        <label for="hourlyWage">시급 (원단위)</label>
         <div class="inline">
           <input type="number" id="hourlyWage" value="11000" />
-          <small>원</small>
         </div>
       </div>
 
       <div class="field-row">
-        <label for="hoursPerDay">일일 소정 근로시간</label>
+        <label for="hoursPerDay">일일 소정 근무시간</label>
         <div class="inline">
           <input type="number" id="hoursPerDay" value="4" step="0.5" />
-          <small>시간</small>
         </div>
       </div>
 
       <div class="field-row inline">
-        <label for="breakMinutes">휴게시간</label>
+        <label for="breakMinutes">휴게시간 반영 (분단위)</label>
         <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
-        <small>분</small>
         <label for="breakEnabled"><span>차감</span><input type="checkbox" id="breakEnabled" /></label>
-        <small>분단위로 입력</small>
       </div>
 
       <div class="field-row day-row">
-        <label>근무 요일 (기본값: 월~금 주 5일)</label>
+        <label>근무 요일 (기본값: 월~금, 주 5일) </label>
         <label><input type="checkbox" id="mon" checked /> 월</label>
         <label><input type="checkbox" id="tue" checked /> 화</label>
         <label><input type="checkbox" id="wed" checked /> 수</label>
@@ -109,16 +98,18 @@
         </div>
       </div>
 
+      <button id="btnCalc">계산하기</button>
+
       <div class="result-box">
         <div id="outDaysLine" style="margin-bottom:8px; font-weight:600; color:#333;"></div>
 
         <hr style="margin:10px 0;" />
-        <div>기본급: <id="outJhu">0</> 원</div>
-        <div>주휴수당: <id="outJhu">0</> 원</div>
+        <div>기본급: <span id="outBase">0</span> 원</div>
+        <div>주휴수당: <span id="outJhu">0</span> 원</div>
 
         <hr style="margin:10px 0;" />
-        <div>총 인건비 소요액: <sid="outTotal">0</> 원</div>
-        <div>예산 잔액: <id="outRemain">0</> 원</div>
+        <div>총 지급액: <span id="outTotal">0</span> 원</div>
+        <div>예산 잔액: <span id="outRemain">0</span> 원</div>
         <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
       </div>
 
