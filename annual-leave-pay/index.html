@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html lang="ko"><head>
+  <script src="/static/disable-copy.js"></script>
+  <style>
+  :root{--gap:14px}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,'Malgun Gothic',sans-serif;line-height:1.55;color:#111;padding:20px;max-width:980px;margin:0 auto}
+  h1{font-size:28px;margin:0 0 12px}
+  h2{font-size:20px;margin:24px 0 8px}
+  .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  label{display:block;font-weight:600;margin:8px 0 4px}
+  input,select,button{font-size:15px}
+  input,select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px}
+  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+  .muted{color:#64748b;font-size:13px}
+  .btn{display:inline-block;background:#111;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;border:0;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border:1px solid #e5e7eb;padding:8px;text-align:center}
+  th{background:#f8fafc}
+  .stack{display:flex;flex-direction:column;gap:8px}
+  .exitem{border:1px dashed #e2e8f0;padding:10px;border-radius:10px;margin-top:8px}
+
+
+  * { box-sizing: border-box; }
+  .row > * , .row3 > * { min-width: 0; } /* allow shrinking inside grid */
+  :root{ --gap:16px }
+  @media (max-width: 900px){
+    .row, .row3 { grid-template-columns: 1fr; }
+  }
+</style></head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>교육공무직 연차 유급휴가 미사용 수당 계산기</title>
+<body>
+<h1>교육공무직 연차 유급휴가 미사용 수당 계산기</h1><p class="muted">연차수당 =통상임금 *1일 근로시간 *연차 유급휴가 미사용 일수</p>
+<div class="card">
+<h2>① 기본 입력</h2>
+<div class="row">
+<div>
+<label>통상임금 (원 단위)</label>
+<input id="hourly" min="0" step="10" type="number" value="10000"/>
+</div>
+<div>
+<label>1일 근로시간 (시간 단위)</label>
+<input id="hoursPerDay" min="0" step="0.5" type="number" value="8"/>
+</div>
+</div>
+<div class="row">
+<div>
+<label>연차 유급휴가 부여 일수</label>
+<input id="grantedDays" min="0" step="1" type="number" value="15"/>
+</div>
+<div>
+<label>사용한 연차 일수 (일 단위)</label>
+<input id="usedDays" min="0" step="1" type="number" value="0"/>
+</div>
+</div>
+</div>
+<div class="card">
+<h2>② 시간 단위 사용(최대 4개 구간)</h2>
+<div class="row3">
+<div><label>지각 (시간 단위)</label><input id="h1" min="0" step="1" type="number" value="0"/></div>
+<div><label>지각 (분 단위)</label><input id="m1" min="0" step="1" type="number" value="0"/></div>
+<div><label>비고</label><input placeholder=" "/></div>
+</div>
+<div class="row3">
+<div><label>외출 (시간 단위)</label><input id="h2" min="0" step="1" type="number" value="0"/></div>
+<div><label>외출 (분 단위)</label><input id="m2" min="0" step="1" type="number" value="0"/></div>
+<div><label>비고</label><input placeholder=" "/></div>
+</div>
+<div class="row3">
+<div><label>조퇴 (시간 단위)</label><input id="h3" min="0" step="1" type="number" value="0"/></div>
+<div><label>조퇴 (분 단위)</label><input id="m3" min="0" step="1" type="number" value="0"/></div>
+<div><label>비고</label><input placeholder=" "/></div>
+</div>
+<div class="row3">
+<div><label>반일연가 (시간 단위)</label><input id="h4" min="0" step="1" type="number" value="0"/></div>
+<div><label>반일연가 (분 단위)</label><input id="m4" min="0" step="1" type="number" value="0"/></div>
+<div><label>비고</label><input placeholder=" "/></div>
+</div>
+<div class="row">
+<div><label>기타 (분 단위)</label><input id="extraMin" min="0" step="1" type="number" value="0"/></div>
+<div></div>
+</div>
+</div>
+<div class="card">
+<h2>③ 자동 계산 결과</h2>
+<div class="row3">
+<div>
+<label>총 사용시간 (시간 단위)</label>
+<input disabled="" id="totalHours"/>
+</div>
+<div>
+<label>총 사용일수 (일 단위)</label>
+<input disabled="" id="totalUsedDays"/>
+<div class="muted">= (총 사용시간/8시간) + 총 사용일수</div>
+</div>
+<div>
+<label>미사용 일수 (일 단위)</label>
+<input disabled="" id="unusedDays"/>
+<div class="muted">= 연차 유급휴가 부여일수 - 총 사용 일수</div>
+</div>
+</div>
+<div class="row">
+<div>
+<label>연차수당 (원 단위)</label>
+<input disabled="" id="allowance"/>
+<div class="muted">= (시급 *1일 소정 근로시간) *미사용 일수 (원 단위 절삭)</div>
+</div>
+</div>
+</div>
+  <a class="btn" href="../index.html">메인으로 돌아가기</a>
+</div><script>
+function val(id){return parseFloat(document.getElementById(id).value||'0');}
+function calc(){
+  const hourly=val('hourly');
+  const hpd=val('hoursPerDay');
+  const granted=val('grantedDays');
+  const usedDays=val('usedDays');
+
+  const h = val('h1')+val('h2')+val('h3')+val('h4');
+  const m = val('m1')+val('m2')+val('m3')+val('m4')+val('extraMin');
+  const totalHours = h + m/60;
+
+  const totalUsedDays = Math.floor(totalHours/8) + usedDays;
+  const unused = Math.max(granted - totalUsedDays, 0);
+
+  const raw = (hourly * hpd) * unused;
+  const allowance = Math.floor(raw/10)*10;
+
+  document.getElementById('totalHours').value = totalHours.toFixed(2);
+  document.getElementById('totalUsedDays').value = totalUsedDays.toFixed(0);
+  document.getElementById('unusedDays').value = unused.toFixed(0);
+  document.getElementById('allowance').value = Math.round(allowance).toLocaleString();
+}
+document.querySelectorAll('input').forEach(el=> el.addEventListener('input', calc));
+calc();
+</script>
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+</body>
+</html>

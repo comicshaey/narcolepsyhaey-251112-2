@@ -1,0 +1,79 @@
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto,Noto Sans,Apple SD Gothic Neo,'Malgun Gothic',sans-serif}
+a{text-decoration:none;color:inherit}
+.shell{max-width:1100px;margin:0 auto;padding:20px}
+.site-header{background:#fff;border-bottom:1px solid #e8e8ef}
+.site-header h1{margin:0;font-size:28px}
+.sub{margin:.25rem 0 0;color:#000;font-size:14px}
+.site-footer{padding:24px 0;color:#000;border-top:1px solid #eee}
+.card{background:#fff;border:1px solid #e6e6f0;border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+h2{margin:0 0 12px;font-size:18px}
+.grid{display:grid;gap:12px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.grid.two,.grid.three{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:14px}
+input,select,button,textarea{font:inherit}
+input[type="text"],input[type="number"],input[type="time"],input[type="date"],select,textarea{
+  padding:10px 12px;border:1px solid #d9d9e3;border-radius:12px;background:#fff;outline:none
+}
+textarea{min-height:100px}
+input:disabled{background:#f6f7fb;color:#000}
+small{color:#000;font-weight:400}
+.row{display:flex;align-items:center}
+.between{justify-content:space-between}
+.gap{gap:8px}
+.btn{padding:10px 14px;border-radius:12px;border:1px solid #c9c9d4;background:#fff;cursor:pointer}
+.btn.primary{background:#2563eb;border-color:#2563eb;color:#fff}
+.btn.ghost{background:transparent}
+
+  /* 버튼 기본 디자인 */
+  .btn{
+    display:inline-block;
+    padding:12px 20px;
+    border-radius:10px;
+    text-decoration:none;
+    font-weight:600;
+    background:#000;
+    color:#fff;
+    border:none;
+    transition:0.2s;
+  }
+
+  /* 버튼 간격 */
+  .btn + .btn{margin-left:10px}
+
+  /* 마우스 올렸을 때 */
+  .btn:hover{
+    background:#222;
+    transform:translateY(-2px);
+  }
+
+  body{color:#111;background:#fff; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR","맑은 고딕",sans-serif}
+  h1{font-size:1.75rem; margin:18px 0 8px}
+  .muted{color:#555; font-size:0.95rem}
+  footer{margin:40px 0 20px; color:#333}
+
+.table-wrap{overflow:auto;border:1px solid #ececf3;border-radius:12px}
+table{border-collapse:collapse;min-width:980px;width:100%}
+th,td{border-bottom:1px solid #eee;padding:10px 12px;text-align:left;font-size:14px;vertical-align:middle}
+thead th{background:#fafafb;font-weight:700}
+tfoot td{background:#fafafb;font-weight:700}
+.numeric{text-align:right}
+.right{text-align:right}
+.center{text-align:center}
+.note{margin-top:8px;color:#000}
+.callout{margin:24px 0; padding:16px 18px; background:#f7fbff; border:1px solid #e4f0ff; border-radius:14px}
+.cardlink{display:block;padding:18px;border:1px solid #e6e6f0;border-radius:16px;transition:transform .06s ease, box-shadow .06s ease}
+.cardlink:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.kicker{font-size:12px;letter-spacing:.06em;color:#000;text-transform:uppercase;margin-bottom:6px}
+.footer-note{margin-top:6px;white-space:pre-line}
+
+
+/* === 모든 버튼(홈 포함) 검정색 통일 === */
+.btn, .btn-home, footer a.btn{
+  background:#000 !important;
+  color:#fff !important;
+  border:1px solid #000 !important;
+}
+.btn:hover{ filter:brightness(1.2); }

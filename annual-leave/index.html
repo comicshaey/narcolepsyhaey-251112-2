@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>교육공무직 연차 유급휴가 일수 계산기</title>
+<style>
+  :root{--gap:14px}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,'Malgun Gothic',sans-serif;line-height:1.55;color:#111;padding:20px;max-width:980px;margin:0 auto}
+  h1{font-size:28px;margin:0 0 12px}
+  h2{font-size:20px;margin:24px 0 8px}
+  .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  label{display:block;font-weight:600;margin:8px 0 4px}
+  input,select,button{font-size:15px}
+  input,select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px}
+  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+  .muted{color:#64748b;font-size:13px}
+  .btn{display:inline-block;background:#111;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;border:0;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border:1px solid #e5e7eb;padding:8px;text-align:center}
+  th{background:#f8fafc}
+  .stack{display:flex;flex-direction:column;gap:8px}
+  .exitem{border:1px dashed #e2e8f0;padding:10px;border-radius:10px;margin-top:8px}
+  @media (max-width: 900px){ .row,.row3{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<h1>교육공무직 연차 유급휴가 일수 계산기</h1>
+
+<!-- 1. 인적정보 및 근무형태 -->
+<div class="card">
+  <h2>① 인적정보 및 근무형태</h2>
+  <div class="row">
+    <div>
+      <label>구분</label>
+      <select id="type">
+        <option>상시근무자</option>
+        <option>방학중비상시근무자</option>
+      </select>
+    </div>
+    <div>
+      <label>최초임용일</label>
+      <input type="date" id="firstHire">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>근무지 유형</label>
+      <select id="grantOrg">
+        <option value="기관">기관 (1.1.일자 기준)</option>
+        <option value="학교">학교 (3.1.일자 기준)</option>
+      </select>
+    </div>
+    <div>
+      <label>소속기관명</label>
+      <input type="text" id="orgName" placeholder="예: 무적초등학교">
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>성명</label>
+      <input type="text" id="empName" placeholder="예: 김무적">
+    </div>
+    <div>
+      <label>직종</label>
+      <select id="jobSelect">
+        <option selected>교무행정사</option>
+        <option>유치원방과후교육사</option>
+        <option>장애유아지도사(유)</option>
+        <option>장애유아지도사(유)(단시간)</option>
+        <option>영양사</option>
+        <option>기숙사생활지도원</option>
+        <option>학교운동부지도자</option>
+        <option>교육복지사(학교)</option>
+        <option>전문상담사</option>
+        <option>건강실무사(유)</option>
+        <option>통학차량운전원</option>
+        <option>발명실무원</option>
+        <option>통학지도원(특수학교)</option>
+        <option>특수교육지도사</option>
+        <option>조리사</option>
+        <option>조리실무사</option>
+        <option>장애유아지도사(특)</option>
+        <option>장애유아지도사(특)(단시간)</option>
+        <option>직업지도사</option>
+        <option>학교치료사</option>
+        <option>초등돌봄전담사</option>
+        <option>학교도서관사서</option>
+        <option>학교도서관실무사</option>
+        <option>건강실무사</option>
+        <option>방과후전담사</option>
+        <option>영양사(기숙학교)</option>
+        <option>늘봄학교전담사</option>
+        <option>직접 입력</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div>
+      <label>직종 직접 입력</label>
+      <input type="text" id="jobCustom" placeholder="직접 입력" style="display:none">
+    </div>
+    <div>
+      <label>연차 부여 계산 기준일</label>
+      <input id="refDate" disabled>
+      <div class="muted">기간 종료일의 다음날 회계연도 기준 · 기관 1.1 / 학교 3.1</div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. 산정 대상기간 -->
+<div class="card">
+  <h2>② 산정 대상기간</h2>
+  <div class="row">
+    <div><label>대상기간 시작일자</label><input type="date" id="periodStart" value="2025-03-01"></div>
+    <div><label>대상기간 종료일자</label><input type="date" id="periodEnd" value="2026-02-28"></div>
+  </div>
+  <div class="row">
+    <div><label>여름방학 시작일자</label><input type="date" id="vac1Start"></div>
+    <div><label>여름방학 종료일자</label><input type="date" id="vac1End"></div>
+  </div>
+  <div class="row">
+    <div><label>겨울방학 시작일자</label><input type="date" id="vac2Start"></div>
+    <div><label>겨울방학 종료일자</label><input type="date" id="vac2End"></div>
+  </div>
+  <div class="row">
+    <div><label>결근 시작</label><input type="date" id="absStart"></div>
+    <div><label>결근 종료</label><input type="date" id="absEnd"></div>
+  </div>
+  <div class="row">
+    <div><label>방학중 출근일(여름, 일수)</label><input type="number" id="vac1Work" value="0" min="0"></div>
+    <div><label>방학중 출근일(겨울, 일수)</label><input type="number" id="vac2Work" value="0" min="0"></div>
+  </div>
+
+  <h3 style="margin-top:12px">제외기간 (여러 건 추가 가능)</h3>
+  <div id="exList"></div>
+  <button class="btn" id="addExBtn" type="button">+ 제외기간 추가</button>
+  <div class="muted">각 제외기간마다 사유/시작일자/종료일자를 입력하세요.</div>
+</div>
+
+<!-- 3. 자동 계산 결과 -->
+<div class="card">
+  <h2>③ 자동 계산 결과</h2>
+  <div class="row3">
+    <div><label>학기 총일수</label><input id="daysSemester" disabled><div class="muted">= 대상기간 - (여름+겨울 방학)</div></div>
+    <div><label>근무일수</label><input id="daysWorked" disabled><div class="muted">= 학기총일수 - (제외+결근) + 방중출근</div></div>
+    <div><label>방중출근 제외일수</label><input id="daysNoVacWork" disabled><div class="muted">= 학기총일수 - (제외+결근)</div></div>
+  </div>
+  <div class="row3" style="margin-top:12px">
+    <div><label>기본 연차</label><input id="baseLeave" disabled></div>
+    <div><label>근속 가산일</label><input id="extraLeave" disabled><div class="muted">= ⌊(근무연수-1)/2⌋</div></div>
+    <div><label>근무연수(년)</label><input id="years" disabled></div>
+  </div>
+
+  <h2 style="margin-top:18px">④ 연차휴가 산정 내역</h2>
+  <table>
+    <thead><tr><th>학기 총일수 기준</th><th>달력상 총일수 기준</th></tr></thead>
+    <tbody><tr><td id="ruleSemester">-</td><td id="ruleCalendar">-</td></tr></tbody>
+  </table>
+</div>
+
+<p><a class="btn" href="../index.html">메인으로 돌아가기</a></p>
+
+
+<script>
+function parseDate(id){var el=document.getElementById(id); var v=el?el.value:''; return v? new Date(v+'T00:00:00'): null;}
+function countDaysExcludingSaturday(start,end){ if(!start||!end) return 0; var cnt=0; for(var d=new Date(start); d<=end; d.setDate(d.getDate()+1)){ if(d.getDay()!==6) cnt++; } return cnt; }
+function yearsBetween(start,end){ if(!start||!end) return 0; var y=end.getFullYear()-start.getFullYear(); var a=new Date(start); a.setFullYear(start.getFullYear()+y); if(a>end) y--; return y; }
+
+function addEx(){
+  var box=document.getElementById('exList');
+  var wrap=document.createElement('div'); wrap.className='exitem';
+  wrap.innerHTML =
+    '<div class="row">'
+    +'<div><label>사유</label><input type="text" class="exReason" placeholder="예: 육아휴직"></div>'
+    +'<div><label>시작</label><input type="date" class="exStart"></div>'
+    +'</div>'
+    +'<div class="row">'
+    +'<div><label>종료</label><input type="date" class="exEnd"></div>'
+    +'<div style="display:flex;align-items:flex-end"><button class="btn delExBtn" type="button">삭제</button></div>'
+    +'</div>';
+  box.appendChild(wrap);
+  var del = wrap.querySelector('.delExBtn');
+  if(del){ del.addEventListener('click', function(){ wrap.remove(); calc(); }); }
+  var inputs = wrap.querySelectorAll('input');
+  for(var i=0;i<inputs.length;i++){ inputs[i].addEventListener('input', calc); }
+  calc();
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('addExBtn'); if(btn){ btn.addEventListener('click', addEx); }
+  // bind inputs
+  function bindAll(){
+    var fields=document.querySelectorAll('input,select');
+    for(var i=0;i<fields.length;i++){
+      if(!fields[i]._bound){
+        fields[i].addEventListener('input', calc);
+        fields[i].addEventListener('change', calc);
+        fields[i]._bound=true;
+      }
+    }
+  }
+  bindAll();
+  // observe for dynamic nodes
+  var obs=new MutationObserver(function(){ bindAll(); });
+  obs.observe(document.body,{childList:true,subtree:true});
+  calc();
+});
+
+// 직종 직접입력 토글
+(function(){
+  function toggle(){
+    var sel=document.getElementById('jobSelect');
+    var custom=document.getElementById('jobCustom');
+    if(!sel||!custom) return;
+    custom.style.display=(sel.value==='직접 입력')?'block':'none';
+  }
+  document.addEventListener('input', function(e){ if(e.target && e.target.id==='jobSelect'){ toggle(); } });
+  document.addEventListener('DOMContentLoaded', toggle);
+  window.addEventListener('load', toggle);
+})();
+
+function calc(){
+  var ps=parseDate('periodStart'), pe=parseDate('periodEnd');
+  var vac1s=parseDate('vac1Start'), vac1e=parseDate('vac1End');
+  var vac2s=parseDate('vac2Start'), vac2e=parseDate('vac2End');
+  var absS=parseDate('absStart'), absE=parseDate('absEnd');
+  var vac1Work=parseInt(document.getElementById('vac1Work').value||'0',10);
+  var vac2Work=parseInt(document.getElementById('vac2Work').value||'0',10);
+
+  var total=countDaysExcludingSaturday(ps, pe);
+  var vac1=countDaysExcludingSaturday(vac1s, vac1e);
+  var vac2=countDaysExcludingSaturday(vac2s, vac2e);
+  var excl=(function(){ var items=document.querySelectorAll('#exList .exitem'); var t=0; for(var i=0;i<items.length;i++){ var s=items[i].querySelector('.exStart'); var e=items[i].querySelector('.exEnd'); if(s&&e&&s.value&&e.value){ t+=countDaysExcludingSaturday(new Date(s.value+'T00:00:00'), new Date(e.value+'T00:00:00')); } } return t; })();
+  var abs=countDaysExcludingSaturday(absS, absE);
+  var semester=total-(vac1+vac2);
+  var daysNoVacWork=semester-excl-abs;
+  var worked=daysNoVacWork+vac1Work+vac2Work;
+
+  document.getElementById('daysSemester').value = semester||0;
+  document.getElementById('daysNoVacWork').value = daysNoVacWork||0;
+  document.getElementById('daysWorked').value = worked||0;
+
+  var type=document.getElementById('type').value;
+  var base=(type==='상시근무자')?15:12;
+
+  // 기준일: 종료일 다음날 연도의 1/1 또는 3/1
+  var peNext = (ps&&pe)? new Date(pe.getTime()+24*3600*1000) : null;
+  var targetYear = peNext? peNext.getFullYear() : (new Date()).getFullYear();
+  var grantOrg = document.getElementById('grantOrg').value;
+  var 기준일 = new Date(targetYear, grantOrg==='기관'?0:2, 1);
+  var firstHire=parseDate('firstHire');
+  var years=yearsBetween(firstHire, 기준일);
+  var extra= firstHire? Math.floor(Math.max(years-1,0)/2) : 0;
+
+  document.getElementById('baseLeave').value = base;
+  document.getElementById('years').value = years;
+  document.getElementById('extraLeave').value = extra;
+  if(기준일){ var yyyy=기준일.getFullYear(), mm=('0'+(기준일.getMonth()+1)).slice(-2), dd=('0'+기준일.getDate()).slice(-2); document.getElementById('refDate').value = yyyy+'.'+mm+'.'+dd; }
+
+  function ratio(a,b){ return (b>0)? (a/b) : 0; }
+  var semText='-';
+  if(type!=='상시근무자'){ var r1=ratio(worked, semester); var r2=ratio(worked, semester-excl); if(r1>=0.8){ semText=(base+extra)+' 일'; } else if(r1<0.8 && r2>=0.8){ semText=((base+extra)*(semester-excl)/semester).toFixed(2)+' 일 (비율부여)'; } else { semText='개근 월수만큼 부여'; } }
+  var r3=ratio(worked,total), r4=ratio(worked,total-excl); var calText='-';
+  if(r3>=0.8){ calText=(15+extra)+' 일'; } else if(r3<0.8 && r4>=0.8){ calText=((15+extra)*(total-excl)/total).toFixed(2)+' 일 (비율부여)'; } else { calText='개근 월수만큼 부여'; }
+  document.getElementById('ruleSemester').innerText = semText;
+  document.getElementById('ruleCalendar').innerText = calText;
+}
+</script>
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+</body>
+</html>

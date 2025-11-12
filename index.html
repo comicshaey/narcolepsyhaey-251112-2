@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>[구상 단계] 씩씩하고 귀여운 고주무관의 업무 효율화 웹페이지</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    .btn-desc{font-size:0.9rem; margin:6px 0 18px 0; color:#333}
+    .section{border:1px solid #e5e5e5; border-radius:12px; padding:16px 18px; margin:18px 0;}
+    .btn{display:inline-block; padding:10px 16px; border-radius:12px; border:1px solid #222; text-decoration:none; color:#111; font-weight:600;}
+    .btn + .btn{margin-left:10px}
+    body{color:#111;background:#fff; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR","맑은 고딕",sans-serif}
+    h1{font-size:1.75rem; margin:18px 0 8px}
+    .muted{color:#555; font-size:0.95rem}
+    footer{margin:40px 0 20px; color:#333}
+  </style>
+</head>
+<body>
+  <main class="container" style="max-width:880px; margin:0 auto; padding:24px 16px;">
+    <h1>[구상 단계] 씩씩하고 귀여운 고주무관의 업무 효율화 웹페이지</h1>
+    <p class="muted"> ·목표: 업무적으로 1인분을 하게 되면 2026.7월부터 본격적으로 개발 시작, 2027년 베타 테스트 및 배포. </p>
+
+    <!-- 교육공무직 연차 관련 업무 -->
+    <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">교육공무직 연차 업무 관련 기능</h2>
+      <div><a class="btn" href="/annual-leave/">교육공무직 연차 유급휴가 일수 계산기</a>
+        <div class="btn-desc">·C++ 실행 파일과 다른 양식. (완성도 괜찮음. 베타 테스트 가능)</div></div>
+      <div><a class="btn" href="/annual-leave-pay/">교육공무직 연차 유급휴가 미사용 수당 계산기</a>
+        <div class="btn-desc">·통상임금 계산기는 별도 (완성도 괜찮음. 베타 테스트 가능)</div></div>
+      <div><a class="btn" href="/ordinary-wage/">교육공무직 통상임금 계산기</a>
+        <div class="btn-desc">·직종별 보수표 반영 (완성도 괜찮음. 베타 테스트 가능)</div></div>
+    </section>
+
+    <!-- 기타 업무 (카테고리 미분류) -->
+    <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">기타 업무 관련 기능</h2>
+      <div><a class="btn" href="/coach-ot/">학교 운동부지도자 초과근무수당 계산기</a>
+        <div class="btn-desc">·출장과 훈련이 많은 운동부지도자… (완성도 없음. 추가 작업 필요.)</div></div>
+      <div><a class="btn" href="/wage-ledger-2025/">학교장 임용권자 2025 임금대장</a>
+        <div class="btn-desc">·엑셀 파일로 변환 저장 가능하게. (완성도 없음. 동적 페이지로 변경, 클라우드 서버 연결 필요)</div></div>
+      <div><a class="btn" href="/travel-audit/">관내여비 지급 내역 점검기</a>
+        <div class="btn-desc">·번외: 감사관님의 노가다를 줄여보자. (완성도 없음. 동적 페이지로 변경, 클라우드 서버 연결 필요)</div></div>
+    </section>
+
+    <!-- 개발자 노트 -->
+    <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">개발자 노트</h2>
+      <a class="btn" href="/dev-notes/">개발자 노트 보러가기</a>
+      <div class="btn-desc">·다수가 규정한 "정상성"의 범주에서 벗어나는, 울타리 바깥 구성원의 기록. <br />·조직 내 다양성은 불편과 갈등만 일으키는 게 아니라 개선과 발전도 불러온다.</div>
+    </section>
+
+    <!-- 업무 관련 툴 -->
+    <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">업무 관련 툴</h2>
+<div style="margin-bottom:10px">
+  <a class="btn" href="/calendar/">학년도별 업무 일정 모음</a>
+  <div class="btn-desc">·업무 일정 (월간 달력)</div>
+</div>
+
+      <div>
+        <a class="btn" href="/study-log/">업무 학습 일지 작성하기</a>
+        <div class="btn-desc">·2025.11.12.(수)~2025.12.31. 남은 과원 배치 기간 동안 업무 공부 많이 해두기</div>
+      </div>
+    </section>
+
+  </main>
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+  </footer>
+  <script src="/static/global-loader.js?v=1"></script>
+</body>
+</html>

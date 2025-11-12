@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>관내여비 자동 점검기 | 귀여운 고주무관</title>
+  <link rel="stylesheet" href="../static/style.css" onerror="this.remove();" />
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/isBetween.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/weekday.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+  <script>dayjs.extend(dayjs_plugin_isBetween); dayjs.extend(dayjs_plugin_weekday); dayjs.extend(dayjs_plugin_customParseFormat);</script>
+  <style>
+    :root { --bg:#ffffff; --fg:#111827; --muted:#6b7280; --primary:#111827; --card:#f9fafb; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans KR', Arial, sans-serif; color:var(--fg); background:var(--bg); }
+    header { padding:24px 16px; border-bottom:1px solid #e5e7eb; position:sticky; top:0; background:#fff; z-index:10; }
+    h1 { font-size:20px; margin:0 0 6px; }
+    .sub { color:var(--muted); font-size:13px; }
+    main { padding:16px; display:grid; gap:16px; grid-template-columns: 360px 1fr; }
+    @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
+    .panel { background:var(--card); border:1px solid #e5e7eb; border-radius:16px; padding:16px; }
+    label { display:block; font-weight:600; font-size:13px; margin-bottom:8px; }
+    input[type="file"], input[type="number"], input[type="text"], select { width:100%; padding:10px 12px; border-radius:12px; border:1px solid #e5e7eb; background:#fff; }
+    .row { display:grid; grid-template-columns:1fr; gap:12px; margin-bottom:12px; }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:12px; border:1px solid #e5e7eb; background:#fff; cursor:pointer; font-weight:600; }
+    .btn.primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .tag { font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid #e5e7eb; background:#fff; }
+    .tag.ok { border-color:#10b981; color:#065f46; }
+    .tag.warn { border-color:#fb923c; color:#9a3412; }
+    .tag.err { border-color:#ef4444; color:#991b1b; }
+    table { width:100%; border-collapse:separate; border-spacing:0; }
+    th, td { text-align:left; padding:10px 12px; border-bottom:1px solid #e5e7eb; font-size:13px; vertical-align:top; }
+    th { font-size:12px; color:var(--muted); font-weight:700; }
+    .chip { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; }
+    .chip.ok { background:#ecfdf5; color:#065f46; }
+    .chip.warn { background:#fff7ed; color:#9a3412; }
+    .chip.err { background:#fef2f2; color:#991b1b; }
+    .footer { color:#6b7280; font-size:12px; padding:12px 16px 24px; }
+    .cards { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+    .card { border:1px solid #e5e7eb; border-radius:12px; background:#fff; padding:12px; }
+    .scroll { overflow:auto; max-height:60vh; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .small { font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>관내여비 자동 점검기</h1>
+    <div class="sub">엑셀/CSV 자료를 업로드하면 브라우저에서 <b>오프라인</b>으로 규칙을 적용해 자동 검증합니다. (데이터는 외부 전송되지 않아요)</div>
+  </header>
+  <main>
+    <section class="panel" id="inputs">
+      <div class="row">
+        <label>1) 여비 집행 자료 (CSV 또는 XLSX)</label>
+        <input id="fileRecords" type="file" accept=".csv,.xlsx,.xls" />
+        <div class="small">필드 예시: claim_id, employee_id, employee_name, dept, date, start_time, end_time, origin, destination, km_claimed, amount_paid, expense_type, approver_name, approver_title, approval_date, notes, attachment_present</div>
+      </div>
+
+      <div class="row grid2">
+        <div>
+          <label>2) 기준 거리표 (선택)</label>
+          <input id="fileDistance" type="file" accept=".csv" />
+          <div class="small">origin, destination, expected_km</div>
+        </div>
+        <div>
+          <label>3) 공휴일 목록 (선택)</label>
+          <input id="fileHolidays" type="file" accept=".csv" />
+          <div class="small">date, name</div>
+        </div>
+      </div>
+
+      <div class="row grid2">
+        <div>
+          <label>4) 인사 정보 (선택)</label>
+          <input id="filePersonnel" type="file" accept=".csv" />
+          <div class="small">employee_id, position_grade, employment_type</div>
+        </div>
+        <div>
+          <label>대상 회계연도 (YYYY)</label>
+          <input id="fy" type="number" value="2025" />
+        </div>
+      </div>
+
+      <div class="row">
+        <label>규정/검증 옵션</label>
+        <div class="cards">
+          <div class="card">
+            <div class="small">금액 규칙</div>
+            <div class="row">
+              <div class="grid2">
+                <span><span class="small">기본 단가(원/㎞)</span><input id="ratePerKm" type="number" value="600" /></span>
+                <span><span class="small">반올림 단위(원)</span><input id="roundTo" type="number" value="10" /></span>
+              </div>
+              <div class="grid2">
+                <span><span class="small">허용 오차(±원)</span><input id="tolerance" type="number" value="100" /></span>
+                <span><span class="small">최소 인정거리(㎞)</span><input id="minKm" type="number" value="1" /></span>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="small">시간/중복 규칙</div>
+            <div class="row">
+              <div class="grid2">
+                <span><span class="small">최소 소요시간(분)</span><input id="minMinutes" type="number" value="20" /></span>
+                <span><span class="small">중복판정 시간여유(분)</span><input id="overlapGrace" type="number" value="10" /></span>
+              </div>
+              <label style="margin-top:8px"><input id="flagWeekend" type="checkbox" checked /> 주말/공휴일 청구 건 플래그</label>
+            </div>
+          </div>
+          <div class="card">
+            <div class="small">기타</div>
+            <div class="row">
+              <label><input id="requireApprover" type="checkbox" checked /> 결재자(이름/직위/일자) 누락 시 오류</label>
+              <label><input id="requireAttachment" type="checkbox" /> 증빙(첨부여부) 누락 시 경고</label>
+              <label><input id="enforceDistance" type="checkbox" /> 기준 거리표와 불일치 시 오류</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn primary" id="runBtn">검증 실행</button>
+        <button class="btn" id="exportBtn">결과 CSV 내보내기</button>
+        <a class="btn" href="../index.html">메인으로 돌아가기</a>
+      </div>
+
+      <div class="row">
+        <div class="small">샘플 파일: 
+          <a href="./sample_travel_records.csv" download>여비자료</a> · 
+          <a href="./sample_distance_table.csv" download>거리표</a> · 
+          <a href="./sample_holidays_2025.csv" download>공휴일</a> · 
+          <a href="./sample_personnel.csv" download>인사정보</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="row">
+        <div><span class="tag">총 건수 <b id="totalCnt">0</b></span> 
+             <span class="tag ok">정상 <b id="okCnt">0</b></span> 
+             <span class="tag warn">경고 <b id="warnCnt">0</b></span> 
+             <span class="tag err">오류 <b id="errCnt">0</b></span></div>
+        <div class="row">
+          <input id="q" type="text" placeholder="검색: 이름, 부서, 출발/도착, 메모 등" />
+        </div>
+      </div>
+      <div class="scroll">
+        <table id="resultTbl">
+          <thead>
+            <tr>
+              <th>상태</th>
+              <th>일자</th>
+              <th>성명</th>
+              <th>부서</th>
+              <th>출발→도착</th>
+              <th>시간</th>
+              <th>km</th>
+              <th>지급액</th>
+              <th>메모</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+<script>
+async function readFile(file) {
+  const name = file.name.toLowerCase();
+  if (name.endsWith('.csv')) {
+    return new Promise((resolve, reject) => {
+      Papa.parse(file, { header:true, skipEmptyLines:true, complete: r => resolve(r.data), error: reject });
+    });
+  } else {
+    if (!window.XLSX) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+        s.onload = res; s.onerror = () => rej(new Error('XLSX CDN 로드 실패'));
+        document.head.appendChild(s);
+      });
+    }
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type:'array' });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const json = XLSX.utils.sheet_to_json(ws, { defval:'' });
+        resolve(json);
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
+}
+
+function roundTo(value, unit) { if (!unit || unit <= 0) return Math.round(value); return Math.round(value / unit) * unit; }
+function money(n) { return Number(n || 0).toLocaleString('ko-KR'); }
+const state = { records: [], distance: [], holidays: [], personnel: [], results: [] };
+
+document.getElementById('runBtn').addEventListener('click', async () => {
+  const recordsFile = document.getElementById('fileRecords').files[0];
+  if (!recordsFile) return alert('여비 집행 자료 파일을 선택하세요.');
+  state.records = await readFile(recordsFile);
+  if (document.getElementById('fileDistance').files[0]) state.distance = await readFile(document.getElementById('fileDistance').files[0]);
+  if (document.getElementById('fileHolidays').files[0]) state.holidays = await readFile(document.getElementById('fileHolidays').files[0]);
+  if (document.getElementById('filePersonnel').files[0]) state.personnel = await readFile(document.getElementById('filePersonnel').files[0]);
+  runValidation();
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (!state.results.length) return alert('내보낼 결과가 없습니다. 먼저 검증을 실행하세요.');
+  const header = Object.keys(state.results[0]).join(',');
+  const rows = state.results.map(r => Object.values(r).map(v => `"${String(v).replaceAll('"','""')}"`).join(','));
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'travel_audit_results.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+
+document.getElementById('q').addEventListener('input', renderTable);
+
+function getHolidaySet() {
+  const set = new Set();
+  for (const h of state.holidays) { if (h.date) set.add(String(h.date).trim()); }
+  return set;
+}
+function isWeekend(d) { const wd = d.day(); return wd === 0 || wd === 6; }
+function findDistance(origin, destination) {
+  if (!state.distance.length) return null;
+  const row = state.distance.find(r => String(r.origin).trim() === String(origin).trim() && String(r.destination).trim() === String(destination).trim());
+  return row ? Number(row.expected_km || 0) : null;
+}
+function byKey(obj, k) { return (obj && obj[k] != null) ? String(obj[k]).trim() : ''; }
+
+function runValidation() {
+  const fy = Number(document.getElementById('fy').value || 0);
+  const ratePerKm = Number(document.getElementById('ratePerKm').value || 0);
+  const roundToWon = Number(document.getElementById('roundTo').value || 10);
+  const tol = Number(document.getElementById('tolerance').value || 0);
+  const minKm = Number(document.getElementById('minKm').value || 0);
+  const minMinutes = Number(document.getElementById('minMinutes').value || 0);
+  const overlapGrace = Number(document.getElementById('overlapGrace').value || 0);
+  const flagWeekend = document.getElementById('flagWeekend').checked;
+  const requireApprover = document.getElementById('requireApprover').checked;
+  const requireAttachment = document.getElementById('requireAttachment').checked;
+  const enforceDistance = document.getElementById('enforceDistance').checked;
+
+  const holidays = getHolidaySet();
+  const byEmpDate = new Map();
+
+  state.results = state.records.map(raw => {
+    const claim_id = byKey(raw, 'claim_id') || '';
+    const employee_id = byKey(raw, 'employee_id');
+    const employee_name = byKey(raw, 'employee_name');
+    const dept = byKey(raw, 'dept');
+    const dateStr = byKey(raw, 'date');
+    const start_time = byKey(raw, 'start_time');
+    const end_time = byKey(raw, 'end_time');
+    const origin = byKey(raw, 'origin');
+    const destination = byKey(raw, 'destination');
+    const km_claimed = Number(raw.km_claimed || raw['km_claimed(㎞)'] || 0);
+    const amount_paid = Number(raw.amount_paid || raw['amount_paid(원)'] || 0);
+    const approver_name = byKey(raw, 'approver_name');
+    const approver_title = byKey(raw, 'approver_title');
+    const approval_date = byKey(raw, 'approval_date');
+    const notes = byKey(raw, 'notes');
+    const attachment_present = String(byKey(raw, 'attachment_present')).toLowerCase();
+
+    const issues = [];
+    const d = dayjs(dateStr, ['YYYY-MM-DD','YYYY/M/D','YYYY.M.D','YYYYMMDD']);
+    if (!employee_id || !employee_name || !dateStr || !origin || !destination) issues.push({level:'err', msg:'필수 항목 누락(사번/성명/일자/출발/도착)'});
+    if (!d.isValid()) issues.push({level:'err', msg:'일자 형식 오류'});
+    else if (fy && d.year() !== fy) issues.push({level:'warn', msg:`회계연도(${fy}) 외 일자`});
+
+    const start = dayjs(`${d.format('YYYY-MM-DD')} ${start_time}`, ['YYYY-MM-DD HH:mm','YYYY-MM-DD H:mm'], true);
+    const end = dayjs(`${d.format('YYYY-MM-DD')} ${end_time}`, ['YYYY-MM-DD HH:mm','YYYY-MM-DD H:mm'], true);
+    if (start.isValid() && end.isValid()) {
+      const minutes = end.diff(start, 'minute');
+      if (minutes < minMinutes) issues.push({level:'warn', msg:`최소 소요시간 미달(${minutes}분)`});
+      const key = `${employee_id}__${d.format('YYYY-MM-DD')}`;
+      if (!byEmpDate.has(key)) byEmpDate.set(key, []);
+      byEmpDate.get(key).push({claim_id, start, end});
+    } else {
+      issues.push({level:'warn', msg:'시간(시:분) 확인 필요'});
+    }
+
+    if (km_claimed < minKm) issues.push({level:'warn', msg:`최소 인정거리 미만(${km_claimed}km)`});
+    const expected_km = findDistance(origin, destination);
+    if (enforceDistance && expected_km != null && Math.abs(km_claimed - expected_km) > 0.5) issues.push({level:'err', msg:`거리표와 불일치(청구 ${km_claimed}km ≠ 기준 ${expected_km}km)`});
+    const computed = roundTo(km_claimed * ratePerKm, roundToWon);
+    if (Math.abs(amount_paid - computed) > tol) issues.push({level:'err', msg:`지급액 불일치(지급 ${money(amount_paid)}원 ≠ 계산 ${money(computed)}원, 허용±${tol}원)`});
+
+    const isWE = d.isValid() && (d.day()===0 || d.day()===6 || holidays.has(d.format('YYYY-MM-DD')));
+    if (flagWeekend && isWE) issues.push({level:'warn', msg:'주말/공휴일 청구(사유 확인 필요)'});
+
+    if (requireApprover && (!approver_name || !approver_title || !approval_date)) issues.push({level:'err', msg:'결재 정보 누락'});
+    if (requireAttachment && !(attachment_present == 'true' or attachment_present == '1' or attachment_present == 'y')) issues.push({level:'warn', msg:'증빙(첨부) 미확인'});
+
+    const level = issues.some(i=>i.level==='err') ? 'err' : (issues.some(i=>i.level==='warn') ? 'warn' : 'ok');
+    return {
+      claim_id, level,
+      date: d.isValid()? d.format('YYYY-MM-DD'): dateStr,
+      employee_name, dept,
+      route: f"{origin} → {destination}",
+      time: f"{start_time}-{end_time}",
+      km_claimed, amount_paid,
+      issues: " | ".join([f"[{i['level']}] {i['msg']}" for i in issues]),
+      notes
+    };
+  });
+
+  const grace = Number(document.getElementById('overlapGrace').value || 0);
+  for (const [key, slots] of byEmpDate) {
+    slots.sort((a,b)=>a.start.valueOf()-b.start.valueOf());
+    for (let i=0;i<slots.length-1;i++) {
+      const a=slots[i], b=slots[i+1];
+      if (a.end.add(grace, 'minute').isAfter(b.start)) {
+        for (const target of [a.claim_id, b.claim_id]) {
+          const row = state.results.find(r=>r.claim_id===target);
+          if (row) {
+            row.level = (row.level==='err')?'err':'warn';
+            row.issues = (row.issues? row.issues+' | ': '') + `[warn] 동일일자 시간 중복(여유 ${grace}분)`;
+          }
+        }
+      }
+    }
+  }
+
+  renderTable();
+}
+
+function renderTable() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const tbody = document.querySelector('#resultTbl tbody');
+  tbody.innerHTML = '';
+  let total=0, ok=0, warn=0, err=0;
+  for (const r of state.results) {
+    if (q) {
+      const hay = `${r.employee_name} ${r.dept} ${r.route} ${r.issues} ${r.notes}`.toLowerCase();
+      if (!hay.includes(q)) continue;
+    }
+    total++; if (r.level==='ok') ok++; else if (r.level==='warn') warn++; else err++;
+    const tr = document.createElement('tr');
+    const lvl = r.level;
+    tr.innerHTML = `
+      <td><span class="chip ${lvl}">${lvl.toUpperCase()}</span></td>
+      <td class="mono">${r.date}</td>
+      <td>${r.employee_name||''}</td>
+      <td>${r.dept||''}</td>
+      <td>${r.route||''}</td>
+      <td class="mono">${r.time||''}</td>
+      <td class="mono">${r.km_claimed}</td>
+      <td class="mono">${money(r.amount_paid)}</td>
+      <td>${r.issues}${r.notes? ' | 메모: '+r.notes : ''}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+  document.getElementById('totalCnt').textContent = total;
+  document.getElementById('okCnt').textContent = ok;
+  document.getElementById('warnCnt').textContent = warn;
+  document.getElementById('errCnt').textContent = err;
+}
+</script>
+
+
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+
+  
+</body>
+</html>

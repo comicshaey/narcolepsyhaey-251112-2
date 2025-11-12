@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>학년도별 월간 업무 일정 달력</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <style>
+    :root{--black:#111;--line:#e5e5e5;--sun:#c8352d;--sat:#1e5fbf}
+    *{box-sizing:border-box}
+    body{margin:0;background:#fff;color:#111;font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif}
+    .wrap{max-width:1060px;margin:24px auto;padding:0 16px}
+    h1{font-size:1.35rem;margin:0 0 10px}
+    .muted{color:#666;font-size:.92rem;margin:0 0 14px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--black);text-decoration:none;color:#fff;background:#111;font-weight:800}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0 14px}
+    .month{margin:18px 0 12px;position:sticky;top:0;background:#fff;padding:6px 0;z-index:5;border-bottom:1px solid #f1f1f1}
+    .month h2{font-size:1.15rem;margin:0}
+    .grid{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:22px}
+    .row{display:grid;grid-template-columns:repeat(7,1fr)}
+    .head{background:#fafafa;font-weight:900;text-align:center;padding:10px 8px;border-bottom:1px solid var(--line)}
+    .cell{min-height:120px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:8px;display:flex;flex-direction:column;gap:6px}
+    .cell:nth-child(7n){border-right:none}
+    .date{font-size:.9rem;font-weight:900;margin-bottom:2px}
+    .txt{flex:1;min-height:0;white-space:pre-wrap;line-height:1.35;overflow:auto;overflow-wrap:anywhere;padding-right:2px}
+    .row:first-child > .head:nth-child(1){ color:var(--sun) }
+    .row:first-child > .head:nth-child(7){ color:var(--sat) }
+    .row:not(:first-child) > .cell:nth-child(1) .date{ color:var(--sun) }
+    .row:not(:first-child) > .cell:nth-child(7) .date{ color:var(--sat) }
+
+    .bottom-nav{display:flex;justify-content:center;gap:12px;margin:30px 0}
+    footer{margin:12px 0 8px;text-align:center;color:#555;font-size:.9rem}
+    @media print{ .toolbar{display:none} .bottom-nav{display:none} .wrap{max-width:none} .month{position:static} .txt{overflow:visible} }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 상단 버튼 영역 -->
+    <div class="toolbar" style="justify-content:space-between">
+      <a class="btn" href="/"> 메인으로 돌아가기</a>
+      <a class="btn" href="/calendar/">학년도별 모음으로</a>
+      <button onclick="window.print()" class="btn">인쇄/PDF</button>
+    </div>
+
+    <h1 id="title">학년도별 월간 업무 일정 달력</h1>
+    <p class="muted" id="rangeText">기간: 자동 계산 중…</p>
+
+    <!-- 달력 본문 -->
+    <div id="root"></div>
+
+    <!-- 하단 버튼 (꼬리말 위에 위치) -->
+    <div class="bottom-nav">
+      <a class="btn" href="/calendar/">학년도별 모음으로</a>
+      <a class="btn" href="/">메인으로 돌아가기</a>
+    </div>
+
+    <!-- 꼬리말 -->
+    <footer>
+      제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+    </footer>
+  </div>
+
+  <script>
+    const q = new URLSearchParams(location.search)
+    const START_YM = q.get('start') || '2025-03'
+    const COUNT    = Math.max(1, Math.min(36, parseInt(q.get('months')||'12',10)))
+    const CUSTOM_TITLE = q.get('title') || ''
+
+    const NOTES = {
+      '2025-11-10': '사회보험료 납부',
+      '2025-11-11': '세무서 방문(출장)',
+      '2025-11-12': '9:50 소방훈련, 인건비 17일자로 미리 지출결의, 테니스부 수익자부담금 징수결의',
+      '2025-11-13': '산업안전보건 온라인교육 신청 마감, 유치원 특수교육지도사 방학근무 편람 확인',
+      '2025-11-17': '실장님 안 계심, 학교장임용 인건비 지급명령 교육금고, 세외 개인부담금 수납처리',
+      '2025-11-18': '퇴직예정자 준비 교육 중간 점검 제출',
+      '2025-11-19': '교육공무직 총파업',
+      '2025-11-20': '조리종사원 파업',
+      '2025-11-21': '유치원 시기간제 4분기 인건비 신청 (명절휴가비, 퇴직금, 정근수당 신청)',
+      '2025-11-24': '산업안전보건 교육 이수 결과 제출', 
+      '2025-11-28': '출입문 개폐전담원 인건비 지출, 운동부지도자 계약종료 서면 통지 법정 기간 마감일',
+      '2025-12-02': '늘봄학교 11월 강사료 지출',
+      '2025-12-08': '1:30~4시 학교회계 담당자 역량강화 연수',
+      '2025-12-09': '원천세 신고(홈택스, 위택스)',
+      '2025-12-10': '법정의무교육 직무연수2 교육신청 마감일',
+      '2025-12-30': '병설유치원 겨울방학식 (방과후 미운영)',
+      '2025-12-31': '출입문개폐원 인건비 지출',
+      '2026-01-02': '초등학교 겨울방학식',
+    }
+
+    const root = document.getElementById('root')
+    const rangeText = document.getElementById('rangeText')
+    const h1 = document.getElementById('title')
+    if(CUSTOM_TITLE) h1.textContent = CUSTOM_TITLE
+
+    const pad = n => (n<10?'0':'')+n
+    const ymd = (y,m,d) => `${y}-${pad(m)}-${pad(d)}`
+    const ymToDate = ym => { const [y,m]=ym.split('-').map(Number); return new Date(y, m-1, 1) }
+    const addMonths = (d,n) => new Date(d.getFullYear(), d.getMonth()+n, 1)
+    const escapeHtml = s => (s||'').replace(/[&<>"]/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;'}[m]))
+    const wdK = w => ['일','월','화','수','목','금','토'][w]
+
+    ;(function setRangeText(){
+      const start = ymToDate(START_YM)
+      const startWeek = wdK(start.getDay())
+      const endBase = addMonths(start, COUNT-1)
+      const end = new Date(endBase.getFullYear(), endBase.getMonth()+1, 0)
+      const endWeek = wdK(end.getDay())
+      rangeText.textContent = `기간: ${start.getFullYear()}.${start.getMonth()+1}.1.(${startWeek}) ~ ${end.getFullYear()}.${end.getMonth()+1}.${end.getDate()}.(${endWeek}) · ${COUNT}개월`
+    })()
+
+    function renderMonth(y,m){
+      const first = new Date(y,m-1,1)
+      const last  = new Date(y,m,0)
+      const start = first.getDay()
+      const weeks = Math.ceil((start + last.getDate())/7)
+      const monthEl = document.createElement('section')
+      monthEl.className = 'month'
+      monthEl.innerHTML = `<h2>${y}년 ${m}월</h2>`
+      root.appendChild(monthEl)
+      const grid = document.createElement('div')
+      grid.className = 'grid'
+      root.appendChild(grid)
+      const days = ['일','월','화','수','목','금','토']
+      let html = `<div class="row">${days.map(d=>`<div class="head">${d}</div>`).join('')}</div>`
+      let day = 1 - start
+      for(let w=0; w<weeks; w++){
+        html += '<div class="row">'
+        for(let i=0;i<7;i++,day++){
+          const inMonth = day>=1 && day<=last.getDate()
+          const key = inMonth ? ymd(y,m,day) : ''
+          const text = inMonth ? (NOTES[key]||'') : ''
+          html += `<div class="cell">`
+          html += `<div class="date">${inMonth?day:''}</div>`
+          html += `<div class="txt">${escapeHtml(text)}</div>`
+          html += `</div>`
+        }
+        html += '</div>'
+      }
+      grid.innerHTML = html
+    }
+
+    ;(function renderRange(){
+      const start = ymToDate(START_YM)
+      for(let i=0;i<COUNT;i++){
+        const d = addMonths(start, i)
+        renderMonth(d.getFullYear(), d.getMonth()+1)
+      }
+    })()
+  </script>
+</body>
+</html>

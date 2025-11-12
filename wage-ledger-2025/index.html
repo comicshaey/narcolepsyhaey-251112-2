@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>학교장 임용권자 2025학년도 임금대장</title>
+  <link rel="icon" href="../static/favicon.png">
+  <link rel="stylesheet" href="/static/style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script defer src="./script.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="shell">
+    <h1>학교장 임용권자 2025학년도 임금대장</h1>
+    <p class="sub">지급/공제 항목을 입력하고 엑셀로 내보내기</p>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="card">
+    <h2>1) 기본 정보</h2>
+    <div class="grid three">
+      <label>기관명<input id="org" type="text" placeholder="예: ○○초등학교"></label>
+      <label>작성월<input id="month" type="month" value="2025-03"></label>
+      <label>담당자 메모<textarea id="memo" placeholder="비고/메모"></textarea></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <h2>2) 임금대장 입력</h2>
+      <div class="row gap">
+        <button id="addRow" class="btn">행 추가</button>
+        <button id="clearRows" class="btn ghost">모두 지우기</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table id="wageTable">
+        <thead>
+          <tr>
+            <th>성명</th><th>직종/직급</th>
+            <th>기본급</th><th>정액급식비</th><th>직책수당</th><th>가족수당</th><th>교통비</th><th>시간외수당</th><th>휴일·야간</th>
+            <th>기타지급</th>
+            <th>건강보험</th><th>국민연금</th><th>고용보험</th><th>소득세</th><th>지방소득세</th><th>기타공제</th>
+            <th>지급합계</th><th>공제합계</th><th>차인지급액</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="16" class="right">합계</td>
+            <td id="sum_pay" class="numeric">0</td>
+            <td id="sum_ded" class="numeric">0</td>
+            <td id="sum_net" class="numeric">0</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>내보내기</h2>
+    <div class="row gap">
+      <button id="exportExcel" class="btn primary">엑셀로 다운로드</button>
+      <a class="btn" href="../">메인으로 돌아가기</a>
+    </div>
+  </section>
+</main>
+
+<footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+
+</body>
+</html>

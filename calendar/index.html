@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>학년도별 월간 업무 일정 달력</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <style>
+    :root{--black:#111}
+    *{box-sizing:border-box}
+    body{margin:0;background:#fff;color:#111;font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif}
+    .wrap{max-width:880px;margin:24px auto;padding:0 16px}
+    h1{font-size:1.35rem;margin:0 0 10px}
+    .desc{color:#555;margin-bottom:14px}
+    .card{border:1px solid #e5e5e5;border-radius:14px;padding:16px 16px 14px;margin:12px 0}
+    .btn{display:inline-block;padding:10px 14px;border-radius:12px;border:1px solid var(--black);text-decoration:none;color:#fff;background:#111;font-weight:800}
+    .btn + .btn{margin-left:8px}
+    header, footer{display:flex;justify-content:space-between;align-items:center;gap:8px}
+    footer{margin:18px 0 8px;color:#555}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <p class="desc">·학년도별(당해년도 3월 ~익년도 2월) 월간 달력 모음</p>
+
+    <div class="card">
+      <h2 style="font-size:1.1rem;margin:0 0 8px">학년도 선택</h2>
+      <p class="desc" style="margin:0 0 10px">·2025.11월~</p>
+      <a class="btn" href="/calendar/calendar-academic.html?start=2025-11&months=04&title=2025학년도">2025학년도 (잔여 기간)</a>
+      <a class="btn" href="/calendar/calendar-academic.html?start=2026-03&months=12&title=2026학년도">2026학년도 (12개월) </a>
+      <a class="btn" href="/calendar/calendar-academic.html?start=2027-03&months=12&title=2027학년도">2027학년도(12개월) </a>
+    </div>
+    
+    <a class="btn" href="/">메인으로 돌아가기</a>
+  
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>운동부지도자 초과근무수당 계산기</title>
+  <link rel="icon" href="../static/favicon.png">
+  <link rel="stylesheet" href="../static/style.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script defer src="./script.js"></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="shell">
+    <h1>운동부지도자 초과근무수당 계산기</h1>
+    <p class="sub">법내/법외·휴일·야간 가중치 설정 가능</p>
+  </div>
+</header>
+
+<main class="shell">
+  <section class="card">
+    <h2>1) 기본 정보</h2>
+    <div class="grid three">
+      <label>소속<input id="org" type="text" placeholder="예: ○○학교"></label>
+      <label>성명<input id="name" type="text" placeholder="예: 홍길동"></label>
+      <label>직종/직무<input id="job" type="text" placeholder="예: 운동부지도자"></label>
+
+      <label>월 급여(기본급, 원)<input id="base" type="number" min="0" step="1"></label>
+      <label>정액급식비(원)<input id="meal" type="number" min="0" step="1"></label>
+      <label>명절휴가비(연간, 원)<input id="holiday" type="number" min="0" step="1"></label>
+
+      <label>정기상여금(연간, 원)<input id="bonus" type="number" min="0" step="1"></label>
+      <label>통상임금(시급, 원)
+        <input id="ordinaryWage" type="text" disabled>
+        <small>(기본급 + 급식비 + 명절/12 + 상여/12) ÷ 209</small>
+      </label>
+      <div></div>
+
+      <label>주당 근무시간(시간 단위)<input id="weeklyHours" type="number" step="0.5" value="37.5"></label>
+      <label>연가·조퇴 등(시간 단위)<input id="leaveHours" type="number" step="0.5" value="0"></label>
+      <label>무급 휴게시간 추가(분 단위)<input id="unpaidBreakMin" type="number" step="5" value="0"></label>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2) 가중치 설정</h2>
+    <div class="grid three">
+      <label>법내(평일) 배수<input id="mul_internal" type="number" step="0.1" value="1.0"></label>
+      <label>법외(평일/토) 배수<input id="mul_external" type="number" step="0.1" value="1.5"></label>
+      <label>휴일(일/공휴) 배수<input id="mul_holiday" type="number" step="0.1" value="1.5"></label>
+
+      <label>야간 추가 가산(+배수)<input id="night_extra" type="number" step="0.1" value="1.5"></label>
+      <label>야간 시작(시:분)<input id="night_start" type="time" value="22:00"></label>
+      <label>야간 종료(시:분)<input id="night_end" type="time" value="06:00"></label>
+    </div>
+    <div class="note">일요일은 자동으로 법외 연장근무로 분류됩니다. 필요 시 체크박스로 수정하세요.</div>
+  </section>
+
+  <section class="card">
+    <div class="row between">
+      <h2>3) 초과근무 내역</h2>
+      <div class="row gap">
+        <button id="addRow" class="btn">행 추가</button>
+        <button id="clearRows" class="btn ghost">모두 지우기</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table id="otTable" class="sheetlike">
+        <thead>
+          <tr>
+            <th>일자</th><th>요일</th><th>구분</th><th>휴일</th>
+            <th>시작</th><th>종료</th><th>총시간</th><th>야간시간</th>
+            <th>배수</th><th>금액(원)</th><th>비고</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <td colspan="6" class="right">합계</td>
+            <td id="sum_totalH" class="numeric">0.00</td>
+            <td id="sum_nightH" class="numeric">0.00</td>
+            <td></td>
+            <td id="sum_pay" class="numeric">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>4) 결과/내보내기</h2>
+    <div class="grid two">
+      <label>평일 실근로(주당, 시간)<input id="actualWeeklyHours" type="text" disabled></label>
+      <label>예상 수당 총액(원)<input id="estPay" type="text" disabled></label>
+    </div>
+    <div class="row gap">
+      <button id="exportExcel" class="btn primary">엑셀 파일로 다운로드</button>
+      <a class="btn" href="../">메인으로 돌아가기</a>
+    </div>
+  </section>
+</main>
+
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+</footer>
+
+</body>
+</html>
