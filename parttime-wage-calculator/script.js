@@ -1,5 +1,4 @@
-
-
+// /static/script.js
 // ===== 유틸 =====
 const $ = (sel) => document.querySelector(sel)
 
