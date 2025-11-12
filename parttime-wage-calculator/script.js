@@ -1,6 +1,11 @@
-// 숫자 표시 포맷 (원 단위 절삭)
-function fmt(n){return Math.floor(Number(n)).toLocaleString('ko-KR')}
+
+// 숫자 표시 포맷 (십원 단위 절삭)
+function fmt(n){
+  const tenWon = Math.floor(Number(n) / 10) * 10
+  return tenWon.toLocaleString('ko-KR')
+}
 function val(id){return Number(document.getElementById(id).value||0)}
+
 function calc(){
   const start = new Date(document.getElementById('startDate').value)
   const end = new Date(document.getElementById('endDate').value)
