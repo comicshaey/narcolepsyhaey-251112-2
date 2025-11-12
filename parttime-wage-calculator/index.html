@@ -5,28 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>단시간 근로자 인건비 계산기</title>
 
-  <style>
-  :root{--gap:14px}
-  *{box-sizing:border-box}
-  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,'Malgun Gothic',sans-serif;line-height:1.55;color:#111;padding:20px;max-width:980px;margin:0 auto}
-  h1{font-size:28px;margin:0 0 12px}
-  h2{font-size:20px;margin:24px 0 8px}
-  .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
-  label{display:block;font-weight:600;margin:8px 0 4px}
-  input,select,button{font-size:15px}
-  input,select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px}
-  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
-  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
-  .muted{color:#64748b;font-size:13px}
-  .btn{display:inline-block;background:#111;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;border:0;cursor:pointer}
-  table{width:100%;border-collapse:collapse;margin-top:8px}
-  th,td{border:1px solid #e5e7eb;padding:8px;text-align:center}
-  th{background:#f8fafc}
-  .stack{display:flex;flex-direction:column;gap:8px}
-  .exitem{border:1px dashed #e2e8f0;padding:10px;border-radius:10px;margin-top:8px}
-  @media (max-width: 900px){ .row,.row3{grid-template-columns:1fr} }
-</style>
-  
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="/static/script.js" defer></script>
@@ -41,7 +19,7 @@
       padding: 0;
     }
     main {
-      max-width: 720px;   /* 📏 폭 줄임 */
+      max-width: 720px;
       margin: 20px auto;
       padding: 0 16px;
     }
@@ -96,6 +74,7 @@
       font-size: 1rem;
     }
     button:hover { opacity: 0.9; }
+
     .result-box {
       background: #f8f8f8;
       border-radius: 10px;
@@ -108,7 +87,7 @@
       font-size: 1.05rem;
     }
 
-    /* ✅ 메인으로 돌아가기 버튼 */
+    /* 메인으로 돌아가기 버튼 */
     .btn-home {
       display: inline-block;
       margin-top: 20px;
@@ -190,8 +169,9 @@
       <div class="result-box">
         <div>기본급: <span id="outBase">0</span> 원</div>
         <div>주휴수당: <span id="outJhu">0</span> 원</div>
-        <div>총액: <span id="outTotal">0</span> 원</div>
+        <div>기관부담금: <span id="outInst">0</span> 원</div>
         <hr style="margin:10px 0;" />
+        <div>총액: <span id="outTotal">0</span> 원</div>
         <div>예산 잔액: <span id="outRemain">0</span> 원</div>
         <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
       </div>
