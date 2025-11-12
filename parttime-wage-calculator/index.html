@@ -1,12 +1,15 @@
-
 <!doctype html>
 <html lang="ko">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>단시간 근로계약자 인건비 계산기</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <!-- 사이트 공통 스타일 있으면 유지 -->
   <link rel="stylesheet" href="/static/style.css" />
+
   <style>
+    /* ===== 페이지 기본 ===== */
     body{font-family:system-ui,apple-system,sans-serif;background:#fff;color:#111;}
     .wrap{max-width:960px;margin:24px auto;padding:0 12px}
     .h1{font-size:1.5rem;font-weight:700;margin:8px 0 16px}
@@ -15,12 +18,42 @@
     label{font-size:0.95rem}
     input,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px}
     .btn{display:inline-block;padding:10px 16px;border-radius:12px;border:1px solid #111;text-decoration:none;color:#111;font-weight:600;cursor:pointer;}
-    .table{width:100%;border-collapse:collapse;font-size:0.95rem;margin-top:10px;table-layout:fixed;}
-    .table th,.table td{border:1px solid #e5e5e5;padding:8px;text-align:center;word-wrap:break-word;}
-    .table th{background:#f7f7f7}
-    .table input[type="number"]{width:80px;max-width:100%;box-sizing:border-box;text-align:right;}
-    .warn{color:#c00;font-weight:700}
     .muted{color:#555;font-size:0.9rem}
+
+    /* ===== 테이블(넘침 방지/태블릿 대응) ===== */
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:0.95rem;
+      margin-top:10px;
+      table-layout:fixed;   /* 셀 폭 균등 분배 */
+    }
+    .table th,.table td{
+      border:1px solid #e5e5e5;
+      padding:6px;          /* 패딩 살짝 줄여 넘침 방지 */
+      text-align:center;
+      word-wrap:break-word;
+    }
+    /* 입력칸이 셀 밖으로 안 튀도록 */
+    .table input[type="number"]{
+      width:100%;           /* 셀 기준 */
+      max-width:70px;       /* 데스크톱 상한 */
+      box-sizing:border-box;
+      text-align:right;
+      padding:4px 6px;
+      margin:0 auto;        /* 셀 내부 가운데 정렬 */
+      display:block;
+    }
+    /* 모바일/태블릿에서 더 타이트하게 */
+    @media (max-width:768px){
+      .table input[type="number"]{
+        max-width:60px;
+        font-size:0.9rem;
+      }
+    }
+
+    /* 표가 작게라도 튀면 가로 스크롤 허용 */
+    .section.table-wrap{ overflow-x:auto; }
   </style>
 </head>
 <body>
@@ -54,46 +87,62 @@
         </div>
         <div>
           <label>자원봉사 시간 유급처리(Y/N)</label>
-          <select id="volPaid"><option value="N">N</option><option value="Y">Y</option></select>
+          <select id="volPaid">
+            <option value="N">N</option>
+            <option value="Y">Y</option>
+          </select>
         </div>
         <div>
           <label>주당 자원봉사 시간</label>
-          <input id="volHours" type="number" value="0" />
+          <input id="volHours" type="number" value="0" step="0.5" min="0" />
         </div>
       </div>
 
       <h3 style="margin-top:20px;">주간 근무 요일 및 하루 근무 시간</h3>
-      <table class="table">
-        <thead><tr><th>요일</th><th>근무여부</th><th>하루 근무시간</th></tr></thead>
-        <tbody>
-          <tr><td>월</td><td><input type="checkbox" id="mon"></td><td><input type="number" id="monH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>화</td><td><input type="checkbox" id="tue"></td><td><input type="number" id="tueH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>수</td><td><input type="checkbox" id="wed"></td><td><input type="number" id="wedH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>목</td><td><input type="checkbox" id="thu"></td><td><input type="number" id="thuH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>금</td><td><input type="checkbox" id="fri"></td><td><input type="number" id="friH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>토</td><td><input type="checkbox" id="sat"></td><td><input type="number" id="satH" value="0" min="0" step="0.5"></td></tr>
-          <tr><td>일</td><td><input type="checkbox" id="sun"></td><td><input type="number" id="sunH" value="0" min="0" step="0.5"></td></tr>
-        </tbody>
-      </table>
+
+      <div class="section table-wrap" style="padding:0;margin-top:10px;">
+        <table class="table">
+          <thead>
+            <tr><th>요일</th><th>근무여부</th><th>하루 근무시간</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>월</td><td><input type="checkbox" id="mon"></td><td><input type="number" id="monH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>화</td><td><input type="checkbox" id="tue"></td><td><input type="number" id="tueH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>수</td><td><input type="checkbox" id="wed"></td><td><input type="number" id="wedH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>목</td><td><input type="checkbox" id="thu"></td><td><input type="number" id="thuH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>금</td><td><input type="checkbox" id="fri"></td><td><input type="number" id="friH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>토</td><td><input type="checkbox" id="sat"></td><td><input type="number" id="satH" value="0" min="0" step="0.5"></td></tr>
+            <tr><td>일</td><td><input type="checkbox" id="sun"></td><td><input type="number" id="sunH" value="0" min="0" step="0.5"></td></tr>
+          </tbody>
+        </table>
+      </div>
 
       <p class="muted">※ 주 15시간 이상 근로 시 근로기준법상 주휴수당 자동 산정됩니다.</p>
-      <button class="btn" onclick="calc()">계산하기</button>
-      <a href="./template.xlsx" class="btn">엑셀 템플릿 받기</a>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn" onclick="calc()">계산하기</button>
+        <a href="./template.xlsx" class="btn">엑셀 템플릿 받기</a>
+      </div>
     </div>
 
     <div class="section">
       <h3>결과</h3>
-      <table class="table">
-        <thead><tr><th>구분</th><th>주중 기본급 합계</th><th>주휴수당 합계</th><th>총합</th></tr></thead>
-        <tbody>
-          <tr><td>금액(원)</td><td id="basePay">0</td><td id="holidayPay">0</td><td id="totalPay">0</td></tr>
-          <tr><td>예산 대비 잔액</td><td id="baseRemain">0</td><td id="holidayRemain">0</td><td id="totalRemain">0</td></tr>
-        </tbody>
-      </table>
-      <p id="warn" class="warn" style="display:none;">⚠ 예산을 초과했습니다.</p>
+      <div class="section table-wrap" style="padding:0;margin-top:10px;">
+        <table class="table">
+          <thead><tr><th>구분</th><th>주중 기본급 합계</th><th>주휴수당 합계</th><th>총합</th></tr></thead>
+          <tbody>
+            <tr><td>금액(원)</td><td id="basePay">0</td><td id="holidayPay">0</td><td id="totalPay">0</td></tr>
+            <tr><td>예산 대비 잔액</td><td id="baseRemain">0</td><td id="holidayRemain">0</td><td id="totalRemain">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p id="warn" style="display:none; color:#c00; font-weight:700;">⚠ 예산을 초과했습니다.</p>
     </div>
   </div>
+
+  <!-- 계산 스크립트 -->
   <script src="./script.js"></script>
+
+  <!-- 우클릭/복사 방지 (상대경로 주의) -->
   <script src="../static/disable-copy.js?v=1"></script>
 </body>
 </html>
