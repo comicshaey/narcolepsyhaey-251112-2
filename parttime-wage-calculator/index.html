@@ -50,4 +50,92 @@
     }
     .btn-home:hover { opacity: 0.9; }
 
-    footer { text-align: center; margin-top: 24px; color: #555; fon
+    footer { text-align: center; margin-top: 24px; color: #555; font-size: 0.85rem; line-height: 1.5; }
+  </style>
+</head>
+
+<body>
+  <main>
+    <h1>단시간 근로자 인건비 계산기</h1>
+
+    <div class="section">
+      <div class="field-row">
+        <label for="startDate">계약 시작일</label>
+        <input type="date" id="startDate" />
+      </div>
+
+      <div class="field-row">
+        <label for="endDate">계약 종료일</label>
+        <input type="date" id="endDate" />
+      </div>
+
+      <div class="field-row">
+        <label for="hourlyWage">시급</label>
+        <div class="inline">
+          <input type="number" id="hourlyWage" value="11000" />
+          <small>원</small>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label for="hoursPerDay">하루 근무시간</label>
+        <div class="inline">
+          <input type="number" id="hoursPerDay" value="4" step="0.5" />
+          <small>시간</small>
+        </div>
+      </div>
+
+      <div class="field-row inline">
+        <label for="breakMinutes">휴게시간</label>
+        <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
+        <small>분</small>
+        <label for="breakEnabled"><span>차감</span><input type="checkbox" id="breakEnabled" /></label>
+        <small>(예: 30 → 하루 30분 차감)</small>
+      </div>
+
+      <div class="field-row day-row">
+        <label>근무 요일</label>
+        <label><input type="checkbox" id="mon" checked /> 월</label>
+        <label><input type="checkbox" id="tue" checked /> 화</label>
+        <label><input type="checkbox" id="wed" checked /> 수</label>
+        <label><input type="checkbox" id="thu" checked /> 목</label>
+        <label><input type="checkbox" id="fri" checked /> 금</label>
+        <label><input type="checkbox" id="sat" /> 토</label>
+        <label><input type="checkbox" id="sun" /> 일</label>
+      </div>
+
+      <div class="field-row">
+        <label for="budget">예산</label>
+        <div class="inline">
+          <input type="number" id="budget" placeholder="예: 1000000" />
+          <small>원</small>
+        </div>
+      </div>
+
+      <button id="btnCalc">계산하기</button>
+
+      <div class="result-box">
+        <!-- 한 줄 요약만 표시 -->
+        <div id="outDaysLine" style="margin-bottom:8px; font-weight:600; color:#333;"></div>
+
+        <hr style="margin:10px 0;" />
+        <div>기본급: <span id="outBase">0</span> 원</div>
+        <div>주휴수당: <span id="outJhu">0</span> 원</div>
+
+        <hr style="margin:10px 0;" />
+        <div>총액: <span id="outTotal">0</span> 원</div>
+        <div>예산 잔액: <span id="outRemain">0</span> 원</div>
+        <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
+      </div>
+
+      <div style="text-align:center;">
+        <a href="/" class="btn-home">메인으로 돌아가기</a>
+      </div>
+    </div>
+
+    <footer>
+      제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+    </footer>
+  </main>
+</body>
+</html>
