@@ -4,40 +4,36 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>단시간 근로자 인건비 계산기</title>
+
+  <!-- 공통 리소스(static) 그대로 사용 -->
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
   <script src="/static/script.js" defer></script>
+
+  <!-- 폴더 내 전용 스크립트 -->
+  <script src="./script.js" defer></script>
+
   <style>
     body {
       font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
       margin: 20px;
       color: #222;
     }
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 12px;
-    }
+    h1 { font-size: 1.4rem; margin-bottom: 12px; }
     .section {
       border: 1px solid #e5e5e5;
       border-radius: 12px;
       padding: 16px 18px;
       margin: 18px 0;
     }
-    label {
-      font-weight: 500;
-    }
-    input[type="number"],
-    input[type="date"] {
+    label { font-weight: 500; }
+    input[type="number"], input[type="date"] {
       padding: 4px 6px;
       border: 1px solid #ccc;
       border-radius: 6px;
     }
-    .field-row {
-      margin-bottom: 12px;
-    }
-    .day-row label {
-      margin-right: 10px;
-    }
+    .field-row { margin-bottom: 12px; }
+    .day-row label { margin-right: 10px; }
     .result-box {
       background: #f8f8f8;
       border-radius: 10px;
@@ -58,9 +54,7 @@
       font-weight: 600;
       cursor: pointer;
     }
-    button:hover {
-      opacity: 0.9;
-    }
+    button:hover { opacity: 0.9; }
   </style>
 </head>
 
