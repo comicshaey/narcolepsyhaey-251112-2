@@ -1,5 +1,3 @@
-// 바이브 코딩 감성, 한국어 주석만 씀 :)
-
 // ===== 유틸 =====
 const $ = (sel) => document.querySelector(sel)
 
