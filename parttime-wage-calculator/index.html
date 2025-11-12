@@ -98,12 +98,19 @@
         </div>
       </div>
 
-<!-- 휴게시간: 글씨 오른쪽에 체크박스 + 숫자 입력칸 좁게 -->
-<div class="field-row" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-  <label for="breakMinutes" style="white-space:nowrap;">
-    휴게시간 차감
-    <input type="checkbox" id="breakEnabled" style="margin-left:6px;" />
-  </label>
+<div class="field-row" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+  <label for="breakMinutes" style="white-space:nowrap;">휴게시간</label>
+
+  <div style="display:inline-flex; align-items:center; gap:6px;">
+    <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:70px; text-align:right;" />
+    <label style="display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
+      <input type="checkbox" id="breakEnabled" />
+      차감
+    </label>
+  </div>
+
+  <small>분 (예: 30 → 하루 30분 차감)</small>
+</div>
 
   <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
   <small>분 (예: 30 → 하루 30분 차감)</small>
