@@ -3,169 +3,145 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>단시간 근로계약자 인건비 계산기</title>
+  <title>단시간 근로자 인건비 계산기</title>
   <link rel="icon" href="/static/favicon.ico" />
-  <!-- 사이트 공통 스타일 있으면 유지 -->
   <link rel="stylesheet" href="/static/style.css" />
-
+  <script src="/static/script.js" defer></script>
   <style>
-    /* ===== 페이지 기본 ===== */
-    body{font-family:system-ui,apple-system,sans-serif;background:#fff;color:#111;}
-    .wrap{max-width:960px;margin:24px auto;padding:0 12px}
-    .h1{font-size:1.5rem;font-weight:700;margin:8px 0 16px}
-    .section{border:1px solid #e5e5e5;border-radius:12px;padding:16px 18px;margin:18px 0;background:#fff}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    label{font-size:0.95rem}
-    input,select{width:100%;padding:10px;border:1px solid #ccc;border-radius:10px}
-    .btn{display:inline-block;padding:10px 16px;border-radius:12px;border:1px solid #111;text-decoration:none;color:#111;font-weight:600;cursor:pointer;}
-    .muted{color:#555;font-size:0.9rem}
-
-    /* ===== 테이블(넘침 방지/태블릿 대응) ===== */
-    .table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:0.95rem;
-      margin-top:10px;
-      table-layout:fixed;   /* 셀 폭 균등 분배 */
+    body {
+      font-family: system-ui, -apple-system, "Noto Sans KR", sans-serif;
+      margin: 20px;
+      color: #222;
     }
-    .table th,.table td{
-      border:1px solid #e5e5e5;
-      padding:6px;          /* 패딩 살짝 줄여 넘침 방지 */
-      text-align:center;
-      word-wrap:break-word;
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 12px;
     }
-    /* 입력칸이 셀 밖으로 안 튀도록 */
-    .table input[type="number"]{
-      width:100%;           /* 셀 기준 */
-      max-width:70px;       /* 데스크톱 상한 */
-      box-sizing:border-box;
-      text-align:right;
-      padding:4px 6px;
-      margin:0 auto;        /* 셀 내부 가운데 정렬 */
-      display:block;
+    .section {
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin: 18px 0;
     }
-    /* 모바일/태블릿에서 더 타이트하게 */
-    @media (max-width:768px){
-      .table input[type="number"]{
-        max-width:60px;
-        font-size:0.9rem;
-      }
+    label {
+      font-weight: 500;
     }
-
-    /* 표가 작게라도 튀면 가로 스크롤 허용 */
-    .section.table-wrap{ overflow-x:auto; }
+    input[type="number"],
+    input[type="date"] {
+      padding: 4px 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .field-row {
+      margin-bottom: 12px;
+    }
+    .day-row label {
+      margin-right: 10px;
+    }
+    .result-box {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+    .result-box span {
+      font-weight: bold;
+      font-size: 1.05rem;
+    }
+    button {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #111;
+      background: #111;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="row" style="display:flex;justify-content:space-between;align-items:center;">
-      <div class="h1">단시간 근로계약자 인건비 계산기</div>
-      <a href="/" class="btn">메인으로</a>
+  <h1>단시간 근로자 인건비 계산기</h1>
+
+  <div class="section">
+    <!-- 계약기간 -->
+    <div class="field-row">
+      <label for="startDate">계약 시작일</label><br />
+      <input type="date" id="startDate" />
     </div>
 
-    <div class="section">
-      <div class="grid">
-        <div>
-          <label>근로계약 시작일</label>
-          <input id="startDate" type="date" />
-        </div>
-        <div>
-          <label>근로계약 종료일</label>
-          <input id="endDate" type="date" />
-        </div>
-        <div>
-          <label>기본급 예산(원)</label>
-          <input id="budgetBase" type="number" value="0" />
-        </div>
-        <div>
-          <label>주휴수당 예산(원)</label>
-          <input id="budgetHoliday" type="number" value="0" />
-        </div>
-        <div>
-          <label>시급(원)</label>
-          <input id="wage" type="number" value="10000" />
-        </div>
-        <div>
-          <label>자원봉사 시간 유급처리(Y/N)</label>
-          <select id="volPaid">
-            <option value="N">N</option>
-            <option value="Y">Y</option>
-          </select>
-        </div>
-        <div>
-          <label>주당 자원봉사 시간</label>
-          <input id="volHours" type="number" value="0" step="0.5" min="0" />
-        </div>
-      </div>
-
-<div class="field-row" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-  <label for="breakMinutes" style="white-space:nowrap;">휴게시간</label>
-
-  <div style="display:inline-flex; align-items:center; gap:6px;">
-    <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:70px; text-align:right;" />
-    <label style="display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
-      <input type="checkbox" id="breakEnabled" />
-      차감
-    </label>
-  </div>
-
-
-
-  <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
-  <small>분 (예: 30 → 하루 30분 차감)</small>
-</div>
-
-
-  <input type="number" id="breakMinutes" min="0" step="5" value="30" style="width:80px;" />
-  <small>분 (예: 30 → 30분 차감)</small>
-</div>
-
-
-      <h3 style="margin-top:20px;">주간 근무 요일 및 하루 근무 시간</h3>
-
-      <div class="section table-wrap" style="padding:0;margin-top:10px;">
-        <table class="table">
-          <thead>
-            <tr><th>요일</th><th>근무여부</th><th>하루 근무시간</th></tr>
-          </thead>
-          <tbody>
-            <tr><td>월</td><td><input type="checkbox" id="mon"></td><td><input type="number" id="monH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>화</td><td><input type="checkbox" id="tue"></td><td><input type="number" id="tueH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>수</td><td><input type="checkbox" id="wed"></td><td><input type="number" id="wedH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>목</td><td><input type="checkbox" id="thu"></td><td><input type="number" id="thuH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>금</td><td><input type="checkbox" id="fri"></td><td><input type="number" id="friH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>토</td><td><input type="checkbox" id="sat"></td><td><input type="number" id="satH" value="0" min="0" step="0.5"></td></tr>
-            <tr><td>일</td><td><input type="checkbox" id="sun"></td><td><input type="number" id="sunH" value="0" min="0" step="0.5"></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <p class="muted">※ 주 15시간 이상 근로 시 근로기준법상 주휴수당 자동 산정됩니다.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn" onclick="calc()">계산하기</button>
-        <a href="./template.xlsx" class="btn">엑셀 템플릿 받기</a>
-      </div>
+    <div class="field-row">
+      <label for="endDate">계약 종료일</label><br />
+      <input type="date" id="endDate" />
     </div>
 
-    <div class="section">
-      <h3>결과</h3>
-      <div class="section table-wrap" style="padding:0;margin-top:10px;">
-        <table class="table">
-          <thead><tr><th>구분</th><th>주중 기본급 합계</th><th>주휴수당 합계</th><th>총합</th></tr></thead>
-          <tbody>
-            <tr><td>금액(원)</td><td id="basePay">0</td><td id="holidayPay">0</td><td id="totalPay">0</td></tr>
-            <tr><td>예산 대비 잔액</td><td id="baseRemain">0</td><td id="holidayRemain">0</td><td id="totalRemain">0</td></tr>
-          </tbody>
-        </table>
+    <!-- 시급 / 근무시간 -->
+    <div class="field-row">
+      <label for="hourlyWage">시급</label><br />
+      <input type="number" id="hourlyWage" value="11000" /> 원
+    </div>
+
+    <div class="field-row">
+      <label for="hoursPerDay">하루 근무시간</label><br />
+      <input type="number" id="hoursPerDay" value="4" step="0.5" /> 시간
+    </div>
+
+    <!-- 휴게시간 입력칸 오른쪽에 체크박스 -->
+    <div class="field-row" 
+         style="display:flex; align-items:center; flex-wrap:nowrap; gap:6px; font-size:15px;">
+      <label for="breakMinutes" style="white-space:nowrap;">휴게시간</label>
+
+      <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+        <input type="number" id="breakMinutes" min="0" step="5" value="30"
+               style="width:70px; text-align:right;" />
+        <label for="breakEnabled"
+               style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+          <span>차감</span>
+          <input type="checkbox" id="breakEnabled" style="transform:scale(1.1);" />
+        </label>
       </div>
-      <p id="warn" style="display:none; color:#c00; font-weight:700;">⚠ 예산을 초과했습니다.</p>
+
+      <small style="white-space:nowrap;">분 (예: 30 → 하루 30분 차감)</small>
+    </div>
+
+    <!-- 근무 요일 -->
+    <div class="field-row day-row">
+      <label>근무 요일</label><br />
+      <label><input type="checkbox" id="mon" checked /> 월</label>
+      <label><input type="checkbox" id="tue" checked /> 화</label>
+      <label><input type="checkbox" id="wed" checked /> 수</label>
+      <label><input type="checkbox" id="thu" checked /> 목</label>
+      <label><input type="checkbox" id="fri" checked /> 금</label>
+      <label><input type="checkbox" id="sat" /> 토</label>
+      <label><input type="checkbox" id="sun" /> 일</label>
+    </div>
+
+    <!-- 예산 입력 -->
+    <div class="field-row">
+      <label for="budget">예산</label><br />
+      <input type="number" id="budget" placeholder="예: 1000000" /> 원
+    </div>
+
+    <!-- 계산 버튼 -->
+    <button id="btnCalc">계산하기</button>
+
+    <!-- 결과 -->
+    <div class="result-box">
+      <div>기본급: <span id="outBase">0</span> 원</div>
+      <div>주휴수당: <span id="outJhu">0</span> 원</div>
+      <div>총액: <span id="outTotal">0</span> 원</div>
+      <hr style="margin:10px 0;" />
+      <div>예산 잔액: <span id="outRemain">0</span> 원</div>
+      <div id="outMsg" style="color:#555; font-size:0.9rem;"></div>
     </div>
   </div>
 
-  <!-- 계산 스크립트 -->
-  <script src="./script.js"></script>
-
-  <!-- 우클릭/복사 방지 (상대경로 주의) -->
-  <script src="../static/disable-copy.js?v=1"></script>
+  <footer style="text-align:center; margin-top:15px; font-size:0.85rem; color:#555;">
+    제작자: 씩씩하고 귀여운 고주무관 · 개인 토이 프로젝트입니다.
+  </footer>
 </body>
 </html>
