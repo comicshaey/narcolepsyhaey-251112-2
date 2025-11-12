@@ -1,213 +1,154 @@
+
 // ===== 유틸 =====
 const $ = (sel) => document.querySelector(sel)
 
-function ymd(d) {
-  const z = (n) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())}`
+function ymd(d){const z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`}
+function parseDate(v){if(!v)return null;const [y,m,d]=v.split('-').map(Number);if(!y||!m||!d)return null;return new Date(y,m-1,d)}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function isSameOrBefore(a,b){return a.getTime()<=b.getTime()}
+function isSameOrAfter(a,b){return a.getTime()>=b.getTime()}
+function floor10(n){return Math.floor(n/10)*10}
+function dayToKoreaNum(d){const w=d.getDay();return w===0?7:w}
+function weekKeyMonToSun(d){
+  const x=new Date(d), dow=x.getDay(); const diffToMon=(dow===0?-6:1-dow)
+  const monday=addDays(x,diffToMon)
+  return `${monday.getFullYear()}-W${String(monday.getMonth()+1).padStart(2,'0')}${String(monday.getDate()).padStart(2,'0')}`
 }
-function parseDate(v) {
-  if (!v) return null
-  const [y, m, d] = v.split('-').map(Number)
-  if (!y || !m || !d) return null
-  return new Date(y, m - 1, d)
+function nextWeekKeyOf(weekKey){
+  const m=weekKey.match(/(\d{4})-W(\d{2})(\d{2})/); if(!m) return ''
+  const y=+m[1], mm=+m[2], dd=+m[3]; const mon=new Date(y,mm-1,dd); const nextMon=addDays(mon,7)
+  return `${nextMon.getFullYear()}-W${String(nextMon.getMonth()+1).padStart(2,'0')}${String(nextMon.getDate()).padStart(2,'0')}`
 }
-function addDays(d, n) {
-  const x = new Date(d)
-  x.setDate(x.getDate() + n)
-  return x
-}
-function isSameOrBefore(a, b) {
-  return a.getTime() <= b.getTime()
-}
-function isSameOrAfter(a, b) {
-  return a.getTime() >= b.getTime()
-}
-function floor10(n) {
-  return Math.floor(n / 10) * 10
-}
-function dayToKoreaNum(d) {
-  const w = d.getDay()
-  return w === 0 ? 7 : w
-}
-function weekKeyMonToSun(d) {
-  const x = new Date(d)
-  const dow = x.getDay() // 0=일
-  const diffToMon = dow === 0 ? -6 : 1 - dow
-  const monday = addDays(x, diffToMon)
-  const y = monday.getFullYear()
-  const m = String(monday.getMonth() + 1).padStart(2, '0')
-  const dd = String(monday.getDate()).padStart(2, '0')
-  return `${y}-W${m}${dd}`
-}
-function nextWeekKeyOf(weekKey) {
-  const m = weekKey.match(/(\d{4})-W(\d{2})(\d{2})/)
-  if (!m) return ''
-  const y = Number(m[1]),
-    mm = Number(m[2]),
-    dd = Number(m[3])
-  const mon = new Date(y, mm - 1, dd)
-  const nextMon = addDays(mon, 7)
-  const nm = String(nextMon.getMonth() + 1).padStart(2, '0')
-  const nd = String(nextMon.getDate()).padStart(2, '0')
-  return `${nextMon.getFullYear()}-W${nm}${nd}`
-}
-function groupBy(arr, keyFn) {
-  const m = {}
-  for (const it of arr) {
-    const k = keyFn(it)
-    ;(m[k] ||= []).push(it)
-  }
-  return m
-}
-function hasAnyPlannedWork(weekArr) {
-  return weekArr.some((it) => it.paidHours > 0)
-}
+function groupBy(arr,keyFn){const m={}; for(const it of arr){const k=keyFn(it); (m[k] ||= []).push(it)} return m}
+function hasAnyPlannedWork(weekArr){return weekArr.some(it=>it.paidHours>0)}
 
 // ===== 계산 메인 =====
-function calc() {
-  const start = parseDate($('#startDate')?.value)
-  const end = parseDate($('#endDate')?.value)
-  const hourly = Number($('#hourlyWage')?.value || 0)
-  const hoursPerDay = Number($('#hoursPerDay')?.value || 0)
-  const breakEnabled = $('#breakEnabled')?.checked || false
-  const breakMinutes = Number($('#breakMinutes')?.value || 0)
+function calc(){
+  const start=parseDate($('#startDate')?.value)
+  const end=parseDate($('#endDate')?.value)
+  const hourly=Number($('#hourlyWage')?.value||0)
+  const hoursPerDay=Number($('#hoursPerDay')?.value||0)
+  const breakEnabled=$('#breakEnabled')?.checked||false
+  const breakMinutes=Number($('#breakMinutes')?.value||0)
 
-  const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
-  const workDays = new Set(days.filter((d) => $(`#${d}`)?.checked))
+  const days=['mon','tue','wed','thu','fri','sat','sun']
+  const workDays=new Set(days.filter(d=>$(`#${d}`)?.checked))
 
-  if (!(start && end && isSameOrBefore(start, end))) {
-    return showResult(0, 0, 0, 0, 0, '기간을 확인해줘')
-  }
-  if (hourly <= 0 || hoursPerDay <= 0) {
-    return showResult(0, 0, 0, 0, 0, '시급/근로시간을 확인해줘')
-  }
-  if (workDays.size === 0) {
-    return showResult(0, 0, 0, 0, 0, '근무 요일을 하나 이상 선택해줘')
-  }
+  if(!(start&&end&&isSameOrBefore(start,end))) return showResult(0,0,0,0,0,0,0,"기간을 확인해줘")
+  if(hourly<=0||hoursPerDay<=0) return showResult(0,0,0,0,0,0,0,"시급/근로시간을 확인해줘")
+  if(workDays.size===0) return showResult(0,0,0,0,0,0,0,"근무 요일을 하나 이상 선택해줘")
 
-  // --- 휴게시간 차감 ---
-  const breakHours = breakEnabled ? Math.max(0, breakMinutes / 60) : 0
+  // 휴게시간 차감
+  const breakHours = breakEnabled ? Math.max(0, breakMinutes/60) : 0
   const paidHoursPerDay = Math.max(0, hoursPerDay - breakHours)
 
-  // --- 계약기간 날짜별로 생성 ---
-  const daysArr = []
-  for (let d = new Date(start); isSameOrBefore(d, end); d = addDays(d, 1)) {
-    const wn = dayToKoreaNum(d)
-    const key = ['', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][wn]
-    const planned = workDays.has(key)
-    const paidHours = planned ? paidHoursPerDay : 0
+  // 계약기간 내 날짜 풀기
+  const daysArr=[]
+  for(let d=new Date(start); isSameOrBefore(d,end); d=addDays(d,1)){
+    const wn=dayToKoreaNum(d)
+    const key=['','mon','tue','wed','thu','fri','sat','sun'][wn]
+    const planned=workDays.has(key)
     daysArr.push({
-      date: new Date(d),
-      ymd: ymd(d),
-      weekNoKey: weekKeyMonToSun(d),
-      isSunday: wn === 7,
+      date:new Date(d),
+      ymd:ymd(d),
+      weekNoKey:weekKeyMonToSun(d),
+      isSunday:(wn===7),
       planned,
-      paidHours,
+      paidHours: planned ? paidHoursPerDay : 0
     })
   }
-  
-<div>실근로일: <span id="outWorkDays">0</span> 일</div>
-<div>유급주휴일: <span id="outJhuDays">0</span> 일</div>
-<div style="margin-bottom:8px;">총 지급일수: <span id="outPaidDays">0</span> 일</div>
-  
-  // --- 기본급 ---
-  const baseHours = daysArr.reduce((s, it) => s + it.paidHours, 0)
-  const basePayRaw = baseHours * hourly
-  const basePay = floor10(basePayRaw)
 
-  // --- 주휴수당 ---
-  const weeks = groupBy(daysArr, (it) => it.weekNoKey)
+  // ✅ 실근로일(실제 출근 예정일) 개수
+  const workDayCount = daysArr.filter(it=>it.planned).length
+
+  // 기본급
+  const baseHours = daysArr.reduce((s,it)=>s+it.paidHours,0)
+  const basePay   = floor10(baseHours * hourly)
+
+  // 주휴수당
+  const weeks = groupBy(daysArr, it=>it.weekNoKey)
   let jhuRawSum = 0
-  for (const wkKey of Object.keys(weeks)) {
+  let jhuDaysCount = 0
+  for(const wkKey of Object.keys(weeks)){
     const wk = weeks[wkKey]
-    const weeklyPlannedHours = wk.reduce((s, it) => s + it.paidHours, 0)
+    const weeklyPlannedHours = wk.reduce((s,it)=>s+it.paidHours,0)
     const perfectAttendance = true
     const nextWeekKey = nextWeekKeyOf(wkKey)
-    const hasNextWeekWork = Object.keys(weeks).includes(nextWeekKey)
-      ? hasAnyPlannedWork(weeks[nextWeekKey])
-      : false
-    const sundayInside = wk.some(
-      (it) =>
-        it.isSunday &&
-        isSameOrAfter(it.date, start) &&
-        isSameOrBefore(it.date, end)
-    )
-    const qualifies =
-      weeklyPlannedHours >= 15 &&
-      perfectAttendance &&
-      hasNextWeekWork &&
-      sundayInside
+    const hasNextWeekWork = Object.keys(weeks).includes(nextWeekKey) ? hasAnyPlannedWork(weeks[nextWeekKey]) : false
+    const sundayInside = wk.some(it=>it.isSunday && isSameOrAfter(it.date,start) && isSameOrBefore(it.date,end))
 
-    if (qualifies) {
+    const qualifies = (weeklyPlannedHours>=15) && perfectAttendance && hasNextWeekWork && sundayInside
+    if(qualifies){
       jhuRawSum += paidHoursPerDay * hourly
+      jhuDaysCount += 1                 // ✅ 주휴일 1일 발생
     }
   }
   const jhuPay = floor10(jhuRawSum)
 
-  // --- 기관부담금 (예: 기본급 + 주휴수당의 10%) ---
-  const instPay = floor10((basePay + jhuPay) * 0.1)
+  // 기관부담금: 모드 선택이 있으면 반영, 없으면 0 처리(호환)
+  const mode = $('#instMode')?.value || 'none'
+  const pct  = Number($('#instPercent')?.value || 0)
+  const amt  = Number($('#instAmount')?.value || 0)
+  let instPay = 0
+  if (mode === 'percent')      instPay = floor10((basePay + jhuPay) * (pct/100))
+  else if (mode === 'amount')  instPay = floor10(amt)
 
-  // --- 총액 ---
   const total = basePay + jhuPay + instPay
 
-  // --- 예산 잔액 ---
+  // 예산 잔액
   const budget = Number($('#budget')?.value || 0)
   const remain = budget - total
 
-  showResult(basePay, jhuPay, instPay, total, remain)
+  // ✅ 총 지급일수
+  const paidDays = workDayCount + jhuDaysCount
+
+  showResult(basePay, jhuPay, instPay, total, remain, workDayCount, jhuDaysCount, paidDays)
 }
 
 // ===== 결과 표시 =====
-function showResult(basePay, jhuPay, instPay, total, remain, msg) {
-  const elBase = $('#outBase')
-  const elJhu = $('#outJhu')
-  const elInst = $('#outInst')
-  const elTot = $('#outTotal')
-  const elRemain = $('#outRemain')
-  const elMsg = $('#outMsg')
+function showResult(basePay, jhuPay, instPay, total, remain, workDays, jhuDays, paidDays, msg){
+  $('#outBase')?.textContent = Number(basePay).toLocaleString()
+  $('#outJhu')?.textContent  = Number(jhuPay).toLocaleString()
+  $('#outInst')?.textContent = Number(instPay).toLocaleString()
+  $('#outTotal')?.textContent= Number(total).toLocaleString()
 
-  if (elBase) elBase.textContent = Number(basePay).toLocaleString()
-  if (elJhu) elJhu.textContent = Number(jhuPay).toLocaleString()
-  if (elInst) elInst.textContent = Number(instPay).toLocaleString()
-  if (elTot) elTot.textContent = Number(total).toLocaleString()
+  // ✅ 일수 표시
+  $('#outWorkDays')?.textContent = workDays ?? 0
+  $('#outJhuDays')?.textContent  = jhuDays ?? 0
+  $('#outPaidDays')?.textContent = paidDays ?? 0
 
-  if (elRemain) {
-    elRemain.textContent = Number(remain).toLocaleString()
-    elRemain.style.color = remain < 0 ? 'red' : '#111'
-    elRemain.style.fontWeight = remain < 0 ? '700' : '500'
+  const elR = $('#outRemain')
+  if(elR){
+    elR.textContent = Number(remain).toLocaleString()
+    elR.style.color = remain < 0 ? 'red' : '#111'
+    elR.style.fontWeight = remain < 0 ? '700' : '500'
   }
-
-  if (elMsg) elMsg.textContent = msg || ''
+  $('#outMsg')?.textContent = msg || ''
 }
 
 // ===== 이벤트 바인딩 =====
-function bind() {
-  const inputs = [
-    '#startDate',
-    '#endDate',
-    '#hourlyWage',
-    '#hoursPerDay',
-    '#mon',
-    '#tue',
-    '#wed',
-    '#thu',
-    '#fri',
-    '#sat',
-    '#sun',
-    '#breakEnabled',
-    '#breakMinutes',
-    '#budget',
+function toggleInstUI(){
+  const mode = $('#instMode')?.value || 'none'
+  const $p = $('#instPercentWrap'), $a = $('#instAmountWrap')
+  if($p) $p.style.display = (mode==='percent' ? 'inline-flex' : 'none')
+  if($a) $a.style.display = (mode==='amount'  ? 'inline-flex' : 'none')
+}
+
+function bind(){
+  const inputs=[
+    '#startDate','#endDate','#hourlyWage','#hoursPerDay',
+    '#mon','#tue','#wed','#thu','#fri','#sat','#sun',
+    '#breakEnabled','#breakMinutes','#budget',
+    '#instMode','#instPercent','#instAmount' // 없어도 에러 안 나게 선택자만 등록
   ]
-  inputs.forEach((sel) => {
-    const el = $(sel)
-    if (!el) return
+  inputs.forEach(sel=>{
+    const el=$(sel); if(!el) return
     el.addEventListener('input', calc)
     el.addEventListener('change', calc)
   })
-  $('#btnCalc')?.addEventListener('click', (e) => {
-    e.preventDefault()
-    calc()
-  })
+  $('#instMode')?.addEventListener('change', ()=>{ toggleInstUI(); calc() })
+  toggleInstUI()
+  $('#btnCalc')?.addEventListener('click', e=>{ e.preventDefault(); calc() })
   calc()
 }
 
