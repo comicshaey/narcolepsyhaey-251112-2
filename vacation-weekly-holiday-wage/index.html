@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>조리종사원 및 청소원 방학중근무 인건비 계산기</title>
+  <title>조리종사원 및 청소원 방학중근무 인건비 계산기 (괴물버전)</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="shell">
-      <h1>조리종사원 및 청소원 방학중근무 인건비 계산기 (임시)</h1>
+      <h1>조리종사원 및 청소원 방학중근무 인건비 계산기 (괴물 버전)</h1>
       <p class="sub">
-        방학중 비상시근로자의 방학 중 근무에 대한 인건비(방학중근무수당·주휴수당·일할계산)를
-        간단히 가늠해보는 도구입니다.
+        방학이 여러 달에 걸쳐 있는 경우까지 고려해서,
+        방학중근무수당 · 주휴수당 · 월별 일할계산 인건비를 달별로 나눠 합산하는 도구입니다.
       </p>
     </div>
   </header>
@@ -56,64 +56,17 @@
         </div>
       </div>
 
-      <!-- 통상임금 / 세부 항목 / 기준 일수 / 주휴일 수 -->
-      <div class="grid two">
-        <div class="form-row">
-          <label for="monthlyPay">월 통상임금 합계 (원)</label>
-          <input id="monthlyPay" type="number" min="0" step="10" />
-          <p class="hint">
-            예: 기본급 + 정액급식비 + 위험수당 등.<br />
-            아래 항목별 금액을 입력하면 이 칸에 자동으로 합산됩니다.
-          </p>
-        </div>
-
-        <div class="form-row">
-          <label>통상임금 세부 항목 (선택)</label>
-          <input id="wageBase" type="number" min="0" step="10" placeholder="기본급" />
-          <input id="wageMeal" type="number" min="0" step="10" placeholder="정액급식비" />
-          <input id="wageExtra" type="number" min="0" step="10" placeholder="기타 정기수당 합계" />
-          <p class="hint">
-            세 칸에 입력하면 <strong>기본급+식대+기타수당</strong>을 합산해서
-            월 통상임금 칸에 자동 반영합니다.
-          </p>
-        </div>
-      </div>
-
-      <div class="grid two">
-        <div class="form-row">
-          <label for="monthDays">기준 일수 (해당 월 유급일수)</label>
-          <input id="monthDays" type="number" min="1" max="31" step="1" />
-          <p class="hint">
-            예: 31일 중 토요일 4일을 뺀 27일처럼,
-            실제 일할계산에 사용할 <strong>분모</strong>를 입력합니다.
-          </p>
-        </div>
-
-        <div class="form-row">
-          <label for="holidayDaysPerWeek">주휴일 수 (직종 기준)</label>
-          <select id="holidayDaysPerWeek">
-            <option value="2">주말 토·일 2일 (급식실 청소처럼 양일 주휴)</option>
-            <option value="1">일요일 1일만</option>
-          </select>
-          <p class="hint">
-            조리종사원 방학중 청소처럼 토·일 모두 유급 주휴로 잡는 경우는 2일,
-            일반 단시간 근로자처럼 일요일만 주휴일이면 1일을 선택합니다.
-          </p>
-        </div>
-      </div>
-
       <p class="note">
-        ※ 이 계산기는 업무편람의
-        <strong>“방학 중 1주에 2일 이상 근무하고 그 다음 주에 근무가 예정된 경우 주말을 유급 주휴일로 처리”</strong>
-        하는 사례를 참고하여, 실제 근무일별 근로시간을 기준으로 간단히 계산해주는 도구입니다.
+        ※ 방학이 두 달 이상에 걸친 경우에도, 아래에서
+        <strong>달별(YYYY-MM 단위)로 인건비와 기준일수</strong>를 따로 입력해서 계산합니다.
       </p>
     </section>
 
     <!-- ② 날짜별 근무 선택 -->
     <section class="card">
-      <h2>② 근무일 · 근무시간 선택</h2>
+      <h2>② 날짜별 근무일 · 근무시간 입력</h2>
       <p class="hint">
-        방학 시작일자와 종료일자를 먼저 입력하면, 그 사이의 날짜가 아래 표에 나타납니다.<br />
+        근무 시작일자와 종료일자를 먼저 입력하면, 그 사이의 날짜가 아래 표에 나타납니다.<br />
         실제로 <strong>근무한 날짜에만 체크</strong>하고,
         해당 날짜의 <strong>유급 근로시간(휴게 제외)</strong>을 입력해 주세요.
       </p>
@@ -125,10 +78,41 @@
       </div>
     </section>
 
-    <!-- ③ 자동 계산 결과 -->
+    <!-- ③ 달별 인건비 · 기준 설정 -->
     <section class="card">
-      <h2>③ 자동 계산 결과</h2>
-      <p class="hint">근무일과 근로시간, 통상임금을 입력하면 아래 금액이 자동으로 다시 계산됩니다.</p>
+      <h2>③ 달별 인건비 · 기준 설정</h2>
+      <p class="hint">
+        선택한 기간이 걸쳐 있는 <strong>각 달(YYYY-MM)</strong>별로,
+        월 인건비, 기준일수, 주휴수당 산정 기준 월 금액을 입력합니다.<br />
+        예: 7·8월 방학이면 2025-07, 2025-08 두 줄이 생성됩니다.
+      </p>
+
+      <div class="table-wrap" id="monthConfigContainer">
+        <p class="hint" style="padding:10px 12px;">
+          근무 시작일자와 종료일자를 입력하면, 여기에 달별 설정 행이 생성됩니다.
+        </p>
+      </div>
+
+      <div class="form-row" style="margin-top:10px;">
+        <label for="holidayDaysPerWeek">주휴일 수 (직종 기준)</label>
+        <select id="holidayDaysPerWeek">
+          <option value="2">주말 토·일 2일 (급식실 청소처럼 양일 주휴)</option>
+          <option value="1">일요일 1일만</option>
+        </select>
+        <p class="hint">
+          조리종사원이 방학 중 급식실 청소를 하고,
+          토·일 모두 유급 주휴로 처리하는 경우에는 2일을 선택합니다.<br />
+          일반 단시간 근로자처럼 일요일만 주휴일이면 1일을 선택합니다.
+        </p>
+      </div>
+    </section>
+
+    <!-- ④ 자동 계산 결과 -->
+    <section class="card">
+      <h2>④ 자동 계산 결과</h2>
+      <p class="hint">
+        근무일과 근로시간, 달별 인건비 정보를 입력하면 아래 금액이 자동으로 다시 계산됩니다.
+      </p>
 
       <div class="result-grid">
         <div class="result-item">
@@ -137,7 +121,7 @@
         </div>
 
         <div class="result-item">
-          <div class="result-label">주당 실근로시간 (최대치 기준)</div>
+          <div class="result-label">가장 많이 일한 주의 실근로시간</div>
           <div class="result-value" id="weeklyHoursText">-</div>
           <div class="result-sub" id="weeklyHoursHintText">
             근무기록을 바탕으로, 가장 많이 일한 주의 실근로시간을 기준으로 설명합니다.
@@ -145,7 +129,7 @@
         </div>
 
         <div class="result-item">
-          <div class="result-label">방학중근무수당 (조리직용)</div>
+          <div class="result-label">방학중근무수당 (조리직)</div>
           <div class="result-value" id="restPerDayText">-</div>
           <div class="result-sub" id="restRuleText">
             방학중근무수당 규칙: 4시간 이하 1만원, 4시간 초과 2만원
@@ -153,15 +137,16 @@
         </div>
 
         <div class="result-item">
-          <div class="result-label">방학중근무수당 합계 (조리직용)</div>
+          <div class="result-label">방학중근무수당 합계 (조리직)</div>
           <div class="result-value" id="restTotalText">-</div>
         </div>
 
         <div class="result-item">
-          <div class="result-label">주휴일수 (선택한 주휴일 기준, 조리직)</div>
+          <div class="result-label">주휴일수 (달별 합산, 조리직)</div>
           <div class="result-value" id="holidayDaysText">-</div>
           <div class="result-sub" id="holidayCondText">
-            주휴 요건(1주 15시간 이상 + 다음 주 근무 예정)을 충족한 주 수 × 선택한 주휴일 수
+            주휴 요건(1주 15시간 이상 + 다음 주 근무 예정)을 충족한 주의 주휴일을,
+            실제 달별로 나누어 계산합니다.
           </div>
         </div>
 
@@ -169,7 +154,8 @@
           <div class="result-label">1일 주휴수당 (조리직)</div>
           <div class="result-value" id="holidayPerDayText">-</div>
           <div class="result-sub" id="holidayHintText">
-            월 통상임금 ÷ 기준 일수로 산출
+            한 달만 포함된 경우에만 1일 금액을 보여줍니다.
+            여러 달에 걸치면 “월별 상이”로 표시합니다.
           </div>
         </div>
 
@@ -179,7 +165,7 @@
         </div>
 
         <div class="result-item">
-          <div class="result-label">일할계산 인건비 (청소원용)</div>
+          <div class="result-label">일할계산 인건비 (청소원)</div>
           <div class="result-value" id="prorataText">-</div>
           <div class="result-sub" id="prorataHintText">
             특수운영직군 청소원 선택 시에만 사용됩니다.
@@ -199,27 +185,30 @@
       </p>
     </section>
 
-    <!-- ④ 규칙 요약 -->
+    <!-- ⑤ 규칙 요약 -->
     <section class="card">
-      <h2>④ 적용 규칙 요약 (메모용)</h2>
+      <h2>⑤ 적용 규칙 요약 (메모용)</h2>
       <ul class="rule-list">
         <li>조리사·조리실무사: 방학중비상시 직종 교육공무직 규정 적용</li>
         <li>
-          방학중근무수당(조리직): 근무일마다 <strong>유급 근로시간이 4시간 이하이면 10,000원</strong>,
+          방학중근무수당(조리직): 근무일마다
+          <strong>유급 근로시간이 4시간 이하이면 10,000원</strong>,
           <strong>4시간 초과이면 20,000원</strong>으로 일자별 합산
         </li>
         <li>
-          방학 중 어떤 주의 실근로시간이 <strong>15시간 이상</strong>이고
-          그 다음 주에 근무가 예정되어 있으며, 해당 주에 주휴일(일요일 등)이 포함된 경우
-          그 주를 <strong>주휴수당 요건 충족 주</strong>로 봄
+          방학 중 어떤 주의 실근로시간이 <strong>15시간 이상</strong>이고,
+          그 다음 주에 근무가 예정되어 있으며,
+          해당 주에 주휴일(일요일 등)이 포함된 경우 그 주를
+          <strong>주휴수당 요건 충족 주</strong>로 봄
         </li>
         <li>
-          주휴수당(조리직): <strong>월 통상임금 × (주휴일수 ÷ 기준 일수)</strong> 방식으로 산정
+          주휴수당(조리직): 각 달별로
+          <strong>“주휴수당 산정 기준 월 금액 × (해당 달의 주휴일수 ÷ 기준 일수)”</strong>로 산정 후 합산
         </li>
         <li>
           특수운영직군 <strong>청소원</strong>:
           방학중비상시 주휴 규정은 적용하지 않고,
-          <strong>월 통상임금 × (근로일수 ÷ 기준 일수)</strong>로 방학 근무분 인건비를
+          각 달별로 <strong>월 인건비 × (근로일수 ÷ 기준 일수)</strong>로 방학 근무분 인건비를
           일할계산하는 것으로 가정
         </li>
       </ul>
