@@ -208,3 +208,74 @@ tfoot td{background:#fafafb;font-weight:700}
   .card{padding:16px;}
   footer{text-align:center;font-size:0.9rem;padding:0 10px;}
 }
+
+
+/* 251113목 방학중 인건비 추가 */
+
+/* 결과 박스 그리드 */
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
+  gap:10px;
+  margin-top:12px;
+}
+
+.result-item{
+  border-radius:12px;
+  border:1px solid #ececf5;
+  padding:10px 12px;
+  background:#fafafa;
+}
+
+.result-item-wide{
+  grid-column:1 / -1;
+  background:#000;
+  color:#fff;
+  border-color:#000;
+}
+
+.result-label{
+  font-size:13px;
+  color:#666;
+}
+
+.result-label.strong{
+  font-weight:700;
+  font-size:14px;
+}
+
+.result-value{
+  margin-top:4px;
+  font-size:16px;
+  font-weight:600;
+}
+
+.result-total{
+  margin-top:4px;
+  font-size:20px;
+  font-weight:700;
+}
+
+.result-sub{
+  margin-top:3px;
+  font-size:11px;
+  color:#999;
+}
+
+/* 메모/규칙 리스트 */
+.rule-list{
+  margin:0;
+  padding-left:18px;
+  font-size:13px;
+  color:#444;
+  line-height:1.6;
+}
+
+.rule-list li + li{
+  margin-top:4px;
+}
+
+/* note 확장 */
+.note.small{
+  font-size:11px;
+}
