@@ -76,7 +76,28 @@ textarea{
 
 textarea{min-height:100px}
 input:disabled{background:#f6f7fb;color:#000}
-small{color:#000;font-weight:400}
+
+/* 작은 글씨는 살짝 연하게 */
+small{
+  color:#666;
+  font-weight:400;
+  font-size:0.85em;
+}
+
+/* 한 줄에 묶어서 쓰는 폼 행 */
+.form-row{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:8px;
+}
+
+/* 설명문 공통 */
+.hint{
+  margin:4px 0 0;
+  font-size:12px;
+  color:#666;
+}
 
 .row{display:flex;align-items:center}
 .between{justify-content:space-between}
@@ -210,7 +231,7 @@ tfoot td{background:#fafafb;font-weight:700}
 }
 
 
-/* 251113목 방학중 인건비 추가 */
+/* 251113목 방학중 인건비 추가 - 계산기 공통 컴포넌트 */
 
 /* 결과 박스 그리드 */
 .result-grid{
@@ -259,7 +280,8 @@ tfoot td{background:#fafafb;font-weight:700}
 .result-sub{
   margin-top:3px;
   font-size:11px;
-  color:#999;
+  color:#666;
+  line-height:1.4;
 }
 
 /* 메모/규칙 리스트 */
