@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>조리종사원 및 청소원 방학중근무 인건비 계산기</title>
   <link rel="stylesheet" href="style.css" />
+
+<style>
+  :root{--gap:14px}
+  *{box-sizing:border-box}
+  body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,'Malgun Gothic',sans-serif;line-height:1.55;color:#111;padding:20px;max-width:980px;margin:0 auto}
+  h1{font-size:28px;margin:0 0 12px}
+  h2{font-size:20px;margin:24px 0 8px}
+  .card{border:1px solid #e5e7eb;border-radius:14px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+  label{display:block;font-weight:600;margin:8px 0 4px}
+  input,select,button{font-size:15px}
+  input,select{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px}
+  .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--gap)}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gap)}
+  .muted{color:#64748b;font-size:13px}
+  .btn{display:inline-block;background:#111;color:#fff;padding:10px 14px;border-radius:10px;text-decoration:none;border:0;cursor:pointer}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  th,td{border:1px solid #e5e7eb;padding:8px;text-align:center}
+  th{background:#f8fafc}
+  .stack{display:flex;flex-direction:column;gap:8px}
+  .exitem{border:1px dashed #e2e8f0;padding:10px;border-radius:10px;margin-top:8px}
+  @media (max-width: 900px){ .row,.row3{grid-template-columns:1fr} }
+</style>
+
+
 </head>
 <body>
   <header class="site-header">
