@@ -5,17 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>조리종사원 및 청소원 방학중근무 인건비 계산기</title>
   <link rel="stylesheet" href="/static/style.css" />
-
- 
-
 </head>
 <body>
   <header class="site-header">
     <div class="shell">
-
       <h1>조리종사원 및 청소원 방학중근무 인건비 계산기 (임시)</h1>
       <p class="sub">
-        방학중 비상시근로자
+        방학중 비상시근로자 인건비(방학중근무수당·주휴수당·일할계산)를 대략 계산해보는 도구입니다.
       </p>
     </div>
   </header>
@@ -24,6 +20,7 @@
     <section class="card">
       <h2>① 기본 정보 입력</h2>
 
+      <!-- 직종 선택 -->
       <div class="form-row">
         <label for="jobType">직종 선택</label>
         <select id="jobType">
@@ -32,18 +29,41 @@
           <option value="cleaner">특수운영직군 - 청소원</option>
         </select>
         <p class="hint">
-          ※ 교육공무직(조리사·조리실무사)은 방학중비상시 직종 규정에 따라
-          방학중근무수당·주휴수당을, 특수운영직군 청소원은
+          ※ 조리사·조리실무사는 방학중비상시 직종 규정에 따른
+          <strong>방학중근무수당·주휴수당</strong>을, 청소원은
           <strong>월급 일할계산 방식</strong>으로 인건비를 산정하는 것으로 가정합니다.
         </p>
       </div>
 
+      <!-- 근무 기간 (선택 입력) -->
       <div class="grid two">
+        <div class="form-row">
+          <label for="startDate">근무 시작일자 (선택)</label>
+          <input type="date" id="startDate" />
+          <p class="hint">
+            예: 방학 중 급식실 청소를 시작하는 날짜. 시작·종료일을 입력하면
+            대략적인 <strong>근무 주 수</strong>를 자동으로 추정해 줍니다.
+          </p>
+        </div>
+
+        <div class="form-row">
+          <label for="endDate">근무 종료일자 (선택)</label>
+          <input type="date" id="endDate" />
+          <p class="hint">
+            예: 방학 청소를 마지막으로 하는 날짜. 자동으로 계산된 주 수가
+            실제와 다르면 아래 주 수를 직접 덮어써도 됩니다.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <!-- 근무 주 수 / 주당 근무일 수 / 1일 근무시간 -->
         <div class="form-row">
           <label for="weeks">방학 중 근무한 주 수 (주휴 요건 충족 주 기준)</label>
           <input id="weeks" type="number" min="0" step="1" value="2" />
           <p class="hint">
-            예: 방학 중 급식실 청소를 1주에 2일씩, 2주 동안 했다면 → 2주
+            예: 방학 중 급식실 청소를 1주에 2일씩, 2주 동안 했다면 → <strong>2주</strong>.<br />
+            시작·종료일을 입력하면 이 값을 자동으로 추정해 줍니다.
           </p>
         </div>
 
@@ -57,33 +77,63 @@
           <label for="hoursPerDay">1일 근무시간 (시간)</label>
           <input id="hoursPerDay" type="number" min="0" step="0.5" value="4" />
           <p class="hint">
-            예: 08:30~13:00 (휴게 30분 제외)라면 4, 08:30~16:30(휴게 1시간 제외)라면 7 등 실제 유급시간 기준
+            예: 08:30~13:00 (휴게 30분 제외)라면 4, 08:30~16:30(휴게 1시간 제외)라면 7 등
+            실제 <strong>유급 근로시간</strong> 기준
           </p>
         </div>
 
+        <!-- 주휴일 수 선택 -->
+        <div class="form-row">
+          <label for="holidayDaysPerWeek">주휴일 수 (직종 기준)</label>
+          <select id="holidayDaysPerWeek">
+            <option value="2">주말 토·일 2일 (방학중 급식실 청소 등)</option>
+            <option value="1">일요일 1일만</option>
+          </select>
+          <p class="hint">
+            조리종사원 방학중 청소처럼 토·일 모두 유급 주휴로 잡는 경우는 2일,
+            일반 단시간 근로자처럼 일요일만 주휴일이면 1일을 선택합니다.
+          </p>
+        </div>
+      </div>
+
+      <!-- 월 통상임금 + 세부 항목 -->
+      <div class="grid two">
         <div class="form-row">
           <label for="monthlyPay">월 통상임금 합계 (원)</label>
           <input id="monthlyPay" type="number" min="0" step="10" />
           <p class="hint">
-            예: 기본급 + 정액급식비 + 위험수당 등
-            <br />조리직 주휴수당 / 청소원 일할계산 모두 이 금액을 기준으로 합니다.
+            예: 기본급 + 정액급식비 + 위험수당 등.<br />
+            아래 항목별 금액을 입력하면 이 칸에 자동으로 합산됩니다.
           </p>
         </div>
 
         <div class="form-row">
-          <label for="monthDays">기준 일수 (해당 월 유급일수)</label>
-          <input id="monthDays" type="number" min="1" max="31" step="1" />
+          <label>통상임금 세부 항목 (선택)</label>
+          <input id="wageBase" type="number" min="0" step="10" placeholder="기본급" />
+          <input id="wageMeal" type="number" min="0" step="10" placeholder="정액급식비" />
+          <input id="wageExtra" type="number" min="0" step="10" placeholder="기타 정기수당 합계" />
           <p class="hint">
-            예: 31일 중 토요일 4일을 뺀 27일처럼, 실제 일할계산에 쓸 분모를 입력
+            세 칸에 입력하면 <strong>기본급+식대+기타수당</strong>을 합산해서
+            월 통상임금 칸에 자동으로 반영합니다.
           </p>
         </div>
+      </div>
+
+      <div class="form-row">
+        <label for="monthDays">기준 일수 (해당 월 유급일수)</label>
+        <input id="monthDays" type="number" min="1" max="31" step="1" />
+        <p class="hint">
+          예: 31일 중 토요일 4일을 뺀 27일처럼,
+          실제 일할계산에 사용할 <strong>분모</strong>를 입력합니다.
+        </p>
       </div>
 
       <p class="note">
         ※ 현재 버전은,
         <strong>“방학 중 1주에 2일 이상 근무하고 그 다음 주에 근무가 예정된 경우, 해당 주 토·일을 유급 주휴일로 처리”</strong>
         하는 업무편람 사례를 단순화한 구조입니다.
-        <br />주 수 입력란은 “이 요건을 충족한 주”의 개수를 의미합니다.
+        <br />주 수 입력란은 “이 요건을 충족한 주”의 개수를 의미하며,
+        시작·종료일 입력 시 대략적인 주 수를 자동 추정합니다.
       </p>
     </section>
 
@@ -119,10 +169,10 @@
         </div>
 
         <div class="result-item">
-          <div class="result-label">주휴일수 (토·일 기준)<br />(교육공무직 조리직용)</div>
+          <div class="result-label">주휴일수 (선택한 주휴일 기준)<br />(교육공무직 조리직용)</div>
           <div class="result-value" id="holidayDaysText">-</div>
           <div class="result-sub" id="holidayCondText">
-            방학 중 1주 15시간 이상 + 다음 주 근무 예정인 주 수 × 토·일 2일
+            “주휴 요건 충족 주 수 × 선택한 주휴일 수”로 계산합니다.
           </div>
         </div>
 
@@ -170,29 +220,4 @@
         </li>
         <li>
           방학 중 1주 실 근로시간이 <strong>15시간 이상</strong>이고 그 다음 주에 근무가 예정된 경우,
-          해당 주 <strong>토·일요일 유급 주휴</strong> 처리
-        </li>
-        <li>
-          주휴수당(조리직): <strong>월 통상임금 × (주휴일수 ÷ 기준 일수)</strong> 방식으로 산정
-        </li>
-        <li>
-          특수운영직군 <strong>청소원</strong>:
-          방학중비상시 주휴 규정은 적용하지 않고,
-          <strong>월 통상임금 × (근로일수 ÷ 기준 일수)</strong>로 방학 근무분 인건비를
-          일할계산하는 것으로 가정
-        </li>
-      </ul>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="shell">
-      <p>
-        제작자: 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
-      </p>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
-</body>
-</html>
+          해당 주에 선택한 <strong>
