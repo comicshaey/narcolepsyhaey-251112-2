@@ -182,7 +182,7 @@ function recalc() {
   let grandTotal = 0;
 
   if (jobType === 'cleaner') {
-    // 청소원은 일할계산 인건비만 사용 (방학중근무수당·주휴는 0으로 보는 구조)
+    // 청소원은 일할계산 인건비만 사용
     grandTotal = prorataTotal;
   } else {
     // 조리직은 방학중근무수당 + 주휴수당 합산
