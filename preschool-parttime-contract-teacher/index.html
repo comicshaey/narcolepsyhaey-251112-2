@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>유치원 시간제근무 기간제교원 인건비 소요액 계산기</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/disable-copy.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell">
+      <h1>유치원 시간제근무 기간제교원 인건비 소요액 계산기</h1>
+      <p class="sub">
+        ·학기중 4시간, 방학중 8시간 근무 (미운영 기간은 4시간 인건비 지급), 운영계획 참고
+      </p>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <!-- 1. 계약 기본 정보 -->
+    <section class="card">
+      <h2>근무 조건 설정</h2>
+
+      <div class="grid two">
+        <div class="form-row">
+          <label>
+            근로계약 시작일
+            <input type="date" id="contractStart" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            근로계약 종료일
+            <input type="date" id="contractEnd" />
+          </label>
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-top:8px;">
+        <label>
+          근무 요일 (복수 선택)
+          <div class="row gap" style="flex-wrap:wrap; margin-top:4px;">
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="1" checked /> 월
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="2" checked /> 화
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="3" checked /> 수
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="4" checked /> 목
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="5" checked /> 금
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="6" /> 토
+            </label>
+            <label style="font-weight:400;font-size:13px;">
+              <input type="checkbox" class="weekday" value="0" /> 일
+            </label>
+          </div>
+        </label>
+        <p class="hint">※ 아무것도 선택 안 하면 자동으로 월~금만 계산합니다.</p>
+      </div>
+
+      <div class="grid two" style="margin-top:8px;">
+        <div class="form-row">
+          <label>
+            학기 중 월 기준 근무일수 (4시간 기준)
+            <input type="number" id="semesterBaseDays" min="1" step="1" placeholder="예: 20" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            방학 중 월 기준 근무일수 (8시간 기준)
+            <input type="number" id="vacationBaseDays" min="1" step="1" placeholder="예: 20" />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. 호봉 및 기본급 -->
+    <section class="card">
+      <h2>2. 호봉 및 기본급 (봉급표 자동 반영)</h2>
+
+      <div class="grid two">
+        <div class="form-row">
+          <label>
+            호봉 선택
+            <select id="stepSelect">
+              <option value="">호봉을 선택하세요</option>
+              <!-- 1~40호봉 예시 -->
+              <option value="1">1호봉</option>
+              <option value="2">2호봉</option>
+              <option value="3">3호봉</option>
+              <option value="4">4호봉</option>
+              <option value="5">5호봉</option>
+              <option value="6">6호봉</option>
+              <option value="7">7호봉</option>
+              <option value="8">8호봉</option>
+              <option value="9">9호봉</option>
+              <option value="10">10호봉</option>
+              <option value="11">11호봉</option>
+              <option value="12">12호봉</option>
+              <option value="13">13호봉</option>
+              <option value="14">14호봉</option>
+              <option value="15">15호봉</option>
+              <option value="16">16호봉</option>
+              <option value="17">17호봉</option>
+              <option value="18">18호봉</option>
+              <option value="19">19호봉</option>
+              <option value="20">20호봉</option>
+              <option value="21">21호봉</option>
+              <option value="22">22호봉</option>
+              <option value="23">23호봉</option>
+              <option value="24">24호봉</option>
+              <option value="25">25호봉</option>
+              <option value="26">26호봉</option>
+              <option value="27">27호봉</option>
+              <option value="28">28호봉</option>
+              <option value="29">29호봉</option>
+              <option value="30">30호봉</option>
+              <option value="31">31호봉</option>
+              <option value="32">32호봉</option>
+              <option value="33">33호봉</option>
+              <option value="34">34호봉</option>
+              <option value="35">35호봉</option>
+              <option value="36">36호봉</option>
+              <option value="37">37호봉</option>
+              <option value="38">38호봉</option>
+              <option value="39">39호봉</option>
+              <option value="40">40호봉</option>
+            </select>
+          </label>
+          <p class="hint">
+            ※ 실제 봉급표 금액은 <code>script.js</code>의 <code>payTable</code>에 입력해야 합니다.<br />
+            (지금은 0으로 넣어두었고, 직접 수정하면 자동으로 반영됩니다.)
+          </p>
+        </div>
+
+        <div>
+          <div class="form-row">
+            <label>
+              기본급 (8시간 기준, 월액)
+              <input type="number" id="basePay8" placeholder="0" />
+            </label>
+            <p class="hint">호봉 선택 시 자동 입력되며, 필요하면 여기서 직접 수정 가능합니다.</p>
+          </div>
+          <div class="grid two">
+            <div class="form-row">
+              <label>
+                학기 중 기본급 (4시간 기준, 월액)
+                <input type="number" id="basePay4Sem" disabled />
+              </label>
+            </div>
+            <div class="form-row">
+              <label>
+                방학 중 기본급 (8시간 기준, 월액)
+                <input type="number" id="basePay8Vac" disabled />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 기본 수당 (월 단위) -->
+    <section class="card">
+      <h2>3. 기본 수당 (월 단위)</h2>
+      <p class="hint">
+        학기 중/방학 중 각각 월 기준으로 지급되는 수당을 입력합니다.<br />
+        (기본급은 위 호봉·봉급표에서 자동 계산되고, 여기에는 교직·연구비·정근가산·급식비·가족수당 등을 입력)
+      </p>
+
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>항목명</th>
+              <th>학기 중 월액 (4시간 기준)</th>
+              <th>방학 중 월액 (8시간 기준)</th>
+            </tr>
+          </thead>
+          <tbody id="allowanceBody">
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" value="교직수당" /></td>
+              <td><input type="number" class="allow-semester" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" value="교원연구비" /></td>
+              <td><input type="number" class="allow-semester" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" value="정근수당 가산금" /></td>
+              <td><input type="number" class="allow-semester" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" value="정액급식비" /></td>
+              <td><input type="number" class="allow-semester" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" value="가족수당" /></td>
+              <td><input type="number" class="allow-semester" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" placeholder="0" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button type="button" class="btn" id="addAllowBtn">+ 수당 항목 추가</button>
+    </section>
+
+    <!-- 4. 연 단위 수당 -->
+    <section class="card">
+      <h2>4. 연 단위 수당 (정근수당·명절휴가비·정기상여금 등)</h2>
+      <p class="hint">
+        1년 기준으로 지급되는 금액(또는 이 계약기간에 해당하는 금액)을 입력하면,<br />
+        계약기간 전체 근무일수 비율에 따라 월별로 나누어 배분합니다.
+      </p>
+
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th>항목명</th>
+              <th>연 단위 금액 (계약기간에 해당하는 총액)</th>
+            </tr>
+          </thead>
+          <tbody id="annualBody">
+            <tr class="annual-row">
+              <td><input type="text" class="annual-name" value="정근수당" /></td>
+              <td><input type="number" class="annual-amount" placeholder="0" /></td>
+            </tr>
+            <tr class="annual-row">
+              <td><input type="text" class="annual-name" value="명절휴가비" /></td>
+              <td><input type="number" class="annual-amount" placeholder="0" /></td>
+            </tr>
+            <tr class="annual-row">
+              <td><input type="text" class="annual-name" value="정기상여금" /></td>
+              <td><input type="number" class="annual-amount" placeholder="0" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" id="addAnnualBtn">+ 연단위 수당 항목 추가</button>
+    </section>
+
+    <!-- 5. 방학/미운영 기간 설정 -->
+    <section class="card">
+      <h2>5. 방학 기간 및 방과후 미운영 기간 설정</h2>
+      <p class="hint">
+        계약기간 전체 중에서 방학 기간(8시간 근무)과, 그 안에서 방과후 미운영(4시간 근무) 기간을 설정합니다.<br />
+        여러 구간으로 나눠서 입력할 수 있습니다.
+      </p>
+
+      <h3 style="font-size:15px;margin:8px 0 6px;">방학 기간 (8시간 근무)</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>시작일</th>
+              <th>종료일</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody id="vacationBody">
+            <tr class="vac-row">
+              <td><input type="date" class="vac-start" /></td>
+              <td><input type="date" class="vac-end" /></td>
+              <td><input type="text" class="vac-note" placeholder="예: 여름방학" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" id="addVacBtn">+ 방학 구간 추가</button>
+
+      <h3 style="font-size:15px;margin:18px 0 6px;">방학 중 방과후 미운영 기간 (4시간 근무)</h3>
+      <p class="hint">
+        방학 기간 안에서 “방과후 미운영으로 4시간만 근무하는 기간”을 입력합니다.<br />
+        방학 기간과 겹치는 날짜는 방학(8시간) 대신 미운영(4시간)으로 처리합니다.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>시작일</th>
+              <th>종료일</th>
+              <th>비고</th>
+            </tr>
+          </thead>
+          <tbody id="noAfBody">
+            <tr class="noaf-row">
+              <td><input type="date" class="noaf-start" /></td>
+              <td><input type="date" class="noaf-end" /></td>
+              <td><input type="text" class="noaf-note" placeholder="예: 방과후 미운영기간 1" /></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" id="addNoAfBtn">+ 미운영 구간 추가</button>
+    </section>
+
+    <!-- 6. 월별 근무일수 자동 계산 -->
+    <section class="card">
+      <h2>6. 월별 근무일수 자동 계산</h2>
+      <p class="hint">
+        계약기간 + 방학·미운영 구간 + 근무 요일을 기준으로,<br />
+        월별로 학기중(4시간)·방학(8시간)·미운영(4시간) 근무일수를 자동 계산합니다.<br />
+        이후 월별 근무일수는 표에서 직접 수정해도 됩니다.
+      </p>
+      <button type="button" class="btn" id="buildMonthBtn">월별 근무일수 계산하기</button>
+      <p id="monthError" class="error"></p>
+
+      <div id="monthTableWrap" style="margin-top:10px;"></div>
+    </section>
+
+    <!-- 7. 월별 인건비 계산 -->
+    <section class="card">
+      <h2>7. 월별 인건비 및 기관부담금 계산</h2>
+      <p class="hint">
+        호봉·기본급·수당·월별 근무일수를 종합하여 월별 인건비와 기관부담금을 계산합니다.<br />
+        건강보험·연금·고용·산재·장기요양 보험료는 합산 비율로 계산합니다.
+      </p>
+      <button type="button" class="btn" id="calcBtn">월별 인건비 계산하기</button>
+      <p id="calcError" class="error"></p>
+
+      <div id="resultWrap" style="margin-top:10px;"></div>
+    </section>
+
+    <a class="btn" href="/index.html">메인으로 돌아가기</a>
+  </main>
+
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+  </footer>
+
+  <script src="/static/global-loader.js?v=1"></script>
+  <script src="script.js"></script>
+</body>
+</html>
