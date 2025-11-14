@@ -3,10 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>계약제교원 예산 신청용 인건비 일할계산기</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="color-scheme" content="light" />
+  <title>계약제교원 예산 신청 계산기</title>
+  <link rel="icon" href="/static/favicon.ico" />
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="/static/disable-copy.js"></script>
 </head>
 <body>
+  <!-- 상단 헤더: 다른 계산기랑 통일 -->
   <header class="site-header">
     <div class="shell">
       <h1>계약제교원 예산 신청 계산기</h1>
@@ -21,54 +25,83 @@
   </header>
 
   <main class="shell">
+
     <!-- 1. 근무 요일 및 기간 입력 -->
     <section class="card">
       <h2>1. 근무 요일 및 기간 입력</h2>
 
-      <div class="field-group">
-        <label class="label">근무 요일 (복수 선택)</label>
-        <div class="weekday-box">
-          <label><input type="checkbox" class="weekday" value="1" checked> 월</label>
-          <label><input type="checkbox" class="weekday" value="2" checked> 화</label>
-          <label><input type="checkbox" class="weekday" value="3" checked> 수</label>
-          <label><input type="checkbox" class="weekday" value="4" checked> 목</label>
-          <label><input type="checkbox" class="weekday" value="5" checked> 금</label>
-          <label><input type="checkbox" class="weekday" value="6"> 토</label>
-          <label><input type="checkbox" class="weekday" value="0"> 일</label>
-        </div>
+      <div class="form-row">
+        <label>
+          근무 요일 (복수 선택)
+          <div class="row gap" style="flex-wrap:wrap; margin-top:4px;">
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="1" checked /> 월
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="2" checked /> 화
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="3" checked /> 수
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="4" checked /> 목
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="5" checked /> 금
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="6" /> 토
+            </label>
+            <label style="font-weight:400; font-size:13px;">
+              <input type="checkbox" class="weekday" value="0" /> 일
+            </label>
+          </div>
+        </label>
         <p class="hint">※ 아무것도 선택하지 않으면 자동으로 월~금 기준으로 계산합니다.</p>
       </div>
 
       <div class="grid two">
         <div>
-          <h3>학기 중 기간 (4시간 근무)</h3>
-          <div class="field-group">
-            <label class="label" for="semesterStart">학기 중 시작일</label>
-            <input type="date" id="semesterStart">
+          <h3 style="margin:4px 0 6px; font-size:15px;">학기 중 기간 (4시간 근무)</h3>
+          <div class="form-row">
+            <label>
+              학기 중 시작일
+              <input type="date" id="semesterStart" />
+            </label>
           </div>
-          <div class="field-group">
-            <label class="label" for="semesterEnd">학기 중 종료일</label>
-            <input type="date" id="semesterEnd">
+          <div class="form-row">
+            <label>
+              학기 중 종료일
+              <input type="date" id="semesterEnd" />
+            </label>
           </div>
         </div>
 
         <div>
-          <h3>방학 기간 (8시간 근무)</h3>
-          <div class="field-group">
-            <label class="label" for="vacation1Start">여름방학 시작일</label>
-            <input type="date" id="vacation1Start">
+          <h3 style="margin:4px 0 6px; font-size:15px;">방학 기간 (8시간 근무)</h3>
+          <div class="form-row">
+            <label>
+              여름방학 시작일
+              <input type="date" id="vacation1Start" />
+            </label>
           </div>
-          <div class="field-group">
-            <label class="label" for="vacation1End">여름방학 종료일</label>
-            <input type="date" id="vacation1End">
+          <div class="form-row">
+            <label>
+              여름방학 종료일
+              <input type="date" id="vacation1End" />
+            </label>
           </div>
-          <div class="field-group">
-            <label class="label" for="vacation2Start">겨울방학 시작일</label>
-            <input type="date" id="vacation2Start">
+          <div class="form-row">
+            <label>
+              겨울방학 시작일
+              <input type="date" id="vacation2Start" />
+            </label>
           </div>
-          <div class="field-group">
-            <label class="label" for="vacation2End">겨울방학 종료일</label>
-            <input type="date" id="vacation2End">
+          <div class="form-row">
+            <label>
+              겨울방학 종료일
+              <input type="date" id="vacation2End" />
+            </label>
           </div>
           <p class="hint">
             ※ 여름·겨울 방학 일수가 서로 달라도, 방학 기준 월 인건비는 하나로 합산해서 사용합니다.
@@ -82,48 +115,50 @@
       <h2>2. 월 인건비(기본급 + 각종 수당) 입력</h2>
       <p class="hint">
         항목별로 <b>학기 중 기준 월액(4시간)</b>과 <b>방학 중 기준 월액(8시간)</b>을 입력하세요.<br />
-        (예: 18호봉 기준 본봉, 교직수당, 교원연구비, 정근수당가산금, 가족수당, 정액급식비 등)
+        (예: 본봉, 교직수당, 교원연구비, 정근수당가산금, 가족수당, 정액급식비 등)
       </p>
 
-      <div class="allowance-header">
-        <div>항목명</div>
-        <div>학기 중 월액(원, 4시간)</div>
-        <div>방학 중 월액(원, 8시간)</div>
-      </div>
-      <div id="allowance-rows">
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 본봉">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 교직수당">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 교원연구비">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 정근수당가산금">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 정액급식비">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
-        <div class="allowance-row">
-          <input type="text" class="allow-name" placeholder="예: 가족수당 평균">
-          <input type="number" class="allow-semester" min="0" step="1" placeholder="0">
-          <input type="number" class="allow-vacation" min="0" step="1" placeholder="0">
-        </div>
+      <div class="table-wrap" style="margin-top:10px;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40%;">항목명</th>
+              <th style="width:30%;">학기 중 월액(원, 4시간)</th>
+              <th style="width:30%;">방학 중 월액(원, 8시간)</th>
+            </tr>
+          </thead>
+          <tbody id="allowance-rows">
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" placeholder="예: 본봉" /></td>
+              <td><input type="number" class="allow-semester" min="0" step="1" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" min="0" step="1" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" placeholder="예: 교직수당" /></td>
+              <td><input type="number" class="allow-semester" min="0" step="1" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" min="0" step="1" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" placeholder="예: 교원연구비" /></td>
+              <td><input type="number" class="allow-semester" min="0" step="1" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" min="0" step="1" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" placeholder="예: 정근수당가산금" /></td>
+              <td><input type="number" class="allow-semester" min="0" step="1" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" min="0" step="1" placeholder="0" /></td>
+            </tr>
+            <tr class="allowance-row">
+              <td><input type="text" class="allow-name" placeholder="예: 정액급식비" /></td>
+              <td><input type="number" class="allow-semester" min="0" step="1" placeholder="0" /></td>
+              <td><input type="number" class="allow-vacation" min="0" step="1" placeholder="0" /></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <button type="button" class="btn" id="addRowBtn">+ 항목 추가</button>
+      <p class="hint">※ 월 인건비는 1개월 기준(보통 3개월 평균)으로 입력하면 됩니다.</p>
     </section>
 
     <!-- 3. 월 기준 근무일수 -->
@@ -134,66 +169,83 @@
         (예: 월~금 주5일 근무, 학기 중 20일, 방학 중 20일 등)
       </p>
       <div class="grid two">
-        <div class="field-group">
-          <label class="label" for="semesterBaseDays">학기 중 월 기준 근무일수(4시간)</label>
-          <input type="number" id="semesterBaseDays" min="1" step="1" placeholder="예: 20">
+        <div class="form-row">
+          <label>
+            학기 중 월 기준 근무일수(4시간)
+            <input type="number" id="semesterBaseDays" min="1" step="1" placeholder="예: 20" />
+          </label>
         </div>
-        <div class="field-group">
-          <label class="label" for="vacationBaseDays">방학 중 월 기준 근무일수(8시간)</label>
-          <input type="number" id="vacationBaseDays" min="1" step="1" placeholder="예: 20">
+        <div class="form-row">
+          <label>
+            방학 중 월 기준 근무일수(8시간)
+            <input type="number" id="vacationBaseDays" min="1" step="1" placeholder="예: 20" />
+          </label>
         </div>
       </div>
     </section>
 
-    <!-- 4. 연간/기간별 기본 계산 -->
+    <!-- 4. 기본 일할 계산 결과 -->
     <section class="card">
       <h2>4. 연간 기준 일할계산</h2>
-      <button type="button" class="btn primary" id="calcBtn">계산하기</button>
-      <p id="errorBox" class="error" aria-live="polite"></p>
+      <button type="button" class="btn" id="calcBtn">학기·방학 전체 계산하기</button>
+      <p id="errorBox" class="error"></p>
 
-      <div id="resultBox" class="result">
-        <h3>학기 중 / 방학별 요약</h3>
-        <div class="grid two">
-          <div>
-            <h4>학기 중</h4>
-            <p>월 총액: <span id="semMonthTotal">0원</span></p>
-            <p>월 기준 근무일수: <span id="semBaseDays">0일</span></p>
-            <p>1일 단가: <span id="semDailyRate">0원</span></p>
-            <p>실제 근무일수: <span id="semRealDays">0일</span></p>
-            <p>학기 중 인건비 합계: <span id="semTotal">0원</span></p>
-          </div>
-          <div>
-            <h4>방학 중 (여름+겨울)</h4>
-            <p>월 총액: <span id="vacMonthTotal">0원</span></p>
-            <p>월 기준 근무일수: <span id="vacBaseDays">0일</span></p>
-            <p>1일 단가: <span id="vacDailyRate">0원</span></p>
-            <p>여름방학 근무일수: <span id="vac1RealDays">0일</span></p>
-            <p>겨울방학 근무일수: <span id="vac2RealDays">0일</span></p>
-            <p>방학 전체 근무일수: <span id="vacRealDays">0일</span></p>
-            <p>방학 중 인건비 합계: <span id="vacTotal">0원</span></p>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-label strong">학기 중 (4시간)</div>
+          <div class="result-label">월 총액</div>
+          <div class="result-value" id="semMonthTotal">0원</div>
+          <div class="result-label" style="margin-top:6px;">월 기준 근무일수</div>
+          <div class="result-value" id="semBaseDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">1일 단가</div>
+          <div class="result-value" id="semDailyRate">0원</div>
+          <div class="result-label" style="margin-top:6px;">실제 근무일수</div>
+          <div class="result-value" id="semRealDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">학기 중 인건비 합계</div>
+          <div class="result-value" id="semTotal">0원</div>
+        </div>
+
+        <div class="result-item">
+          <div class="result-label strong">방학 중 (8시간, 여름+겨울)</div>
+          <div class="result-label">월 총액</div>
+          <div class="result-value" id="vacMonthTotal">0원</div>
+          <div class="result-label" style="margin-top:6px;">월 기준 근무일수</div>
+          <div class="result-value" id="vacBaseDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">1일 단가</div>
+          <div class="result-value" id="vacDailyRate">0원</div>
+          <div class="result-label" style="margin-top:6px;">여름방학 근무일수</div>
+          <div class="result-value" id="vac1RealDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">겨울방학 근무일수</div>
+          <div class="result-value" id="vac2RealDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">방학 전체 근무일수</div>
+          <div class="result-value" id="vacRealDays">0일</div>
+          <div class="result-label" style="margin-top:6px;">방학 중 인건비 합계</div>
+          <div class="result-value" id="vacTotal">0원</div>
+        </div>
+
+        <div class="result-item result-item-wide">
+          <div class="result-label strong">전체 인건비 합계 (학기 중 + 방학 중)</div>
+          <div class="result-total" id="grandTotal">0원</div>
+          <div class="result-sub">
+            원단위까지 계산 후, 10원 단위로 버림 처리한 금액입니다.
           </div>
         </div>
-        <hr />
-        <p class="total-line">
-          전체 인건비 합계 (최종, 10원 단위 버림): <span id="grandTotal">0원</span>
-        </p>
-        <p class="hint">
-          ※ 원단위까지의 내부 계산 결과를 10원 단위로 버림 처리했습니다.
-        </p>
       </div>
     </section>
 
-    <!-- 5. 분기/월별 신청액용 기간 설정 -->
+    <!-- 5. 분기 / 월별 신청액 계산용 구간 -->
     <section class="card">
       <h2>5. 분기 / 월별 신청액 계산용 기간 설정</h2>
       <p class="hint">
         1분기(3~5월), 2분기(6~8월)처럼 실제 학사일정에 맞는 기간을 나눠서 입력하세요.<br />
-        예: 7월 학기중 / 7월 방학중 / 8월 방학중 / 8월 학기중 등으로 행을 쪼갤 수 있습니다.
+        예: 7월 학기중 / 7월 방학중 / 8월 방학중 / 8월 학기중 등으로 행을 쪼개서 사용할 수 있습니다.
       </p>
 
-      <div class="field-group">
-        <label class="label" for="quarterName">분기/기간 이름 (표시용)</label>
-        <input type="text" id="quarterName" placeholder="예: 2025년 4분기 (유치원 시기간제)">
+      <div class="form-row">
+        <label>
+          분기/기간 이름 (표시용)
+          <input type="text" id="quarterName" placeholder="예: 2025년 4분기 (유치원 시기간제)" />
+        </label>
       </div>
 
       <div class="segment-header">
@@ -247,34 +299,49 @@
         사회보험 기관부담금은 1분기 산출기초 양식 기준 비율(건강 3.545%, 연금 4.5%, 고용 1.75%, 산재 0.966%, 노인장기요양 12.95%)을 합산해 사용합니다.
       </p>
 
-      <button type="button" class="btn primary" id="calcQuarterBtn">분기 금액 계산하기</button>
-      <p id="qErrorBox" class="error" aria-live="polite"></p>
+      <button type="button" class="btn" id="calcQuarterBtn">분기 금액 계산하기</button>
+      <p id="qErrorBox" class="error"></p>
 
-      <div id="qResultBox" class="result">
-        <h3>분기 요약: <span id="qNameDisplay">-</span></h3>
-        <p>학기 중 급여 합계: <span id="qSemWage">0원</span></p>
-        <p>방학 중 급여 합계: <span id="qVacWage">0원</span></p>
-        <p>급여 합계(학기중+방학중): <span id="qWageTotal">0원</span></p>
-        <p>기관부담금 합계(건강+연금+고용+산재+장기요양): <span id="qEmployerTotal">0원</span></p>
-        <hr />
-        <p>분기 총액(급여+기관부담금, 원단위): <span id="qGrandRaw">0원</span></p>
-        <p class="total-line">
-          분기 정당신청액 (10원 단위 버림): <span id="qGrandFinal">0원</span>
-        </p>
-        <p class="hint">
-          ※ 부족분 보정이 필요하면, 이전 분기 신청액(또는 실제 집행액)과의 차액을 따로 계산해 조정하면 됩니다.<br />
-          (이 계산기는 “이번 분기 기준으로 새로 계산한 정당신청액”을 뽑는 용도입니다.)
-        </p>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-label strong">
+            분기 요약: <span id="qNameDisplay">-</span>
+          </div>
+          <div class="result-label" style="margin-top:6px;">학기 중 급여 합계</div>
+          <div class="result-value" id="qSemWage">0원</div>
+          <div class="result-label" style="margin-top:6px;">방학 중 급여 합계</div>
+          <div class="result-value" id="qVacWage">0원</div>
+          <div class="result-label" style="margin-top:6px;">급여 합계(학기중+방학중)</div>
+          <div class="result-value" id="qWageTotal">0원</div>
+          <div class="result-label" style="margin-top:6px;">기관부담금 합계</div>
+          <div class="result-value" id="qEmployerTotal">0원</div>
+        </div>
+
+        <div class="result-item result-item-wide">
+          <div class="result-label strong">분기 정당신청액</div>
+          <div class="result-total" id="qGrandFinal">0원</div>
+          <div class="result-sub">
+            분기 총액(급여+기관부담금)을 원단위로 계산 후, 10원 단위로 버림한 금액입니다.<br />
+            부족분 보정이 필요하면, 이전 분기 신청액(또는 실제 집행액)과의 차액을 따로 계산해 조정하면 됩니다.
+          </div>
+        </div>
       </div>
     </section>
+
+    <section class="card">
+      <p class="note small">
+        ※ 내부 검토용으로만 사용하세요. 계산 결과는 실제 인건비 집행 및 예산 요구 시 담당자 검토를 반드시 거쳐야 합니다.
+      </p>
+    </section>
+
+    <a class="btn" href="/index.html">메인으로 돌아가기</a>
   </main>
 
-  <footer class="site-footer">
-    <div class="shell">
-      <p>ⓒ 귀여운 고주무관 · 계약제교원 예산 신청용 실험 계산기</p>
-    </div>
+  <footer style="text-align:center; margin-top:15px; color:#444;">
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
   </footer>
 
+  <script src="/static/global-loader.js?v=1"></script>
   <script src="script.js"></script>
 </body>
 </html>
