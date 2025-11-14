@@ -23,11 +23,12 @@
 
     <h1>[구상 단계] 씩씩하고 귀여운 고주무관의 업무 효율화 웹페이지</h1>
 
+    <p class="muted">·일 좀 편하게 해보자. </p>
     <p class="muted">·목표: 업무적으로 1인분을 하게 되면 2026.7월부터 본격적으로 개발 시작, 2027년 베타 테스트 및 배포.</p>
 
     <section class="section">
-      <h2 style="font-size:1.2rem; margin:0 0 12px">주요 기능 (현재 업무분장 기반)</h2>
-      <p class="muted"> ※웹사이트로 개발할만한 게 인건비 계산이 가장 적절해서 급여 기능 위주로 갑니다.</p>
+      <h2 style="font-size:1.2rem; margin:0 0 12px">주요 분야</h2>
+      <p class="muted"> ※현재 업무분장 중에서 서식 만들기 적절한 게 인건비임.</p>
 
       <p> ·급여: 각종 인건비성 지출 (사회보험, 원천세 등 포함) </p>
       <p> ·계약: 학교장임용 직원 관련 인사·계약 </p>
@@ -40,17 +41,24 @@
 
     </section>
 
-    <!-- 교육공무직 연차 관련 업무 -->
+    <!-- 교육공무직 인건비 관련 기능 -->
     <section class="section">
-      <h2 style="font-size:1.2rem; margin:0 0 12px">교육공무직 연차 업무 관련 기능</h2>
+      <h2 style="font-size:1.2rem; margin:0 0 12px">교육공무직 인건비 관련 기능</h2>
+
+     <div><a class="btn" href="/ordinary-wage/">교육공무직 통상임금 계산기</a>
+       <div class="btn-desc">·직종별 보수표 반영 (완성도 괜찮음. 베타 테스트 가능)</div></div>
 
       <div><a class="btn" href="/annual-leave/">교육공무직 연차 유급휴가 일수 계산기</a>
         <div class="btn-desc">·C++ 실행 파일과 다른 양식. (완성도 괜찮음. 베타 테스트 가능)</div></div>
+
       <div><a class="btn" href="/annual-leave-pay/">교육공무직 연차 유급휴가 미사용 수당 계산기</a>
         <div class="btn-desc">·통상임금 계산기는 별도 (완성도 괜찮음. 베타 테스트 가능)</div></div>
-      <div><a class="btn" href="/ordinary-wage/">교육공무직 통상임금 계산기</a>
-        <div class="btn-desc">·직종별 보수표 반영 (완성도 괜찮음. 베타 테스트 가능)</div></div>
+
+     <div><a class="btn" href="/vacation-weekly-holiday-wage/">조리종사원 급식소 청소 및 청소원 방학근무 인건비 계산기</a>
+        <div class="btn-desc">·주휴수당 등 (완성도 대충 중간쯤. 좀더 손대기)</div></div>
+
     </section>
+
 
 
     <!-- 계약제 교원 인건비 등 관련 -->
@@ -58,31 +66,42 @@
       <h2 style="font-size:1.2rem; margin:0 0 12px">계약제교원 인건비 예산 및 지급 관련</h2>
 
       <a class="btn" href="/preschool-parttime-contract-teacher/">유치원 시간제근무 기간제교원 인건비 (분기별)</a>
-      <div class="btn-desc">·학기중 4시간 근무, 방학중 방과후 운영기간은 8시간 근무 (완성도 괜찮음. 베타 테스트 가능.)</div>
+      <div class="btn-desc">·학기중 4시간 근무, 방학중 방과후 운영기간은 8시간 근무 (완성도 대충 중간쯤. 추가 작업 필요.)</div>
     </section>
 
-    <!-- 퇴직연금 관련 -->
+
+
+     <!-- 학교운동부지도자 관련 -->
     <section class="section">
-      <h2 style="font-size:1.2rem; margin:0 0 12px">퇴직금 및 퇴직연금 관련 </h2>
+      <h2 style="font-size:1.2rem; margin:0 0 12px">학교운동부지도자, 스포츠강사 관련</h2> 
 
       <a class="btn" href="/dc-retirement/">DC형 퇴직연금 소요액 계산기</a>
-      <div class="btn-desc">·학교운동부지도자, 스포츠강사, 특수운영직군 등. 회계연도 선택 가능 (완성도 괜찮음. 베타 테스트 가능.)</div>
-    </section>
-
-
-    <!-- 기타 업무 (카테고리 미분류) -->
-    <section class="section">
-      <h2 style="font-size:1.2rem; margin:0 0 12px">기타 업무 관련 기능</h2>
-
-
-      <div><a class="btn" href="/parttime-wage-calculator/">시급제 근로계약자 인건비 소요액 계산기</a>
-        <div class="btn-desc">·초단시간 및 단시간 근로자 자동 구분됨. (완성도 괜찮음. 베타 테스트 가능.)</div></div>
-
-      <div><a class="btn" href="/coach-ot/">학교 운동부지도자 초과근무수당 계산기</a>
-        <div class="btn-desc">·출장, 훈련 많고 수익자부담금 귀찮은 운동부지도자… (완성도 없음. 추가 작업 필요.)</div></div>
+      <div class="btn-desc">·학교운동부지도자, 스포츠강사, 특수운영직군 등. 회계연도 선택 가능 (완성도 대충 중간쯤. 추가 작업 필요.)</div>
 
       <div><a class="btn" href="/wage-ledger-2025/">학교장 임용권자 2025 임금대장</a>
         <div class="btn-desc">·엑셀 파일로 변환 저장 가능하게. (완성도 없음. 동적 페이지로 변경, 클라우드 서버 연결 필요)</div></div>
+
+      <a class="btn" href="/coach-ot/">학교운동부지도자 초과근무수당 계산기</a>
+      <div class="btn-desc">·출장, 훈련 많고 수익자부담금 귀찮은 운동부지도자… (완성도 없음. 추가 작업 필요.)</div></div>
+
+
+     </section>
+
+
+   <!-- 근로계약자 -->
+    <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">그외 근로계약자 관련</h2>
+
+      <div><a class="btn" href="/parttime-wage-calculator/">시급제 근로계약자 인건비 소요액 계산기</a>
+        <div class="btn-desc">·초단시간 및 단시간 근로자 자동 구분됨. (완성도 괜찮음. 베타 테스트 가능)</div></div>
+
+     </section>
+
+
+
+     <!-- 기타 미분류 -->
+     <section class="section">
+      <h2 style="font-size:1.2rem; margin:0 0 12px">기타 미분류 기능</h2>
 
       <div><a class="btn" href="/travel-audit/">관내여비 지급 내역 점검기</a>
         <div class="btn-desc">·번외: 감사관님의 노가다를 줄여보자. (완성도 없음. 동적 페이지로 변경, 클라우드 서버 연결 필요)</div></div>
@@ -114,7 +133,6 @@
   <footer style="text-align:center; margin-top:15px; color:#444;">
     제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
   </footer>
-
   <script src="/static/global-loader.js?v=1"></script>
 </body>
 </html>
