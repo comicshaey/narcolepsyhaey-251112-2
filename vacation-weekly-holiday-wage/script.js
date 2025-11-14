@@ -1,5 +1,3 @@
-
-// ===== DOM 요소 =====
 const jobTypeEl = document.getElementById('jobType');
 const startDateEl = document.getElementById('startDate');
 const endDateEl = document.getElementById('endDate');
@@ -29,7 +27,7 @@ const prorataHintText = document.getElementById('prorataHintText');
 
 const grandTotalText = document.getElementById('grandTotalText');
 
-// ===== 유틸 함수 =====
+// ===== 유틸 함수들 =====
 
 // 숫자 → "12,345원"
 function formatKRW(v) {
@@ -68,7 +66,7 @@ function addDays(d, n) {
 function weekKeyMonToSun(d) {
   const x = new Date(d);
   const dow = x.getDay(); // 0=일,1=월...
-  const diffToMon = (dow === 0) ? -6 : (1 - dow);
+  const diffToMon = dow === 0 ? -6 : 1 - dow;
   const mon = addDays(x, diffToMon);
   const z = (n) => String(n).padStart(2, '0');
   return `${mon.getFullYear()}-W${z(mon.getMonth() + 1)}${z(mon.getDate())}`;
@@ -103,7 +101,6 @@ function hasAnyPaidWork(arr) {
 
 // ===== 날짜별 근무 테이블 생성 =====
 
-// 근무일 표 생성
 function buildDaysTable() {
   daysContainer.innerHTML = '';
 
@@ -169,7 +166,6 @@ function buildDaysTable() {
     tdHours.appendChild(hours);
     tr.appendChild(tdHours);
 
-    // 체크 여부에 따라 시간 입력 활성화
     chk.addEventListener('change', () => {
       hours.disabled = !chk.checked;
       if (!chk.checked) hours.value = '0';
@@ -189,7 +185,6 @@ function buildDaysTable() {
 
 // ===== 달별 인건비 설정 테이블 생성 =====
 
-// 기간에 걸친 "YYYY-MM" 목록 만들기
 function monthKeysBetween(start, end) {
   const keys = [];
   if (!(start && end && end >= start)) return keys;
@@ -204,7 +199,6 @@ function monthKeysBetween(start, end) {
   return keys;
 }
 
-// 달별 설정 표 만들기
 function buildMonthConfigTable() {
   monthConfigContainer.innerHTML = '';
 
@@ -224,11 +218,23 @@ function buildMonthConfigTable() {
   const table = document.createElement('table');
   const thead = document.createElement('thead');
   const trHead = document.createElement('tr');
-  ['달(YYYY-MM)', '월 인건비 (청소원 일할계산용)', '기준 일수', '주휴수당 산정 기준 월 금액'].forEach((txt) => {
+
+  [
+    '달(YYYY-MM)',
+    '월 인건비 (청소원 일할계산용)',
+    '기준 일수',
+    '기본급',
+    '직무관련수당 등',
+    '정액급식비',
+    '근속수당',
+    '정기상여 월할분',
+    '명절휴가비 월할분'
+  ].forEach((txt) => {
     const th = document.createElement('th');
     th.textContent = txt;
     trHead.appendChild(th);
   });
+
   thead.appendChild(trHead);
   table.appendChild(thead);
 
@@ -241,9 +247,9 @@ function buildMonthConfigTable() {
 
     const tdYm = document.createElement('td');
     tdYm.textContent = k;
-    tbody.appendChild(tr);
     tr.appendChild(tdYm);
 
+    // 청소원용 월 인건비
     const tdMonthlyPay = document.createElement('td');
     const inpMonthlyPay = document.createElement('input');
     inpMonthlyPay.type = 'number';
@@ -253,6 +259,7 @@ function buildMonthConfigTable() {
     tdMonthlyPay.appendChild(inpMonthlyPay);
     tr.appendChild(tdMonthlyPay);
 
+    // 기준 일수
     const tdDays = document.createElement('td');
     const inpDays = document.createElement('input');
     inpDays.type = 'number';
@@ -263,41 +270,81 @@ function buildMonthConfigTable() {
     tdDays.appendChild(inpDays);
     tr.appendChild(tdDays);
 
-    const tdHolidayMonthly = document.createElement('td');
-    const inpHolidayMonthly = document.createElement('input');
-    inpHolidayMonthly.type = 'number';
-    inpHolidayMonthly.min = '0';
-    inpHolidayMonthly.step = '10';
-    inpHolidayMonthly.className = 'month-holidayMonthlyPay';
-    tdHolidayMonthly.appendChild(inpHolidayMonthly);
-    tr.appendChild(tdHolidayMonthly);
+    // 주휴수당 산입 항목들
+    const makeCell = (cls) => {
+      const td = document.createElement('td');
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.min = '0';
+      inp.step = '10';
+      inp.className = cls;
+      td.appendChild(inp);
+      tr.appendChild(td);
+      return inp;
+    };
 
-    // 입력 바뀔 때마다 재계산
-    [inpMonthlyPay, inpDays, inpHolidayMonthly].forEach((el) => {
+    const inpBase = makeCell('month-basePay');         // 기본급
+    const inpDuty = makeCell('month-dutyAllow');      // 직무관련수당 등
+    const inpMeal = makeCell('month-mealAllow');      // 정액급식비
+    const inpLong = makeCell('month-longAllow');      // 근속수당
+    const inpBonus = makeCell('month-bonusMonthly');  // 정기상여 월할분
+    const inpHoliday = makeCell('month-holidayBonus'); // 명절휴가비 월할분
+
+    // 값 바뀌면 재계산
+    [
+      inpMonthlyPay,
+      inpDays,
+      inpBase,
+      inpDuty,
+      inpMeal,
+      inpLong,
+      inpBonus,
+      inpHoliday
+    ].forEach((el) => {
       el.addEventListener('input', () => recalc());
     });
+
+    tbody.appendChild(tr);
   });
 
   table.appendChild(tbody);
   monthConfigContainer.appendChild(table);
 }
 
-// 달별 설정 값 읽어오기
+// 달별 설정값 읽어서 map으로 넘겨주기
 function getMonthConfigMap() {
   const map = {};
   const rows = monthConfigContainer.querySelectorAll('.month-row');
+
   rows.forEach((row) => {
     const key = row.dataset.monthKey;
+
     const monthlyPayEl = row.querySelector('.month-monthlyPay');
     const monthDaysEl = row.querySelector('.month-monthDays');
-    const holidayMonthlyPayEl = row.querySelector('.month-holidayMonthlyPay');
+
+    const baseEl = row.querySelector('.month-basePay');
+    const dutyEl = row.querySelector('.month-dutyAllow');
+    const mealEl = row.querySelector('.month-mealAllow');
+    const longEl = row.querySelector('.month-longAllow');
+    const bonusEl = row.querySelector('.month-bonusMonthly');
+    const holidayEl = row.querySelector('.month-holidayBonus');
 
     const monthlyPay = parseFloat(monthlyPayEl.value) || 0;
     const monthDays = parseFloat(monthDaysEl.value) || 0;
-    const holidayMonthlyPay = parseFloat(holidayMonthlyPayEl.value) || 0;
 
-    map[key] = { monthlyPay, monthDays, holidayMonthlyPay };
+    const basePay = parseFloat(baseEl.value) || 0;
+    const dutyAllow = parseFloat(dutyEl.value) || 0;
+    const mealAllow = parseFloat(mealEl.value) || 0;
+    const longAllow = parseFloat(longEl.value) || 0;
+    const bonusMonthly = parseFloat(bonusEl.value) || 0;
+    const holidayBonus = parseFloat(holidayEl.value) || 0;
+
+    // 주휴수당 기준이 되는 통상임금 산입 항목 합계
+    const holidayBase = basePay + dutyAllow + mealAllow + longAllow + bonusMonthly + holidayBonus;
+
+    map[key] = { monthlyPay, monthDays, holidayBase };
   });
+
   return map;
 }
 
@@ -307,14 +354,15 @@ function recalc() {
   const jobType = jobTypeEl.value;
   const holidayDaysPerWeek = parseInt(holidayDaysPerWeekEl.value, 10) || 1;
 
-  // 날짜별 근무기록 수집
   const dayRows = daysContainer.querySelectorAll('.day-row');
   const daysArr = [];
+
   dayRows.forEach((row) => {
     const date = parseDate(row.dataset.date);
     const weekNoKey = row.dataset.weekKey;
     const isSunday = row.dataset.isSunday === '1';
     const ym = row.dataset.ymKey;
+
     const chk = row.querySelector('.day-check');
     const hoursInput = row.querySelector('.day-hours');
 
@@ -326,14 +374,13 @@ function recalc() {
       weekNoKey,
       isSunday,
       ymKey: ym,
-      paidHours,
+      paidHours
     });
   });
 
   const anyPaid = daysArr.some((d) => d.paidHours > 0);
   const monthsConfig = getMonthConfigMap();
 
-  // 아무 근무도 없으면 싹 리셋
   if (!anyPaid) {
     workingDaysText.textContent = '-';
     weeklyHoursText.textContent = '-';
@@ -351,7 +398,7 @@ function recalc() {
     holidayPerDayText.textContent = '-';
     holidayTotalText.textContent = '-';
     holidayHintText.textContent =
-      '달별 주휴 기준 금액·기준일수·근무기록을 입력하면 주휴수당을 계산해줍니다.';
+      '달별 통상임금 산입 항목·기준일수·근무기록을 입력하면 주휴수당을 계산해줍니다.';
 
     prorataText.textContent = '-';
     prorataHintText.textContent =
@@ -442,7 +489,6 @@ function recalc() {
     holidayHintText.textContent =
       '청소원은 이 칸에서 주휴수당을 별도로 산정하지 않습니다.';
 
-    // 달별 근로일 수 집계
     const workDaysByMonth = {};
     daysArr.forEach((d) => {
       if (d.paidHours > 0) {
@@ -476,7 +522,7 @@ function recalc() {
     }
   } else {
     // 조리직: 주휴수당 계산
-    const holidayDates = []; // 실제 주휴일(토/일) 날짜 목록
+    const holidayDates = [];
 
     Object.keys(weeksMap).forEach((key) => {
       const wk = weeksMap[key];
@@ -493,7 +539,6 @@ function recalc() {
 
       const sundayInside = !!sunday;
 
-      // 주휴 요건: 1주 15시간 이상 + 다음 주 근무 예정 + 해당 주에 주휴일이 실제로 존재
       if (weeklyHours >= 15 && weeklyWorkDays > 0 && hasNext && sundayInside) {
         if (holidayDaysPerWeek === 1) {
           if (sunday) holidayDates.push(sunday.date);
@@ -504,7 +549,6 @@ function recalc() {
       }
     });
 
-    // 달별 주휴일 수 집계
     const holidayDaysByMonth = {};
     holidayDates.forEach((d) => {
       const key = ymKey(d);
@@ -526,7 +570,6 @@ function recalc() {
         '입력된 근무기록 상 1주 15시간 이상 근무 + 다음 주 근무 예정 요건을 충족한 주가 없거나, 주휴일이 포함되지 않은 것으로 보입니다.';
     }
 
-    // 달별 주휴수당 계산
     let totalJhu = 0;
     let singlePerDay = null;
     const monthKeys = Object.keys(holidayDaysByMonth);
@@ -534,17 +577,14 @@ function recalc() {
     monthKeys.forEach((ym) => {
       const cfg = monthsConfig[ym];
       if (!cfg) return;
-      const { monthlyPay, monthDays, holidayMonthlyPay } = cfg;
-      const baseForHoliday =
-        holidayMonthlyPay > 0 ? holidayMonthlyPay : monthlyPay;
+      const { monthDays, holidayBase } = cfg;
       const cnt = holidayDaysByMonth[ym];
 
-      if (baseForHoliday > 0 && monthDays > 0 && cnt > 0) {
-        const perDay = baseForHoliday / monthDays;
+      if (holidayBase > 0 && monthDays > 0 && cnt > 0) {
+        const perDay = holidayBase / monthDays;
         const subTotal = Math.round(perDay * cnt);
         totalJhu += subTotal;
 
-        // 한 달만 포함된 경우에만 1일 금액 표시용
         if (monthKeys.length === 1) {
           singlePerDay = perDay;
         }
@@ -558,20 +598,19 @@ function recalc() {
       if (monthKeys.length === 1 && singlePerDay !== null) {
         holidayPerDayText.textContent = formatKRW(Math.round(singlePerDay));
         holidayHintText.textContent =
-          '해당 달의 “주휴수당 산정 기준 월 금액”을 기준으로, 기준 일수로 나눠 1일 주휴수당을 계산했습니다.';
+          '해당 달의 통상임금 산입 항목(기본급·직무관련수당·정액급식비·근속수당·상여·명절휴가비 등) 합계를 기준으로, 기준 일수로 나눠 1일 주휴수당을 계산했습니다.';
       } else {
         holidayPerDayText.textContent = '월별 상이 (합계 기준)';
         holidayHintText.textContent =
-          '두 달 이상에 걸쳐 있어, 달별 주휴 기준 금액/기준일수가 달라 1일 금액은 월별로 상이합니다.';
+          '두 달 이상에 걸쳐 있어, 달별 통상임금 산입 항목·기준일수가 달라 1일 금액은 월별로 상이합니다.';
       }
     } else {
       holidayTotalText.textContent = '-';
       holidayPerDayText.textContent = '-';
       holidayHintText.textContent =
-        '각 달의 주휴 기준 금액·기준 일수·주휴일 수가 모두 충족되면 주휴수당을 계산해줍니다.';
+        '각 달의 통상임금 산입 항목·기준 일수·주휴일 수가 모두 충족되면 주휴수당을 계산해줍니다.';
     }
 
-    // 조리직일 때는 청소원 칸 비활성 느낌
     prorataText.textContent = '-';
     prorataHintText.textContent =
       '조리사·조리실무사는 방학중근무수당 + 주휴수당을 기준으로 인건비를 산정하는 것으로 가정했습니다.';
@@ -591,7 +630,6 @@ function recalc() {
 
 // ===== 이벤트 바인딩 =====
 
-// 날짜 변경 → 근무표 + 달별 설정표 재생성 후 재계산
 [startDateEl, endDateEl].forEach((el) => {
   el.addEventListener('change', () => {
     buildDaysTable();
@@ -600,12 +638,10 @@ function recalc() {
   });
 });
 
-// 직종, 주휴일 수 변경 → 재계산
 [jobTypeEl, holidayDaysPerWeekEl].forEach((el) => {
   el.addEventListener('change', () => recalc());
 });
 
-// 초기 호출
 buildDaysTable();
 buildMonthConfigTable();
 recalc();
