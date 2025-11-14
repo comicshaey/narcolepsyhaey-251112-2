@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>조리종사원 및 청소원 방학중근무 인건비 계산기 (괴물버전)</title>
+  <title>조리종사원 및 청소원 방학중근무 인건비 계산기</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
@@ -83,7 +83,9 @@
       <h2>③ 달별 인건비 · 기준 설정</h2>
       <p class="hint">
         선택한 기간이 걸쳐 있는 <strong>각 달(YYYY-MM)</strong>별로,
-        월 인건비, 기준일수, 주휴수당 산정 기준 월 금액을 입력합니다.<br />
+        <strong>청소원 일할계산에 사용할 월 인건비</strong>와
+        <strong>기준 일수</strong>,
+        그리고 <strong>주휴수당 산정 시 통상임금에 들어가는 항목들</strong>을 입력합니다.<br />
         예: 7·8월 방학이면 2025-07, 2025-08 두 줄이 생성됩니다.
       </p>
 
@@ -203,7 +205,7 @@
         </li>
         <li>
           주휴수당(조리직): 각 달별로
-          <strong>“주휴수당 산정 기준 월 금액 × (해당 달의 주휴일수 ÷ 기준 일수)”</strong>로 산정 후 합산
+          <strong>“통상임금에 들어가는 항목 합계 × (해당 달의 주휴일수 ÷ 기준 일수)”</strong>로 산정 후 합산
         </li>
         <li>
           특수운영직군 <strong>청소원</strong>:
