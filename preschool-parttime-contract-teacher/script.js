@@ -1,6 +1,5 @@
-//251114금 
 
-
+// --------- 공통 유틸 ---------
 function toNumber(v) {
   if (v === null || v === undefined || v === "") return 0;
   const n = Number(v);
@@ -21,12 +20,11 @@ function getCheckedWeekdays() {
   cbs.forEach(cb => {
     if (cb.checked) result.push(Number(cb.value));
   });
-  // 아무것도 없으면 월~금
+  // 아무것도 안 찍으면 월~금
   if (result.length === 0) return [1, 2, 3, 4, 5];
   return result;
 }
 
-// 날짜 문자열 YYYY-MM-DD로 포맷
 function fmtDateKey(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -34,14 +32,12 @@ function fmtDateKey(d) {
   return `${y}-${m}-${day}`;
 }
 
-// 월 키 YYYY-MM
 function fmtMonthKey(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   return `${y}-${m}`;
 }
 
-// 날짜 문자열 → Date
 function parseDate(str) {
   if (!str) return null;
   const d = new Date(str);
@@ -49,7 +45,6 @@ function parseDate(str) {
   return d;
 }
 
-// 두 날짜 범위를 돌면서 콜백
 function eachDate(startStr, endStr, cb) {
   const s = parseDate(startStr);
   const e = parseDate(endStr);
@@ -61,7 +56,18 @@ function eachDate(startStr, endStr, cb) {
   }
 }
 
+// 에러 표시 간단 헬퍼
+function setError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = msg ? "#c0392b" : ""; // 빨간색
+  el.style.fontWeight = msg ? "600" : "";
+  el.style.marginTop = msg ? "6px" : "";
+}
+
 // --------- 봉급표 (호봉 → 8시간 기준 월 기본급) ---------
+// 네가 준 값 그대로 사용 (8시간 기준 월액)
 const payTable = {
   1: 1915100,
   2: 1973100,
@@ -105,7 +111,7 @@ const payTable = {
   40: 5995800
 };
 
-// 호봉 선택 시 기본급 세팅
+// --------- 호봉 선택 시 기본급 세팅 ---------
 function updateBasePayFromStep() {
   const stepSelect = document.getElementById("stepSelect");
   const base8Input = document.getElementById("basePay8");
@@ -118,13 +124,12 @@ function updateBasePayFromStep() {
   const base = payTable[stepVal] || 0;
   base8Input.value = base || "";
 
-  // 4시간은 단순히 1/2로 처리 (시간제 4h 기준)
-  const base4 = base * 0.5;
+  const base4 = base * 0.5; // 4시간 기준 기본급
   sem4Input.value = base4 ? Math.round(base4) : "";
   vac8Input.value = base ? Math.round(base) : "";
 }
 
-// 봉급 수동 입력시 4시간 기본급 다시 계산
+// 사용자가 8시간 기본급을 직접 손댔을 때 4시간/방학 기본급도 같이 맞춰주기
 function syncBasePayDerived() {
   const base8Input = document.getElementById("basePay8");
   const sem4Input = document.getElementById("basePay4Sem");
@@ -136,7 +141,7 @@ function syncBasePayDerived() {
   vac8Input.value = base ? Math.round(base) : "";
 }
 
-// 수당, 연단위 지급 수당 ,방학, 방과후 미운영 기간
+// --------- 동적 행 추가 (수당/연단위/방학/미운영) ---------
 function addAllowanceRow() {
   const tbody = document.getElementById("allowanceBody");
   const tr = document.createElement("tr");
@@ -186,28 +191,25 @@ function addNoAfRow() {
 
 // --------- 월별 근무일수 자동 계산 ---------
 function buildMonthTable() {
-  const monthError = document.getElementById("monthError");
-  monthError.textContent = "";
+  setError("monthError", "");
 
   const startStr = document.getElementById("contractStart").value;
   const endStr = document.getElementById("contractEnd").value;
   const start = parseDate(startStr);
   const end = parseDate(endStr);
   if (!start || !end || end < start) {
-    monthError.textContent = "계약 시작일/종료일 입력하세요";
+    setError("monthError", "계약 시작일/종료일을 올바르게 입력해주세요.");
     return;
   }
 
   const weekdays = getCheckedWeekdays();
 
-  // 기본적 설정: 학기중
   const dayType = {}; // dateKey -> 'sem' | 'vac' | 'noaf'
-
   eachDate(startStr, endStr, d => {
     dayType[fmtDateKey(d)] = "sem";
   });
 
-  // 방학 구간: 'vac'
+  // 방학: vac
   document.querySelectorAll(".vac-row").forEach(row => {
     const s = row.querySelector(".vac-start").value;
     const e = row.querySelector(".vac-end").value;
@@ -217,7 +219,7 @@ function buildMonthTable() {
     });
   });
 
-  // 방학중 방과후 미운영 구간: 'noaf' (방학보다 우선)
+  // 미운영: noaf (우선순위 더 높게)
   document.querySelectorAll(".noaf-row").forEach(row => {
     const s = row.querySelector(".noaf-start").value;
     const e = row.querySelector(".noaf-end").value;
@@ -227,7 +229,6 @@ function buildMonthTable() {
     });
   });
 
-  // 월별 집계
   const monthMap = {}; // monthKey -> {semDays, vacDays, noafDays}
   let cur = new Date(start.getTime());
   while (cur <= end) {
@@ -237,24 +238,21 @@ function buildMonthTable() {
     if (!monthMap[monthKey]) {
       monthMap[monthKey] = { semDays: 0, vacDays: 0, noafDays: 0 };
     }
-
     if (weekdays.indexOf(dow) !== -1 && dayType[key]) {
       const t = dayType[key];
       if (t === "sem") monthMap[monthKey].semDays += 1;
       else if (t === "vac") monthMap[monthKey].vacDays += 1;
       else if (t === "noaf") monthMap[monthKey].noafDays += 1;
     }
-
     cur.setDate(cur.getDate() + 1);
   }
 
   const monthKeys = Object.keys(monthMap).sort();
-  if (monthKeys.length === 0) {
-    monthError.textContent = "선택된 근무 요일 기준으로 근무일이 한 건도 없습니다.";
+  if (!monthKeys.length) {
+    setError("monthError", "선택된 근무 요일 기준으로 근무일이 한 건도 없습니다.");
     return;
   }
 
-  // 입력 표 생성
   const wrap = document.getElementById("monthTableWrap");
   const table = document.createElement("table");
   table.innerHTML = `
@@ -289,22 +287,24 @@ function buildMonthTable() {
   wrap.appendChild(div);
 }
 
-// --------- 월별 인건비 계산 ---------
+// --------- 월별 인건비 + 정근수당 로직 포함 계산 ---------
 function calcMonthly() {
-  const err = document.getElementById("calcError");
-  err.textContent = "";
+  setError("calcError", "");
   const resultWrap = document.getElementById("resultWrap");
   resultWrap.innerHTML = "";
 
-  // 기본 입력들
   const semBaseDays = toNumber(
     document.getElementById("semesterBaseDays").value
   );
   const vacBaseDays = toNumber(
     document.getElementById("vacationBaseDays").value
   );
+
   if (semBaseDays <= 0 || vacBaseDays <= 0) {
-    err.textContent = "학기 중/방학 중 월 기준 근무일수를 1 이상으로 입력해주세요.";
+    setError(
+      "calcError",
+      "학기 중/방학 중 월 기준 근무일수를 1 이상으로 입력해주세요."
+    );
     return;
   }
 
@@ -314,11 +314,14 @@ function calcMonthly() {
   const base8Vac = toNumber(document.getElementById("basePay8Vac").value);
 
   if (!base8 || !base4Sem || !base8Vac) {
-    err.textContent = "호봉 선택하거나 기본급 수동 입력 바람";
+    setError(
+      "calcError",
+      "기본급(8시간 기준) 및 4시간/방학 기본급이 비어 있습니다. 호봉 선택 또는 직접 입력 후 다시 시도해주세요."
+    );
     return;
   }
 
-  // 월 단위 기본 수당 합산
+  // 월 단위 수당
   let allowSemSum = 0;
   let allowVacSum = 0;
   document.querySelectorAll(".allowance-row").forEach(row => {
@@ -328,44 +331,78 @@ function calcMonthly() {
     allowVacSum += toNumber(v && v.value);
   });
 
-  // 학기 중 / 방학 월 총액
+  // 기본급만 따로, 기본급+수당 합쳐서도 따로 본다.
+  const baseSemMonth = base4Sem;
+  const baseVacMonth = base8Vac;
   const semMonthTotal = base4Sem + allowSemSum;
   const vacMonthTotal = base8Vac + allowVacSum;
 
-  // 1일 단가
-  const semDaily = semMonthTotal / semBaseDays;
-  const vacDaily = vacMonthTotal / vacBaseDays;
+  // 1일 단가 (기본급만 / 전체)
+  const semDailyBase = baseSemMonth / semBaseDays;
+  const vacDailyBase = baseVacMonth / vacBaseDays;
 
-  // 연 단위 수당 총합
-  let annualTotal = 0;
-  document.querySelectorAll(".annual-row").forEach(row => {
-    const a = row.querySelector(".annual-amount");
-    annualTotal += toNumber(a && a.value);
-  });
+  const semDailyAll = semMonthTotal / semBaseDays;
+  const vacDailyAll = vacMonthTotal / vacBaseDays;
 
-  // 월별 근무일수
+  // 월별 근무일수 가져오기
   const monthRows = document.querySelectorAll(".month-row");
   if (!monthRows.length) {
-    err.textContent = "월별 근무일수 계산하기 먼저 누르쇼 ";
+    setError(
+      "calcError",
+      "먼저 '월별 근무일수 계산하기'를 눌러 월별 표를 만든 뒤 다시 시도하세요."
+    );
     return;
   }
 
   const months = [];
   let totalWorkDays = 0;
+  let totalBaseSubAllMonths = 0;
+
   monthRows.forEach(row => {
     const monthKey = row.getAttribute("data-month");
     const sem = toNumber(row.querySelector(".m-sem").value);
     const vac = toNumber(row.querySelector(".m-vac").value);
     const noaf = toNumber(row.querySelector(".m-noaf").value);
+
     const workDays = sem + vac + noaf;
+
+    const baseSubTotal =
+      semDailyBase * sem + vacDailyBase * vac + semDailyBase * noaf; // 기본급 부분만
+    const wageSubTotalAll =
+      semDailyAll * sem + vacDailyAll * vac + semDailyAll * noaf; // 기본급+수당
+
     totalWorkDays += workDays;
-    months.push({ monthKey, sem, vac, noaf, workDays });
+    totalBaseSubAllMonths += baseSubTotal;
+
+    months.push({
+      monthKey,
+      sem,
+      vac,
+      noaf,
+      workDays,
+      baseSubTotal,
+      wageSubTotalAll
+    });
   });
 
   if (totalWorkDays <= 0) {
-    err.textContent = "근무일수 다시 확인 바람";
+    setError("calcError", "월별 총 근무일수가 0입니다. 근무일수를 다시 확인해주세요.");
     return;
   }
+
+  // 연 단위 수당 분리: 정근수당 vs 기타
+  let annualTotalJeonggeun = 0;
+  let annualTotalOthers = 0;
+  document.querySelectorAll(".annual-row").forEach(row => {
+    const name = (row.querySelector(".annual-name").value || "").trim();
+    const amt = toNumber(row.querySelector(".annual-amount").value);
+    if (!amt) return;
+    if (name.includes("정근수당")) {
+      annualTotalJeonggeun += amt;
+    } else {
+      annualTotalOthers += amt;
+    }
+  });
 
   // 보험료 비율 (건강+연금+고용+산재+장기요양)
   const health = 0.03545;
@@ -377,31 +414,41 @@ function calcMonthly() {
 
   // 월별 계산
   let totalWageAll = 0;
-  let totalAnnualAll = 0;
+  let totalAnnualJG = 0;
+  let totalAnnualOthers = 0;
   let totalEmployerAll = 0;
   let totalFinalAll = 0;
 
-  // 표 만들기
   const table = document.createElement("table");
   let tbodyHtml = "";
 
   months.forEach(m => {
-    const semWage = semDaily * m.sem;
-    const vacWage = vacDaily * m.vac;
-    const noafWage = semDaily * m.noaf; // 미운영도 4시간이라 학기중 단가 사용
+    // 기본급+수당 시간제 인건비 소계
+    const wageSubTotal = m.wageSubTotalAll;
 
-    const wageSubTotal = semWage + vacWage + noafWage;
+    // 정근수당: "기본급 부분 합계" 기준 비율
+    let jgForMonth = 0;
+    if (annualTotalJeonggeun > 0 && totalBaseSubAllMonths > 0) {
+      jgForMonth =
+        (annualTotalJeonggeun * m.baseSubTotal) / totalBaseSubAllMonths;
+    }
 
-    // 연단위 수당 배분: 근무일수 비례
-    const annualForMonth = (annualTotal * m.workDays) / totalWorkDays;
+    // 그 외 연단위 수당: 근무일수 비례
+    let otherAnnualForMonth = 0;
+    if (annualTotalOthers > 0) {
+      otherAnnualForMonth =
+        (annualTotalOthers * m.workDays) / totalWorkDays;
+    }
 
+    const annualForMonth = jgForMonth + otherAnnualForMonth;
     const wageTotal = wageSubTotal + annualForMonth;
     const employer = wageTotal * employerRate;
     const grand = wageTotal + employer;
     const grandFinal = floorTo10(grand);
 
     totalWageAll += wageSubTotal;
-    totalAnnualAll += annualForMonth;
+    totalAnnualJG += jgForMonth;
+    totalAnnualOthers += otherAnnualForMonth;
     totalEmployerAll += employer;
     totalFinalAll += grandFinal;
 
@@ -412,7 +459,8 @@ function calcMonthly() {
         <td class="numeric">${m.vac}</td>
         <td class="numeric">${m.noaf}</td>
         <td class="numeric">${formatWon(Math.round(wageSubTotal))}</td>
-        <td class="numeric">${formatWon(Math.round(annualForMonth))}</td>
+        <td class="numeric">${formatWon(Math.round(jgForMonth))}</td>
+        <td class="numeric">${formatWon(Math.round(otherAnnualForMonth))}</td>
         <td class="numeric">${formatWon(Math.round(employer))}</td>
         <td class="numeric">${formatWon(grandFinal)}</td>
       </tr>
@@ -426,10 +474,11 @@ function calcMonthly() {
         <th>학기중 4시간 일수</th>
         <th>방학 8시간 일수</th>
         <th>미운영 4시간 일수</th>
-        <th>시간제 인건비 소계</th>
-        <th>연단위 수당 배분액</th>
+        <th>시간제 인건비 소계<br/>(기본급+월수당)</th>
+        <th>정근수당 배분액</th>
+        <th>그 외 연단위 수당 배분액</th>
         <th>기관부담금 합계</th>
-        <th>월 최종 합계 (10원 단위 버림)</th>
+        <th>월 최종 합계<br/>(10원 단위 버림)</th>
       </tr>
     </thead>
     <tbody>
@@ -438,11 +487,10 @@ function calcMonthly() {
     <tfoot>
       <tr>
         <td>합계</td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td></td><td></td><td></td>
         <td class="numeric">${formatWon(Math.round(totalWageAll))}</td>
-        <td class="numeric">${formatWon(Math.round(totalAnnualAll))}</td>
+        <td class="numeric">${formatWon(Math.round(totalAnnualJG))}</td>
+        <td class="numeric">${formatWon(Math.round(totalAnnualOthers))}</td>
         <td class="numeric">${formatWon(Math.round(totalEmployerAll))}</td>
         <td class="numeric">${formatWon(floorTo10(totalFinalAll))}</td>
       </tr>
@@ -456,7 +504,7 @@ function calcMonthly() {
   const note = document.createElement("p");
   note.className = "note small";
   note.textContent =
-    "※ '시간제 인건비 소계'는 학기중/방학/미운영 일할계산 합계입니다. '연단위 수당 배분액'은 계약기간 전체 근무일수 비율로 나눈 금액입니다.";
+    "※ 정근수당은 '기본급 부분'이 많이 나오는 달(방학이 많이 낀 달 포함)에 더 많이 배분되도록 계산했습니다. 그 외 연단위 수당은 근무일수 비율로 배분됩니다.";
 
   resultWrap.innerHTML = "";
   resultWrap.appendChild(wrapDiv);
