@@ -107,9 +107,37 @@
       font-size:14px;
     }
 
+    /* 월 정기수당 (월별 입력) */
+    .monthly-grid {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-top:8px;
+    }
+
+    .month-row {
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .month-label {
+      width:90px;
+      font-size:13px;
+      color:#555;
+    }
+
+    .month-allowance-input {
+      flex:1;
+    }
+
     @media (max-width:600px){
       .extra-row {
         grid-template-columns:1fr;
+      }
+      .month-row {
+        flex-direction:column;
+        align-items:stretch;
       }
     }
 
@@ -121,7 +149,7 @@
     <div class="shell">
       <h1 class="page-title">DC형 퇴직연금 소요액 계산기</h1>
       <p class="sub">
-        산정기간 선택 가능 <br/>
+        산정기간 선택 가능 + 월 정기수당(월별) + 연 단위 수당 반영
       </p>
     </div>
   </header>
@@ -132,7 +160,6 @@
     <a href="../index.html" class="btn-main">메인으로 돌아가기</a>
 
     <!-- 산정 기간 선택 -->
-
     <section class="card">
       <h2> 퇴직연금 산정 기간 </h2>
       <p class="field-hint">
@@ -161,7 +188,7 @@
       />
       <p class="field-hint">
         ·교육비특별회계: 2025년 선택 시 2025.1~12월<br />
-        ·학교회계: 2025년 선택 시 2025.3월 ~2026.2월
+        ·학교회계: 2025년 선택 시 2025.3월 ~ 2026.2월
       </p>
     </section>
 
@@ -169,12 +196,12 @@
     <section class="card">
       <h2> 임금 항목 입력</h2>
 
-      <!-- 연간 월 단위 임금 총액 -->
+      <!-- 월 단위 기본 임금 (월간) -->
       <label class="field-label" for="monthlyTotal">
         월 단위 임금 월간 총액
       </label>
       <p class="field-hint">
-        기본급, 정액급식비, 근속수당, 기타 수당 등
+        기본급, 정액급식비, 근속수당 등 매월 고정으로 지급되는 금액(한 달치)
       </p>
       <input
         type="number"
@@ -184,12 +211,11 @@
       />
 
       <!-- 방학 등 제외기간 동안 지급된 월 단위 임금 합계 -->
-
       <label class="field-label" for="excludedMonthly">
         제외 기간 동안 지급된 월 단위 임금 합계
       </label>
       <p class="field-hint">
-        교육공무직 업무편람 p.365 산정 제외 항목 확인
+        교육공무직 업무편람 p.365 산정 제외 항목에 해당하는 금액의 합계 (연간)
       </p>
       <input
         type="number"
@@ -203,7 +229,7 @@
         제외기간 개월 수
       </label>
       <p class="field-hint">
-        숫자만 입력하쇼
+        숫자만 입력하쇼 (예: 방학 2개월 → 2)
       </p>
       <input
         type="number"
@@ -227,15 +253,27 @@
       />
     </section>
 
-    <!-- 추가 수당 항목 -->
+    <!-- 월 정기 수당 (월별 입력) -->
     <section class="card">
-      <h2> 기타 추가 반영 수당</h2>
+      <h2> 월 정기 수당 (월별 입력)</h2>
+      <p class="field-hint">
+        운동부지도자 수익자부담금처럼 매월 금액이 달라지는 수당을 월별로 입력합니다.<br />
+        산정기간에 포함되는 각 월의 수당 총액을 적어주세요.
+      </p>
+
+      <div id="monthlyAllowanceContainer" class="monthly-grid"></div>
+    </section>
+
+    <!-- 기타 추가 수당 (연간 금액) -->
+    <section class="card">
+      <h2> 기타 추가 반영 수당 (연간 금액)</h2>
       <p>
-        운동부지도자 수익자부담금 등
+        위 항목 외에 DC형 임금 산정에 포함하고 싶은 수당이 있으면<br />
+        연간 금액으로 합산해서 입력하세요.
       </p>
 
       <div class="extra-list-header">
-        연간 금액으로 합산해서 입력
+        수당명을 적고, 연간 금액을 입력한 뒤 필요하면 항목을 추가
       </div>
 
       <div id="extraAllowanceList"></div>
@@ -263,8 +301,8 @@
   </main>
 
   <footer style="text-align:center; margin-top:15px; color:#444;">
-  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
-</footer>
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+  </footer>
 
   <script src="./script.js"></script>
 </body>
