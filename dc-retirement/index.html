@@ -201,7 +201,7 @@
     <div class="shell">
       <h1 class="page-title">DC형 퇴직연금 소요액 계산기</h1>
       <p class="sub">
-        ·회계연도에 따른 산정기간 선택 가능
+        산정기간 선택 가능 · 수당별 월별 실지급액 · 연 단위 수당 반영
       </p>
     </div>
   </header>
@@ -218,7 +218,7 @@
       <div class="period-options">
         <label>
           <input type="radio" name="periodType" value="calendar" checked />
-          교육비 특별회계 기준 (1월~12월)
+          교육비특별회계 기준 (1월~12월)
         </label>
         <label>
           <input type="radio" name="periodType" value="school" />
@@ -236,12 +236,12 @@
         placeholder="예: 2025"
       />
       <p class="field-hint">
-        ·교육비 특별회계: 2025년 선택 시 2025.1~12월<br />
+        ·교육비특별회계: 2025년 선택 시 2025.1~12월<br />
         ·학교회계: 2025년 선택 시 2025.3월 ~ 2026.2월
       </p>
     </section>
 
-    <!-- 월단위 임금 매트릭스 -->
+    <!-- ① 월단위 임금 매트릭스 -->
     <section class="card">
       <h2>① 월단위 임금 내역 (수당별 · 월별 실지급액)</h2>
       <p class="field-hint">
@@ -279,9 +279,27 @@
       </button>
     </section>
 
-    <!-- 제외기간 및 연 단위 임금 -->
+    <!-- ② 기타 추가 수당 (연간 금액) -->
     <section class="card">
-      <h2>② 제외기간 · 연 단위 임금</h2>
+      <h2>② 기타 추가 반영 수당 (연간 금액)</h2>
+      <p class="field-hint">
+        월단위 영역에 넣기 애매한 기타 항목이 있으면 연간 금액으로 입력하세요.
+      </p>
+
+      <div class="extra-list-header">
+        수당명을 적고, 연간 금액을 입력한 뒤 필요하면 항목을 추가하세요.
+      </div>
+
+      <div id="extraAllowanceList"></div>
+
+      <button type="button" id="addExtraBtn" class="btn-small" style="margin-top:10px;">
+        + 수당 추가
+      </button>
+    </section>
+
+    <!-- ③ 제외기간 및 연 단위 임금 -->
+    <section class="card">
+      <h2>③ 제외기간 · 연 단위 임금</h2>
 
       <label class="field-label" for="excludedMonthly">
         제외 기간 동안 지급된 월 단위 임금 합계 (연간)
@@ -300,7 +318,7 @@
         제외기간 개월 수
       </label>
       <p class="field-hint">
-        숫자만 입력하쇼 (예: 방학 2개월 → 2)
+        숫자만 입력 (예: 방학 2개월 → 2)
       </p>
       <input
         type="number"
@@ -321,24 +339,6 @@
         class="number-input"
         placeholder="예: 2,461,680"
       />
-    </section>
-
-    <!-- 기타 추가 수당 (연간 금액) -->
-    <section class="card">
-      <h2>③ 기타 추가 반영 수당 (연간 금액)</h2>
-      <p class="field-hint">
-        위 영역에 넣기 애매한 기타 항목이 있으면 연간 금액으로 입력하세요.
-      </p>
-
-      <div class="extra-list-header">
-        수당명을 적고, 연간 금액을 입력한 뒤 필요하면 항목을 추가
-      </div>
-
-      <div id="extraAllowanceList"></div>
-
-      <button type="button" id="addExtraBtn" class="btn-small" style="margin-top:10px;">
-        + 수당 추가
-      </button>
     </section>
 
     <!-- 계산 버튼 및 결과 -->
