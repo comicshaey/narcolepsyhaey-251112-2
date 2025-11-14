@@ -111,7 +111,7 @@ function buildDaysTable() {
     const p = document.createElement('p');
     p.className = 'hint';
     p.style.padding = '10px 12px';
-    p.textContent = '근무 시작일자와 종료일자를 올바르게 입력하면 날짜 목록이 생성됩니다.';
+    p.textContent = '방학 시작일자와 종료일자 입력하면 날짜 목록 생성됨.';
     daysContainer.appendChild(p);
     return;
   }
@@ -183,7 +183,7 @@ function buildDaysTable() {
   daysContainer.appendChild(table);
 }
 
-// ===== 달별 인건비 설정 테이블 생성 =====
+// ===== 월별 인건비 설정 테이블 생성 =====
 
 function monthKeysBetween(start, end) {
   const keys = [];
@@ -210,7 +210,7 @@ function buildMonthConfigTable() {
     const p = document.createElement('p');
     p.className = 'hint';
     p.style.padding = '10px 12px';
-    p.textContent = '근무 시작일자와 종료일자를 입력하면, 여기에 달별 설정 행이 나타납니다.';
+    p.textContent = '방학 시작일자와 종료일자를 입력하면 인건비 항목 생성됨.';
     monthConfigContainer.appendChild(p);
     return;
   }
@@ -220,15 +220,15 @@ function buildMonthConfigTable() {
   const trHead = document.createElement('tr');
 
   [
-    '달(YYYY-MM)',
-    '월 인건비 (청소원 일할계산용)',
-    '기준 일수',
+    '월(YYYY-MM)',
+    '월별 인건비 (청소원 선택시 입력)',
+    '월별 유급 근무일수',
     '기본급',
-    '직무관련수당 등',
+    '직무관련수당·위험수당',
     '정액급식비',
-    '근속수당',
-    '정기상여 월할분',
-    '명절휴가비 월할분'
+    '근속수당·가산수당',
+    '상여·성과급 월 환산액',
+    '명절휴가비 등 기타 수당'
   ].forEach((txt) => {
     const th = document.createElement('th');
     th.textContent = txt;
@@ -259,7 +259,7 @@ function buildMonthConfigTable() {
     tdMonthlyPay.appendChild(inpMonthlyPay);
     tr.appendChild(tdMonthlyPay);
 
-    // 기준 일수
+    // 월별 유급 근무일수
     const tdDays = document.createElement('td');
     const inpDays = document.createElement('input');
     inpDays.type = 'number';
@@ -283,12 +283,12 @@ function buildMonthConfigTable() {
       return inp;
     };
 
-    const inpBase = makeCell('month-basePay');         // 기본급
-    const inpDuty = makeCell('month-dutyAllow');      // 직무관련수당 등
-    const inpMeal = makeCell('month-mealAllow');      // 정액급식비
-    const inpLong = makeCell('month-longAllow');      // 근속수당
-    const inpBonus = makeCell('month-bonusMonthly');  // 정기상여 월할분
-    const inpHoliday = makeCell('month-holidayBonus'); // 명절휴가비 월할분
+    const inpBase = makeCell('month-basePay');
+    const inpDuty = makeCell('month-dutyAllow');
+    const inpMeal = makeCell('month-mealAllow');
+    const inpLong = makeCell('month-longAllow');
+    const inpBonus = makeCell('month-bonusMonthly');
+    const inpHoliday = makeCell('month-holidayBonus');
 
     // 값 바뀌면 재계산
     [
@@ -311,7 +311,7 @@ function buildMonthConfigTable() {
   monthConfigContainer.appendChild(table);
 }
 
-// 달별 설정값 읽어서 map으로 넘겨주기
+// 월별 설정값 읽어서 map으로 전송
 function getMonthConfigMap() {
   const map = {};
   const rows = monthConfigContainer.querySelectorAll('.month-row');
@@ -440,7 +440,7 @@ function recalc() {
   let holidayTotal = 0;
   let prorataTotal = 0;
 
-  // ----- 2) 방학중근무수당 (조리직) -----
+  // ----- 2) 방학중근무수당 (조리종사원) -----
   if (jobType === 'cook' || jobType === 'cook-helper') {
     let firstRate = null;
     let sameRate = true;
@@ -468,7 +468,7 @@ function recalc() {
       }
       restTotalText.textContent = formatKRW(restTotal);
       restRuleText.textContent =
-        '각 근무일의 유급 근로시간이 4시간 이하이면 10,000원, 4시간 초과이면 20,000원으로 일자별 합산했습니다. (조리직 기준)';
+        '각 근무일의 유급 근로시간이 4시간 이하이면 10,000원, 4시간 초과이면 20,000원으로 일자별 합산했습니다. (조리종사원 기준)';
     }
   } else {
     restPerDayText.textContent = '-';
@@ -521,7 +521,7 @@ function recalc() {
         '각 달의 월 인건비와 기준 일수, 그리고 근로일수를 입력하면 청소원 인건비 일할계산을 해줍니다.';
     }
   } else {
-    // 조리직: 주휴수당 계산
+    // 조리종사원: 주휴수당 계산
     const holidayDates = [];
 
     Object.keys(weeksMap).forEach((key) => {
