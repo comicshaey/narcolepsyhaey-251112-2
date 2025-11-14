@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DC형 퇴직연금 소요액 계산기</title>
+  <link rel="stylesheet" href="/static/style.css" />
+
+  <style>
+    /* 페이지 전용 보완 스타일 */
+
+    .page-title {
+      margin: 16px 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .btn-main {
+      display:inline-block;
+      padding:10px 16px;
+      border-radius:999px;
+      border:none;
+      background:#000;
+      color:#fff;
+      font-size:14px;
+      text-decoration:none;
+      margin-bottom:16px;
+    }
+
+    .btn-main.bottom {
+      margin-top:16px;
+    }
+
+    .field-label {
+      display:block;
+      margin-top:12px;
+      margin-bottom:4px;
+      font-weight:600;
+      font-size:14px;
+    }
+
+    .field-hint {
+      font-size:12px;
+      color:#666;
+    }
+
+    .text-input,
+    .number-input {
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #ddd;
+      font-size:14px;
+      box-sizing:border-box;
+    }
+
+    .btn-primary {
+      width:100%;
+      padding:14px;
+      margin-top:16px;
+      border:none;
+      border-radius:10px;
+      background:#000;
+      color:#fff;
+      font-size:15px;
+      cursor:pointer;
+    }
+
+    .result-box {
+      margin-top:18px;
+      padding:16px;
+      border-radius:12px;
+      background:#f6f6f6;
+      font-size:14px;
+    }
+
+    /* 수당 항목 리스트 */
+    .extra-list-header {
+      margin-top:10px;
+      font-size:13px;
+      color:#444;
+    }
+
+    .extra-row {
+      display:grid;
+      grid-template-columns:2fr 2fr auto;
+      gap:8px;
+      margin-top:8px;
+      align-items:center;
+    }
+
+    .btn-small {
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid #ccc;
+      background:#fff;
+      font-size:12px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .period-options {
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-top:8px;
+      font-size:14px;
+    }
+
+    @media (max-width:600px){
+      .extra-row {
+        grid-template-columns:1fr;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="shell">
+      <h1 class="page-title">DC형 퇴직연금 소요액 계산기</h1>
+      <p class="sub">
+        산정기간 선택 가능 <br/>
+      </p>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <!-- 메인으로 돌아가기 (상단) -->
+    <a href="../index.html" class="btn-main">메인으로 돌아가기</a>
+
+    <!-- 산정 기간 선택 -->
+
+    <section class="card">
+      <h2> 퇴직연금 산정 기간 </h2>
+      <p class="field-hint">
+        계약 기간에 따라 산정 기간 선택
+      </p>
+
+      <div class="period-options">
+        <label>
+          <input type="radio" name="periodType" value="calendar" checked />
+          교육비특별회계 기준 (1월~12월)
+        </label>
+        <label>
+          <input type="radio" name="periodType" value="school" />
+          학교회계 기준 (3월~2월)
+        </label>
+      </div>
+
+      <label class="field-label" for="baseYear">
+         기준 연도
+      </label>
+      <input
+        type="number"
+        id="baseYear"
+        class="number-input"
+        placeholder="예: 2025"
+      />
+      <p class="field-hint">
+        ·교육비특별회계: 2025년 선택 시 2025.1~12월<br />
+        ·학교회계: 2025년 선택 시 2025.3월 ~2026.2월
+      </p>
+    </section>
+
+    <!-- 월 단위 / 연 단위 임금 입력 -->
+    <section class="card">
+      <h2> 임금 항목 입력</h2>
+
+      <!-- 연간 월 단위 임금 총액 -->
+      <label class="field-label" for="monthlyTotal">
+        월 단위 임금 월간 총액
+      </label>
+      <p class="field-hint">
+        기본급, 정액급식비, 근속수당, 기타 수당 등
+      </p>
+      <input
+        type="number"
+        id="monthlyTotal"
+        class="number-input"
+        placeholder="예: 2,112,000"
+      />
+
+      <!-- 방학 등 제외기간 동안 지급된 월 단위 임금 합계 -->
+
+      <label class="field-label" for="excludedMonthly">
+        제외 기간 동안 지급된 월 단위 임금 합계
+      </label>
+      <p class="field-hint">
+        교육공무직 업무편람 p.365 산정 제외 항목 확인
+      </p>
+      <input
+        type="number"
+        id="excludedMonthly"
+        class="number-input"
+        placeholder="예: 900,840"
+      />
+
+      <!-- 방학 등 제외개월 수 -->
+      <label class="field-label" for="excludedMonths">
+        제외기간 개월 수
+      </label>
+      <p class="field-hint">
+        숫자만 입력하쇼
+      </p>
+      <input
+        type="number"
+        id="excludedMonths"
+        class="number-input"
+        placeholder="예: 2"
+      />
+
+      <!-- 연 단위 임금 총액 -->
+      <label class="field-label" for="yearlyTotal">
+        연 단위 정기지급 임금 총액
+      </label>
+      <p class="field-hint">
+        명절휴가비, 연차휴가 미사용수당, 정기상여금 등 연 단위로 지급되는 항목
+      </p>
+      <input
+        type="number"
+        id="yearlyTotal"
+        class="number-input"
+        placeholder="예: 2,461,680"
+      />
+    </section>
+
+    <!-- 추가 수당 항목 -->
+    <section class="card">
+      <h2> 기타 추가 반영 수당</h2>
+      <p>
+        운동부지도자 수익자부담금 등
+      </p>
+
+      <div class="extra-list-header">
+        연간 금액으로 합산해서 입력
+      </div>
+
+      <div id="extraAllowanceList"></div>
+
+      <button type="button" id="addExtraBtn" class="btn-small" style="margin-top:10px;">
+        + 수당 추가
+      </button>
+    </section>
+
+    <!-- 계산 버튼 및 결과 -->
+    <section class="card">
+      <h2> DC형 퇴직연금 지급액 산정 결과</h2>
+      <button type="button" id="calcBtn" class="btn-primary">
+        계산 결과보기
+      </button>
+
+      <div id="result" class="result-box">
+        아직임
+      </div>
+    </section>
+
+    <!-- 메인으로 돌아가기 (하단) -->
+    <a href="../index.html" class="btn-main bottom">메인으로 돌아가기</a>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <p>
+        DC형 퇴직연금 산정기 · 귀여운 고주무관 토이 프로젝트<br />
+        실제 산정 시에는 반드시 관련 규정 및 인사 담당자 검토와 함께 사용해주세요.
+      </p>
+    </div>
+  </footer>
+
+  <script src="./script.js"></script>
+</body>
+</html>
