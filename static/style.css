@@ -301,3 +301,26 @@ tfoot td{background:#fafafb;font-weight:700}
 .note.small{
   font-size:11px;
 }
+
+
+.segment-header {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 1.2fr 2fr;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.segment-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1.4fr 1.2fr 2fr;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.segment-row input[type="text"],
+.segment-row input[type="number"],
+.segment-row select {
+  font-size: 13px;
+}
