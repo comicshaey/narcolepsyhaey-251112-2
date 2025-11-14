@@ -11,8 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const periodRadios        = document.querySelectorAll('input[name="periodType"]');
   const monthHeaderElements = document.querySelectorAll(".month-header");
 
-
+  // ------------------------
   // 공통 유틸
+  // ------------------------
 
   const fmt = (n) => n.toLocaleString("ko-KR");
 
@@ -46,8 +47,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return text;
   }
 
-
-  // 월단위 임금 표
+  // ------------------------
+  // 월단위 임금 매트릭스
+  // ------------------------
 
   function updateMonthHeaders() {
     const periodTypeEl = document.querySelector('input[name="periodType"]:checked');
@@ -120,9 +122,9 @@ document.addEventListener("DOMContentLoaded", () => {
     return sum;
   }
 
-
-
+  // ------------------------
   // 기타 연간 수당
+  // ------------------------
 
   function addExtraRow(nameValue = "", amountValue = "") {
     const row = document.createElement("div");
@@ -187,8 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 월 헤더 초기화
   updateMonthHeaders();
 
-  // 기본 행
-
+  // 기본 행 몇 개 깔아두기 (엑셀 느낌)
   addMatrixRow("기본급");
   addMatrixRow("초과근무수당");
   addMatrixRow("기타 수당");
@@ -196,7 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 연간 수당 행 하나
   addExtraRow();
 
-  // 헤더 변경
+  // 라디오 바뀔 때마다 헤더 변경
   periodRadios.forEach((r) => {
     r.addEventListener("change", () => {
       updateMonthHeaders();
