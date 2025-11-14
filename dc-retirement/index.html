@@ -87,6 +87,18 @@
       font-size:14px;
     }
 
+    .period-options label {
+  display: flex;          /* 라디오 + 글씨를 한 줄 flex로 */
+  align-items: center;    /* 세로 가운데 정렬 */
+  gap: 8px;               /* 동그라미랑 글씨 사이 간격 */
+}
+
+.period-options input[type="radio"] {
+  margin: 0;              /* 브라우저 기본 여백 제거 */
+}
+
+  
+
     /* 월단위 임금 매트릭스 */
 
     .matrix-wrapper {
