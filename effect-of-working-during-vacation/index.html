@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>방학중 비상시근로자 연차·보수·4대보험·연말정산 괴물 계산기</title>
+  <title>방학중 비상시근로자 방학중 근무로 인한 종합 영향 계산기</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="shell">
-      <h1>방학중 비상시근로자 종합 영향 계산기</h1>
+      <h1>방학중 비상시근로자 방학중 근무로 인한 종합 영향 계산기</h1>
       <p class="sub">
-        연차일수·연차미사용수당·통상임금·4대보험·연말정산까지 한 번에(괴물 버전)
+        ·출근율 산정, 연차 일수 부여 및 미사용 수당, 사회보험료 증가분, 연말정산 등 
       </p>
     </div>
   </header>
@@ -26,40 +26,40 @@
           <input type="number" id="year" value="2025" />
         </label>
         <label>
-          1일 유급처리시간(시간)
+          1일 소정 근무시간 (시간 단위)
           <input type="number" id="paidHoursPerDay" value="8" step="0.1" />
         </label>
 
         <label>
-          근무 시작일(최초 임용일 기준)
+          최초 임용일
           <input type="date" id="startDate" />
         </label>
         <div>
-          <strong>근속연수(해당 연도 3월 1일 기준)</strong><br />
+          <strong>근속연수 (3.1.일자 기준)</strong><br />
           <span id="serviceYears">0</span> 년
         </div>
 
         <label>
-          직종 구분 (설명용 메모)
-          <input type="text" id="jobMemo" placeholder="예: 방학중 비상시 조리종사원" />
+          직종 구분 (수기 입력)
+          <input type="text" id="jobMemo" placeholder="예: 조리실무사" />
         </label>
         <label>
-          비고 메모
-          <input type="text" id="noteMemo" placeholder="예: 2025.3.1. 기준, 학교 근무자" />
+          비고 (수기 입력)
+          <input type="text" id="noteMemo" placeholder="예: 학교 근무자" />
         </label>
       </div>
       <p class="muted">
-        · 회계연도만 선택해도 달력에서 토요일 제외 일수를 자동으로 잡아준다.<br />
-        · 근무 시작일을 넣으면 해당 회계연도 3월 1일 기준 근속연수·기본 연차일수를 자동 산출한다(방학중 비상시근로자 기준, 대략적인 참고용).<br />
-        · 1일 유급처리시간은 연차미사용수당 계산에서 쓰인다(보통 8시간, 5시간, 6시간 등).
+        ·회계연도 입력하면 토요일 제외 일수 자동 산정됨.<br />
+        ·최초 임용일 입력하면 앞서 입력한 회계연도의 3.1.일자를 기준으로 현재 근속연수 및 기본 연차일수 자동 산출함.<br />
+        ·휴게시간 제외 1일 소정 근로시간: 8시간, 6시간, 5시간 등.
       </p>
     </section>
 
     <!-- 2. 달력 기준 근무일수 (토요일 제외) -->
     <section class="card">
-      <h2>2. 달력 기준 근무일수(토요일 제외)</h2>
+      <h2>2. 달력상 총 일수 (토요일 제외)</h2>
       <p>
-        선택한 회계연도 기준으로 <strong>토요일을 뺀 달력상 총 일수</strong>를 자동 계산한다.
+        ·상단에 입력한 회계연도 기준으로 토요일을 제외한 달력상 총 일수 자동 산출
       </p>
       <div class="grid two">
         <div>
@@ -67,7 +67,7 @@
           <span id="calendarTotalDays">-</span> 일
         </div>
         <div>
-          <strong>달력상 총 일수(토요일 제외)</strong><br />
+          <strong>토요일 제외 일수</strong><br />
           <span id="calendarDaysNoSat">-</span> 일
         </div>
       </div>
@@ -77,29 +77,29 @@
     <section class="card">
       <h2>3. 제외기간 입력 (병가·휴직 등)</h2>
       <p class="muted">
-        · 업무편람에서 말하는 ‘해당 기간 제외 사유’를 한 칸씩 입력하는 구간.<br />
-        · 실제로는 사유 이름은 계산에 안 쓰고, 일수만 합산해서 <strong>제외기간</strong>으로 처리한다.
+        ·2025년 교육공무직 등 업무편람 참고 <br />
+        ·사유와 무관하게 제외기간은 총 일수로 합산됨. 
       </p>
 
       <table class="grid-table">
         <thead>
           <tr>
             <th style="width: 40%;">제외 사유</th>
-            <th style="width: 30%;">일수(토요일 제외 기준)</th>
+            <th style="width: 30%;">제외 일수 (토요일 제외)</th>
             <th style="width: 30%;">삭제</th>
           </tr>
         </thead>
         <tbody id="excludeBody"></tbody>
       </table>
-      <button type="button" id="addExcludeBtn">+ 제외기간 행 추가</button>
+      <button type="button" id="addExcludeBtn">행 추가</button>
 
       <div class="grid two" style="margin-top: 16px;">
         <div>
-          <strong>제외기간 합계</strong><br />
+          <strong>제외기간 일수 합계</strong><br />
           <span id="excludeTotalDays">0</span> 일
         </div>
         <div>
-          <strong>제외기간 반영 후 근무가능일수</strong><br />
+          <strong>제외기간 반영 후 근무 가능 일수</strong><br />
           <span id="workableDays">-</span> 일
         </div>
       </div>
@@ -107,28 +107,27 @@
 
     <!-- 4. 방학 기간(여름·겨울) 및 학기중 근무일수 -->
     <section class="card">
-      <h2>4. 방학 기간(여름·겨울) 및 학기중 근무일수</h2>
+      <h2>4. 방학 기간 입력 및 학기중 근무일수 산정</h2>
       <p class="muted">
-        · 여름방학 / 겨울방학 두 구간을 각각 달력으로 넣으면,<br />
-        → 두 방학 기간의 <strong>토요일 제외 일수 합계</strong>를 구하고,<br />
-        → 그걸 빼서 <strong>학기중 근무일수(토요일 제외)</strong>를 계산한다.
+        ·여름방학 및 겨울방학 시작·종료일자 입력하쇼. <br />
+        ·방학기간 중에 토요일 제외 일수 계산하고, 그걸 반영해서 학기중 근무일수 계산함.
       </p>
 
       <h3>4-1. 여름방학 기간</h3>
       <div class="grid two">
         <label>
-          여름방학 시작일
+          여름방학 시작일자
           <input type="date" id="vac1Start" />
         </label>
         <label>
-          여름방학 종료일
+          여름방학 종료일자자
           <input type="date" id="vac1End" />
         </label>
       </div>
 
       <div class="grid two" style="margin-top: 8px;">
         <div>
-          <strong>여름방학 일수(토요일 제외)</strong><br />
+          <strong>여름방학 일수 (토요일 제외)</strong><br />
           <span id="vac1DaysNoSat">0</span> 일
         </div>
       </div>
@@ -136,34 +135,34 @@
       <h3 style="margin-top: 16px;">4-2. 겨울방학 기간</h3>
       <div class="grid two">
         <label>
-          겨울방학 시작일
+          겨울방학 시작일자
           <input type="date" id="vac2Start" />
         </label>
         <label>
-          겨울방학 종료일
+          겨울방학 종료일자
           <input type="date" id="vac2End" />
         </label>
       </div>
 
       <div class="grid two" style="margin-top: 8px;">
         <div>
-          <strong>겨울방학 일수(토요일 제외)</strong><br />
+          <strong>겨울방학 일수 (토요일 제외)</strong><br />
           <span id="vac2DaysNoSat">0</span> 일
         </div>
       </div>
 
-      <h3 style="margin-top: 16px;">4-3. 합계 및 학기중 근무일수</h3>
+      <h3 style="margin-top: 16px;">4-3. 방학 일수로 학기중 일수 계산하기</h3>
       <div class="grid three" style="margin-top: 8px;">
         <div>
-          <strong>두 방학 합계(토요일 제외)</strong><br />
+          <strong>여름방학 및 겨울방학 일수 합계 (토요일 제외)</strong><br />
           <span id="vacDaysNoSat">0</span> 일
         </div>
         <div>
-          <strong>학기중 근무일수(토요일 제외)</strong><br />
+          <strong>학기중 근무일수 (토요일 제외)</strong><br />
           <span id="termDaysNoSat">-</span> 일
         </div>
         <div>
-          <strong>참고용: 학기중 출근율(제외기간 미반영)</strong><br />
+          <strong>학기중 출근율 산정 (제외기간 미반영)</strong><br />
           <span id="termAttendanceRate">-</span> %
         </div>
       </div>
@@ -171,28 +170,28 @@
 
     <!-- 5. 방학 중 근무 보수 입력 (항목별, 비과세 체크) -->
     <section class="card">
-      <h2>5. 방학 중 근무 보수 입력</h2>
+      <h2>5. 방학중 근무로 인한 보수 지급 내역</h2>
       <p class="muted">
-        · 방학 중 비상시근로로 지급하는 보수를 항목별로 넣는다.<br />
-        · <strong>비과세</strong>에 체크한 항목은 소득세/4대보험 계산에서 자동 제외된다.
+        ·방학중 비상시근로자의 방학 근무로 인해 발생한 보수 항목별로 입력.<br />
+        ·비과세에 체크하면 사회보험료 및 (지방)소득세 계산에서 자동 제외됨됨.
       </p>
 
       <table class="grid-table">
         <thead>
           <tr>
-            <th style="width: 40%;">항목명</th>
-            <th style="width: 25%;">금액(원)</th>
-            <th style="width: 15%;">비과세</th>
+            <th style="width: 40%;">보수 지급 항목명</th>
+            <th style="width: 25%;">지급 금액 (원 단위)</th>
+            <th style="width: 15%;">비과세 금액</th>
             <th style="width: 20%;">삭제</th>
           </tr>
         </thead>
         <tbody id="wageBody"></tbody>
       </table>
-      <button type="button" id="addWageBtn">+ 방학근무 보수 항목 추가</button>
+      <button type="button" id="addWageBtn">행 추가</button>
 
       <div class="grid three" style="margin-top: 16px;">
         <div>
-          <strong>방학 근무 보수 총액</strong><br />
+          <strong>방학근무 보수 총액</strong><br />
           <span id="wageTotal">0</span> 원
         </div>
         <div>
@@ -573,4 +572,5 @@
   <script src="script.js"></script>
 </body>
 </html>
+
 
