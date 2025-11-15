@@ -1,260 +1,412 @@
-// 방학중 비상시근로자 방학근무 영향 계산기
-// 통상임금: 명절휴가비 포함 + 시간당 통상임금 → 1일 통상임금까지 자동 계산
+// 숫자 파싱 공통 함수
+function num(val) {
+  const n = parseFloat(val);
+  return isNaN(n) ? 0 : n;
+}
 
-// 숫자 입력값 공통 처리
-function numValue(id) {
+// id로 숫자 읽어오기
+function numById(id) {
   const el = document.getElementById(id);
   if (!el) return 0;
-  const raw = (el.value || '').toString().replace(/,/g, '');
-  const v = parseFloat(raw);
-  return isNaN(v) ? 0 : v;
+  return num(el.value);
 }
 
-// 돈 포맷
-function formatMoney(v) {
-  if (!isFinite(v)) return '-';
-  return v.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) + '원';
+// 날짜 문자열 → Date 객체 (유효성 체크 포함)
+function parseDate(value) {
+  if (!value) return null;
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? null : d;
 }
 
-// 퍼센트 포맷
-function formatPercent(v) {
-  if (!isFinite(v)) return '-';
-  return v.toFixed(2) + '%';
+// 시작~종료 사이에서 토요일만 제외하고 일수 세기(양끝 포함)
+function countDaysWithoutSaturday(startValue, endValue) {
+  const s = parseDate(startValue);
+  const e = parseDate(endValue);
+  if (!s || !e || e < s) return 0;
+
+  let cnt = 0;
+  const d = new Date(s.getTime());
+  while (d <= e) {
+    const day = d.getDay(); // 0:일 ~ 6:토
+    if (day !== 6) cnt++;
+    d.setDate(d.getDate() + 1);
+  }
+  return cnt;
 }
 
-// 통상임금 계산 (시간당, 1일분 둘 다 리턴)
-function calcOrdinaryWage() {
-  const jobType = document.getElementById('jobType').value;
+// 특정 연도의 전체 일수 및 토요일 제외 일수 계산
+function calcYearDays(year) {
+  if (!year) return { total: 0, noSat: 0 };
+  const y = parseInt(year, 10);
+  if (isNaN(y)) return { total: 0, noSat: 0 };
 
-  // 월 임금항목들
-  const baseMonthlyPay = numValue('baseMonthlyPay');      // 기본급(월)
-  const seniorityAllowance = numValue('seniorityAllowance'); // 근속수당/직급보조비(월)
-  const mealAllowance = numValue('mealAllowance');        // 정액급식비(월)
-  const jobRelatedAllowance = numValue('jobRelatedAllowance'); // 직무관련·특수업무수당 등(월)
+  const start = new Date(y, 0, 1);
+  const end = new Date(y, 11, 31);
 
-  // 연 단위 항목들
-  const annualRegularBonus = numValue('annualRegularBonus');   // 정기상여금(연)
-  const annualHolidayBonus = numValue('annualHolidayBonus');   // 명절휴가비(연)
-  const annualJeonggeun = numValue('annualJeonggeun');         // 정근수당 총액(연, 구육성회)
-  const jeonggeunExtra = numValue('jeonggeunExtra');           // 정근수당 가산금(월, 구육성회)
+  let total = 0;
+  let noSat = 0;
 
-  // 공통: 연 단위는 12로 나눠서 월 환산
-  const monthlyRegularBonus = annualRegularBonus / 12;
-  const monthlyHolidayBonus = annualHolidayBonus / 12;
-  const monthlyJeonggeun = annualJeonggeun / 12;
-
-  let monthlyTotal = 0;
-  let baseHours = 209;  // 시간당 통상임금 나눌 기준시간
-  let dailyHours = 8;   // 1일 유급처리시간
-
-  // 직종별 공식 반영
-  if (jobType === 'edu_full') {
-    // 교육공무직(월급제, 전일제) :contentReference[oaicite:4]{index=4}
-    // 월임금(기본급+근속수당+정액급식비+직무관련수당+(정기상여/12)+(명절휴가비/12)) ÷ 209
-    monthlyTotal =
-      baseMonthlyPay +
-      seniorityAllowance +
-      mealAllowance +
-      jobRelatedAllowance +
-      monthlyRegularBonus +
-      monthlyHolidayBonus;
-    baseHours = 209;
-    dailyHours = 8;
-  } else if (jobType === 'edu_5') {
-    // 교육공무직 단시간 5시간 :contentReference[oaicite:5]{index=5}
-    // 월임금(기본급+근속수당+정액급식비+(정기상여/12)+(명절휴가비/12)) ÷ 130
-    monthlyTotal =
-      baseMonthlyPay +
-      seniorityAllowance +
-      mealAllowance +
-      monthlyRegularBonus +
-      monthlyHolidayBonus;
-    baseHours = 130;
-    dailyHours = 5;
-  } else if (jobType === 'edu_6') {
-    // 교육공무직 단시간 6시간 :contentReference[oaicite:6]{index=6}
-    // 월임금(기본급+근속수당+정액급식비+(정기상여/12)+(명절휴가비/12)) ÷ 156
-    monthlyTotal =
-      baseMonthlyPay +
-      seniorityAllowance +
-      mealAllowance +
-      monthlyRegularBonus +
-      monthlyHolidayBonus;
-    baseHours = 156;
-    dailyHours = 6;
-  } else if (jobType === 'gugyu') {
-    // 구육성회직원 :contentReference[oaicite:7]{index=7}
-    // 월임금(봉급+직급보조비+정액급식비+특수업무수당(학교)+(정근수당총액/12)+정근수당가산금
-    //        +(정기상여금/12)+(명절휴가비/12)) ÷ 209
-    monthlyTotal =
-      baseMonthlyPay +            // 봉급
-      seniorityAllowance +        // 직급보조비
-      mealAllowance +             // 정액급식비
-      jobRelatedAllowance +       // 특수업무수당(학교)
-      monthlyJeonggeun +          // 정근수당 총액/12
-      jeonggeunExtra +            // 정근수당 가산금(월)
-      monthlyRegularBonus +
-      monthlyHolidayBonus;
-    baseHours = 209;
-    dailyHours = 8;
-  } else if (jobType === 'special') {
-    // 특수운영직군 종사자(월급제) :contentReference[oaicite:8]{index=8}
-    // 월임금(기본급+근속수당(2유형)+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 209
-    monthlyTotal =
-      baseMonthlyPay +
-      seniorityAllowance +
-      mealAllowance +
-      monthlyRegularBonus +
-      monthlyHolidayBonus;
-    baseHours = 209;
-    dailyHours = 8;
+  const d = new Date(start.getTime());
+  while (d <= end) {
+    total++;
+    if (d.getDay() !== 6) noSat++;
+    d.setDate(d.getDate() + 1);
   }
-
-  if (baseHours <= 0) return { hourly: 0, daily: 0 };
-
-  const hourly = monthlyTotal / baseHours;
-  const daily = hourly * dailyHours; // 연차수당 등에서 쓰는 1일 통상임금
-  return { hourly, daily };
+  return { total, noSat };
 }
 
-function calculateAll() {
-  // 1. 기본 값들
-  const year = numValue('year');
-  const totalDaysNoSat = numValue('totalDaysNoSat');
-  const excludeDays = numValue('excludeDays');
-  const semesterWorkDays = numValue('semesterWorkDays');
+// 제외기간 행 추가
+function addExcludeRow(reason = "", days = "") {
+  const tbody = document.getElementById("excludeBody");
+  const tr = document.createElement("tr");
 
-  // 2. 방학 근무 관련 값
-  const vacationWorkDays = numValue('vacationWorkDays');
-  const vacationPaidHolidays = numValue('vacationPaidHolidays');
-  const vacationWageTaxable = numValue('vacationWageTaxable');
-  const vacationWageNonTax = numValue('vacationWageNonTax');
+  tr.innerHTML = `
+    <td>
+      <select class="exclude-reason">
+        <option value="">선택(메모용)</option>
+        <option value="병가">병가</option>
+        <option value="무급휴직">무급휴직</option>
+        <option value="육아휴직">육아휴직</option>
+        <option value="산재휴직">산재휴직</option>
+        <option value="기타">기타</option>
+      </select>
+    </td>
+    <td>
+      <input type="number" class="exclude-days" value="${days}" step="0.1" />
+    </td>
+    <td>
+      <button type="button" class="btn-remove-exclude">삭제</button>
+    </td>
+  `;
 
-  const totalVacationPaidDays = vacationWorkDays + vacationPaidHolidays;
+  const select = tr.querySelector(".exclude-reason");
+  if (select && reason) select.value = reason;
 
-  // 3. 연차·통상임금 관련 값
-  const baseAnnualLeave = numValue('baseAnnualLeave');
-  const extraLeaveFromVacation = numValue('extraLeaveFromVacation');
-  const usedLeaveThisYear = numValue('usedLeaveThisYear');
+  tbody.appendChild(tr);
+}
 
-  // 통상임금(시간당, 1일분) 계산
-  const ordinary = calcOrdinaryWage();
-  const hourlyOrdinary = ordinary.hourly;
-  const ordinaryDailyWage = ordinary.daily;
+// 방학근무 보수 행 추가
+function addWageRow(name = "", amount = "") {
+  const tbody = document.getElementById("wageBody");
+  const tr = document.createElement("tr");
 
-  // 4. 4대보험·세금 관련 값
-  const fourInsTotalRate = numValue('fourInsTotalRate') / 100;
-  const fourInsPersonalRate = numValue('fourInsPersonalRate') / 100;
-  const taxRate = numValue('taxRate') / 100;
+  tr.innerHTML = `
+    <td>
+      <input type="text" class="wage-name" value="${name}" placeholder="예: 방학근무수당, 주휴수당 등" />
+    </td>
+    <td>
+      <input type="number" class="wage-amount" value="${amount}" step="100" />
+    </td>
+    <td style="text-align:center;">
+      <input type="checkbox" class="wage-nontax" />
+    </td>
+    <td>
+      <button type="button" class="btn-remove-wage">삭제</button>
+    </td>
+  `;
 
-  // ===== ① 출근율 및 연차일수 =====
-  let attendanceRate = null;
-  const denom = totalDaysNoSat - excludeDays;
+  tbody.appendChild(tr);
+}
 
-  if (denom > 0) {
-    attendanceRate =
-      ((semesterWorkDays + totalVacationPaidDays) / denom) * 100;
-  }
+// 제외기간 합계 계산
+function calcExcludeTotal() {
+  const rows = document.querySelectorAll("#excludeBody tr");
+  let total = 0;
+  rows.forEach((row) => {
+    const input = row.querySelector(".exclude-days");
+    total += num(input && input.value);
+  });
+  return total;
+}
 
-  const totalAnnualLeave = baseAnnualLeave + extraLeaveFromVacation;
-  const unusedLeave = Math.max(totalAnnualLeave - usedLeaveThisYear, 0);
-  const unusedLeavePay = unusedLeave * ordinaryDailyWage;
+// 방학근무 보수 합계 계산 (총액 / 과세 / 비과세)
+function calcWageTotals() {
+  const rows = document.querySelectorAll("#wageBody tr");
+  let total = 0;
+  let taxable = 0;
+  let nontax = 0;
 
-  // ===== ③ 4대보험 증가분(추정) =====
-  const fourInsBase = vacationWageTaxable;
-  let fourInsTotal = null;
-  let fourInsPersonal = null;
-  let fourInsEmployer = null;
-
-  if (fourInsTotalRate > 0) {
-    fourInsTotal = fourInsBase * fourInsTotalRate;
-    if (fourInsPersonalRate > 0) {
-      fourInsPersonal = fourInsBase * fourInsPersonalRate;
-      fourInsEmployer = fourInsTotal - fourInsPersonal;
-    }
-  }
-
-  // ===== ④ 연말정산 세금 증가분(추정) =====
-  const extraTaxableIncome = Math.max(
-    vacationWageTaxable - vacationWageNonTax,
-    0
-  );
-  let extraTax = null;
-  if (taxRate > 0) {
-    extraTax = extraTaxableIncome * taxRate;
-  }
-
-  // ===== 결과 출력 =====
-  const resultAttendance = document.getElementById('result-attendance');
-  const resultAnnualpay = document.getElementById('result-annualpay');
-  const resultFourins = document.getElementById('result-fourins');
-  const resultTax = document.getElementById('result-tax');
-
-  // ① 출근율 및 연차일수
-  let attendanceHtml = '';
-  attendanceHtml += `<p>· 기준 연도: <strong>${year || '-'}</strong></p>`;
-  attendanceHtml += `<p>· 학기 중 유급 근로일수: <strong>${semesterWorkDays || 0}일</strong></p>`;
-  attendanceHtml += `<p>· 방학 중 유급 처리일수(근무일 + 유급 주휴일): <strong>${totalVacationPaidDays || 0}일</strong></p>`;
-
-  if (attendanceRate !== null) {
-    attendanceHtml += `<p>· 출근율(간이 계산): <strong>${formatPercent(attendanceRate)}</strong></p>`;
-    attendanceHtml += `<p class="muted">※ 실제 출근율 판단은 월·학기 단위로 나눠서, 방학중 비상시근로자 출근율·연차 기준을 다시 확인해야 함.</p>`;
-  } else {
-    attendanceHtml += `<p>· 출근율: 분모(달력상 총 일수 - 제외기간)가 0 이하라 계산 불가</p>`;
-  }
-
-  attendanceHtml += `<p>· 기본 연차일수(방학근무 반영 전): <strong>${baseAnnualLeave || 0}일</strong></p>`;
-  attendanceHtml += `<p>· 방학근무로 증가한 연차일수(직접 입력): <strong>${extraLeaveFromVacation || 0}일</strong></p>`;
-  attendanceHtml += `<p>→ 방학근무 반영 후 총 연차일수(간이): <strong>${totalAnnualLeave || 0}일</strong></p>`;
-  attendanceHtml += `<p>· 당해연도 사용 연차일수: <strong>${usedLeaveThisYear || 0}일</strong></p>`;
-  attendanceHtml += `<p>→ 남은(미사용) 연차일수(추가 연차 포함): <strong>${unusedLeave}일</strong></p>`;
-
-  resultAttendance.innerHTML = attendanceHtml;
-
-  // ② 통상임금 · 연차미사용수당
-  let annualHtml = '';
-  annualHtml += `<p>· 시간당 통상임금(명절휴가비 포함): <strong>${formatMoney(hourlyOrdinary)}</strong></p>`;
-  annualHtml += `<p>· 1일 통상임금(시간당 통상임금 × 1일 유급처리시간): <strong>${formatMoney(ordinaryDailyWage)}</strong></p>`;
-  annualHtml += `<p>· 미사용 연차일수(추가 연차 포함): <strong>${unusedLeave}일</strong></p>`;
-  annualHtml += `<p>→ 연차휴가미사용수당(추정): <strong>${formatMoney(unusedLeavePay)}</strong></p>`;
-  annualHtml += `<p class="muted">※ 2024.12.19. 이후 발생하는 연차휴가미사용수당은 명절휴가비가 포함된 변경된 통상임금으로 계산해야 함.</p>`;
-
-  resultAnnualpay.innerHTML = annualHtml;
-
-  // ③ 4대보험 추정
-  let fourHtml = '';
-  fourHtml += `<p>· 방학근무 과세 대상 보수 합계: <strong>${formatMoney(fourInsBase)}</strong></p>`;
-  fourHtml += `<p>· 4대보험 총 요율(입력 기준): <strong>${(fourInsTotalRate * 100).toFixed(2)}%</strong></p>`;
-
-  if (fourInsTotal !== null) {
-    fourHtml += `<p>→ 방학근무 보수로 인한 4대보험료 총 증가 추정: <strong>${formatMoney(fourInsTotal)}</strong></p>`;
-    if (fourInsPersonal !== null) {
-      fourHtml += `<p>· 이 중 근로자 개인 부담 추정: <strong>${formatMoney(fourInsPersonal)}</strong></p>`;
-      fourHtml += `<p>· 기관(학교) 부담 추정: <strong>${formatMoney(fourInsEmployer)}</strong></p>`;
+  rows.forEach((row) => {
+    const amountInput = row.querySelector(".wage-amount");
+    const check = row.querySelector(".wage-nontax");
+    const amt = num(amountInput && amountInput.value);
+    total += amt;
+    if (check && check.checked) {
+      nontax += amt;
     } else {
-      fourHtml += `<p class="muted">※ 개인부담률을 입력하면 근로자·기관 부담을 나눠서 볼 수 있음.</p>`;
+      taxable += amt;
     }
-  } else {
-    fourHtml += `<p>→ 4대보험 총 요율을 입력해야 증가액을 계산할 수 있음.</p>`;
-  }
+  });
 
-  fourHtml += `<p class="muted">※ 실제로는 다음 연도에 ‘시간외·방학근무수당 정산내역’을 제출하고, 교육지원청에서 정산한 금액을 학교 예산에 반영.</p>`;
-
-  resultFourins.innerHTML = fourHtml;
-
-  // ④ 연말정산 세금 추정
-  let taxHtml = '';
-  taxHtml += `<p>· 방학근무 과세 대상 금액: <strong>${formatMoney(vacationWageTaxable)}</strong></p>`;
-  taxHtml += `<p>· 그 중 비과세 금액: <strong>${formatMoney(vacationWageNonTax)}</strong></p>`;
-  taxHtml += `<p>→ 추가 과세소득(간이): <strong>${formatMoney(extraTaxableIncome)}</strong></p>`;
-  taxHtml += `<p>· 입력한 평균세율: <strong>${(taxRate * 100).toFixed(2)}%</strong></p>`;
-
-  if (extraTax !== null) {
-    taxHtml += `<p>→ 방학근무 보수로 인한 연말정산 추가 세금 추정: <strong>${formatMoney(extraTax)}</strong></p>`;
-    taxHtml += `<p class="muted">※ 실제 연말정산은 누진세율·각종 공제·4대보험 공제까지 반영되므로, 여기 값은 “대략 이 정도 세금이 더 나올 수 있겠구나” 정도의 참고용.</p>`;
-  } else {
-    taxHtml += `<p>→ 평균세율을 입력하면 추가 세금을 대략 계산할 수 있음.</p>`;
-  }
-
-  resultTax.innerHTML = taxHtml;
+  return { total, taxable, nontax };
 }
+
+// 통상임금 계산
+function calcOrdinaryWage() {
+  const typeEl = document.querySelector('input[name="workType"]:checked');
+  const type = typeEl ? typeEl.value : "full";
+
+  const basic = numById("owBasic");
+  const seniority = numById("owSeniority");
+  const meal = numById("owMeal");
+  const job = numById("owJob");
+  const bonusYear = numById("owBonusYear");
+  const holidayYear = numById("owHolidayYear");
+
+  let monthly = 0;
+  let denom = 209; // 기본값: 전일제
+
+  if (type === "full") {
+    // 전일제: 기본+근속+급식+직무+(상여/12)+(명절/12)
+    monthly =
+      basic +
+      seniority +
+      meal +
+      job +
+      bonusYear / 12 +
+      holidayYear / 12;
+    denom = 209;
+  } else if (type === "part5") {
+    // 단시간 5시간: 직무수당 제외
+    monthly =
+      basic +
+      seniority +
+      meal +
+      bonusYear / 12 +
+      holidayYear / 12;
+    denom = 130;
+  } else if (type === "part6") {
+    // 단시간 6시간: 직무수당 제외
+    monthly =
+      basic +
+      seniority +
+      meal +
+      bonusYear / 12 +
+      holidayYear / 12;
+    denom = 156;
+  }
+
+  const hourly = denom > 0 ? monthly / denom : 0;
+
+  document.getElementById("owMonthly").textContent = Math.round(monthly).toLocaleString();
+  document.getElementById("owHourly").textContent = Math.round(hourly).toLocaleString();
+
+  return { monthly, hourly };
+}
+
+// 연차 관련 계산
+function calcAnnual(hourlyOrdinary) {
+  const paidHoursPerDay = numById("paidHoursPerDay");
+  const base = numById("annualBase");
+  const extraSeniority = numById("annualExtraSeniority");
+  const extraPrevVac = numById("annualExtraFromPrevVac");
+
+  const totalAnnual = base + extraSeniority + extraPrevVac;
+
+  const usedFull = numById("annualUsedFull");
+  const usedHalf = numById("annualUsedHalf");
+  const usedHours = numById("annualUsedHours");
+
+  let usedDaysConv = usedFull + usedHalf * 0.5;
+  if (paidHoursPerDay > 0) {
+    usedDaysConv += usedHours / paidHoursPerDay;
+  }
+
+  const unused = Math.max(0, totalAnnual - usedDaysConv);
+  const unusedPay =
+    hourlyOrdinary > 0 && paidHoursPerDay > 0
+      ? unused * hourlyOrdinary * paidHoursPerDay
+      : 0;
+
+  // 화면 반영
+  document.getElementById("annualTotalDays").textContent = totalAnnual.toFixed(2);
+  document.getElementById("annualUsedDaysConv").textContent = usedDaysConv.toFixed(2);
+  document.getElementById("annualUnusedDays").textContent = unused.toFixed(2);
+  document.getElementById("annualUnusedPay").textContent = Math.round(unusedPay).toLocaleString();
+
+  return { totalAnnual, usedDaysConv, unused, unusedPay };
+}
+
+// 전년도 출근율 계산(참고용)
+function calcPrevAttendance() {
+  const termTotal = numById("prevTermTotalDays");
+  const termWork = numById("prevTermWorkDays");
+  const vacPaid = numById("prevVacPaidDays");
+
+  if (termTotal <= 0) return 0;
+
+  const rate = ((termWork + vacPaid) / termTotal) * 100;
+  document.getElementById("prevAttendanceRate").textContent = rate.toFixed(1);
+  return rate;
+}
+
+// 4대보험 계산
+function calcSocialInsurance(baseFor4ins) {
+  const npEmp = numById("npRateEmp") / 100;
+  const npInd = numById("npRateInd") / 100;
+  const hiEmp = numById("hiRateEmp") / 100;
+  const hiInd = numById("hiRateInd") / 100;
+  const uiEmp = numById("uiRateEmp") / 100;
+  const uiInd = numById("uiRateInd") / 100;
+  const ciEmp = numById("ciRateEmp") / 100;
+
+  const npEmpAmt = baseFor4ins * npEmp;
+  const npIndAmt = baseFor4ins * npInd;
+  const hiEmpAmt = baseFor4ins * hiEmp;
+  const hiIndAmt = baseFor4ins * hiInd;
+  const uiEmpAmt = baseFor4ins * uiEmp;
+  const uiIndAmt = baseFor4ins * uiInd;
+  const ciEmpAmt = baseFor4ins * ciEmp;
+
+  const empTotal = npEmpAmt + hiEmpAmt + uiEmpAmt + ciEmpAmt;
+  const indTotal = npIndAmt + hiIndAmt + uiIndAmt;
+  const grandTotal = empTotal + indTotal;
+
+  document.getElementById("siEmpTotal").textContent = Math.round(empTotal).toLocaleString();
+  document.getElementById("siIndTotal").textContent = Math.round(indTotal).toLocaleString();
+  document.getElementById("siGrandTotal").textContent = Math.round(grandTotal).toLocaleString();
+
+  return { empTotal, indTotal, grandTotal };
+}
+
+// 연말정산 세금 계산
+function calcTax(baseForTax) {
+  const rate = numById("avgTaxRate") / 100;
+  const incomeTax = baseForTax * rate;
+  const localTax = incomeTax * 0.1;
+  const total = incomeTax + localTax;
+
+  document.getElementById("incomeTax").textContent = Math.round(incomeTax).toLocaleString();
+  document.getElementById("localTax").textContent = Math.round(localTax).toLocaleString();
+  document.getElementById("taxTotal").textContent = Math.round(total).toLocaleString();
+
+  return { incomeTax, localTax, total };
+}
+
+// 메인 재계산 함수
+function recalcAll() {
+  const year = document.getElementById("year").value;
+
+  // 1) 연도별 달력 일수
+  const yearInfo = calcYearDays(year);
+  document.getElementById("calendarTotalDays").textContent = yearInfo.total;
+  document.getElementById("calendarDaysNoSat").textContent = yearInfo.noSat;
+
+  // 2) 제외기간
+  const excludeTotal = calcExcludeTotal();
+  document.getElementById("excludeTotalDays").textContent = excludeTotal.toFixed(1);
+
+  const workable = Math.max(0, yearInfo.noSat - excludeTotal);
+  document.getElementById("workableDays").textContent = workable.toFixed(1);
+
+  // 3) 방학 기간 / 학기중 근무일수
+  const vacStart = document.getElementById("vacStart").value;
+  const vacEnd = document.getElementById("vacEnd").value;
+  const vacDaysNoSat = countDaysWithoutSaturday(vacStart, vacEnd);
+  document.getElementById("vacDaysNoSat").textContent = vacDaysNoSat;
+
+  const termDaysNoSat = Math.max(0, yearInfo.noSat - vacDaysNoSat);
+  document.getElementById("termDaysNoSat").textContent = termDaysNoSat;
+
+  const termAttendanceRate =
+    yearInfo.noSat > 0 ? (termDaysNoSat / yearInfo.noSat) * 100 : 0;
+  document.getElementById("termAttendanceRate").textContent = yearInfo.noSat
+    ? termAttendanceRate.toFixed(1)
+    : "-";
+
+  // 4) 방학근무 보수
+  const wageTotals = calcWageTotals();
+  document.getElementById("wageTotal").textContent = wageTotals.total.toLocaleString();
+  document.getElementById("wageTaxable").textContent = wageTotals.taxable.toLocaleString();
+  document.getElementById("wageNonTaxable").textContent = wageTotals.nontax.toLocaleString();
+
+  // 5) 전년도 출근율(참고용)
+  calcPrevAttendance();
+
+  // 6) 통상임금
+  const ow = calcOrdinaryWage();
+
+  // 7) 연차·연차수당
+  const annual = calcAnnual(ow.hourly);
+
+  // 8) 4대보험 기준금액 (방학근무 과세분 + (선택 시) 연차미사용수당)
+  const includeUnused = document.getElementById("includeUnusedIn4ins").checked;
+  const siBase = wageTotals.taxable + (includeUnused ? annual.unusedPay : 0);
+  document.getElementById("siBase").textContent = Math.round(siBase).toLocaleString();
+
+  const si = calcSocialInsurance(siBase);
+
+  // 9) 연말정산 세금 기준금액 (방학근무 과세분 + 연차미사용수당)
+  const taxBase = wageTotals.taxable + annual.unusedPay;
+  document.getElementById("taxBase").textContent = Math.round(taxBase).toLocaleString();
+
+  const tax = calcTax(taxBase);
+
+  // 10) 종합 요약 섹션 반영
+  document.getElementById("sumAnnualTotal").textContent = annual.totalAnnual
+    ? annual.totalAnnual.toFixed(2)
+    : document.getElementById("annualTotalDays").textContent;
+  document.getElementById("sumAnnualUsed").textContent = annual.usedDaysConv.toFixed(2);
+  document.getElementById("sumAnnualUnused").textContent = annual.unused.toFixed(2);
+  document.getElementById("sumAnnualUnusedPay").textContent =
+    Math.round(annual.unusedPay).toLocaleString();
+
+  document.getElementById("sumWageTotal").textContent = wageTotals.total.toLocaleString();
+  document.getElementById("sumWageTaxable").textContent = wageTotals.taxable.toLocaleString();
+  document.getElementById("sumOwHourly").textContent = Math.round(ow.hourly).toLocaleString();
+  document.getElementById("sumPaidHoursPerDay").textContent = numById("paidHoursPerDay").toFixed(1);
+
+  document.getElementById("sumSiEmp").textContent = Math.round(si.empTotal).toLocaleString();
+  document.getElementById("sumSiInd").textContent = Math.round(si.indTotal).toLocaleString();
+  document.getElementById("sumIncomeTax").textContent = Math.round(tax.incomeTax).toLocaleString();
+  document.getElementById("sumLocalTax").textContent = Math.round(tax.localTax).toLocaleString();
+}
+
+// 이벤트 세팅
+document.addEventListener("DOMContentLoaded", () => {
+  // 기본 행 하나씩 만들어두기
+  addExcludeRow();
+  addWageRow("방학근무수당", "");
+  addWageRow("방학 중 주휴수당(과세분)", "");
+
+  // 버튼 이벤트
+  document.getElementById("addExcludeBtn").addEventListener("click", () => {
+    addExcludeRow();
+    recalcAll();
+  });
+
+  document.getElementById("addWageBtn").addEventListener("click", () => {
+    addWageRow();
+    recalcAll();
+  });
+
+  // 동적 삭제 버튼들 - 이벤트 위임
+  document.getElementById("excludeBody").addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-remove-exclude")) {
+      e.target.closest("tr").remove();
+      recalcAll();
+    }
+  });
+
+  document.getElementById("wageBody").addEventListener("click", (e) => {
+    if (e.target.classList.contains("btn-remove-wage")) {
+      e.target.closest("tr").remove();
+      recalcAll();
+    }
+  });
+
+  // 메인 입력들 변경 시마다 재계산
+  document.body.addEventListener("input", (e) => {
+    // 대충 전체 input 변경에 반응해도 계산량이 부담될 정도는 아니라 그냥 통으로 처리
+    recalcAll();
+  });
+
+  document.body.addEventListener("change", (e) => {
+    if (e.target.name === "workType") {
+      recalcAll();
+    }
+  });
+
+  // 첫 계산
+  recalcAll();
+});
