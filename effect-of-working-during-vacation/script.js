@@ -1,15 +1,16 @@
 // 방학중 비상시근로자 방학근무 영향 계산기
-// 그냥 숫자 넣고 "계산하기" 누르면 되는 간이 시뮬레이터 느낌으로 작성
+// 통상임금: 명절휴가비 포함 + 시간당 통상임금 → 1일 통상임금까지 자동 계산
 
-// 숫자 입력값 가져올 때 공통으로 쓸 함수
+// 숫자 입력값 공통 처리
 function numValue(id) {
   const el = document.getElementById(id);
   if (!el) return 0;
-  const v = parseFloat(el.value.replace(/,/g, ''));
+  const raw = (el.value || '').toString().replace(/,/g, '');
+  const v = parseFloat(raw);
   return isNaN(v) ? 0 : v;
 }
 
-// 결과를 깔끔하게 포맷하는 함수(원 단위 표시)
+// 돈 포맷
 function formatMoney(v) {
   if (!isFinite(v)) return '-';
   return v.toLocaleString('ko-KR', { maximumFractionDigits: 0 }) + '원';
@@ -21,52 +22,146 @@ function formatPercent(v) {
   return v.toFixed(2) + '%';
 }
 
+// 통상임금 계산 (시간당, 1일분 둘 다 리턴)
+function calcOrdinaryWage() {
+  const jobType = document.getElementById('jobType').value;
+
+  // 월 임금항목들
+  const baseMonthlyPay = numValue('baseMonthlyPay');      // 기본급(월)
+  const seniorityAllowance = numValue('seniorityAllowance'); // 근속수당/직급보조비(월)
+  const mealAllowance = numValue('mealAllowance');        // 정액급식비(월)
+  const jobRelatedAllowance = numValue('jobRelatedAllowance'); // 직무관련·특수업무수당 등(월)
+
+  // 연 단위 항목들
+  const annualRegularBonus = numValue('annualRegularBonus');   // 정기상여금(연)
+  const annualHolidayBonus = numValue('annualHolidayBonus');   // 명절휴가비(연)
+  const annualJeonggeun = numValue('annualJeonggeun');         // 정근수당 총액(연, 구육성회)
+  const jeonggeunExtra = numValue('jeonggeunExtra');           // 정근수당 가산금(월, 구육성회)
+
+  // 공통: 연 단위는 12로 나눠서 월 환산
+  const monthlyRegularBonus = annualRegularBonus / 12;
+  const monthlyHolidayBonus = annualHolidayBonus / 12;
+  const monthlyJeonggeun = annualJeonggeun / 12;
+
+  let monthlyTotal = 0;
+  let baseHours = 209;  // 시간당 통상임금 나눌 기준시간
+  let dailyHours = 8;   // 1일 유급처리시간
+
+  // 직종별 공식 반영
+  if (jobType === 'edu_full') {
+    // 교육공무직(월급제, 전일제) :contentReference[oaicite:4]{index=4}
+    // 월임금(기본급+근속수당+정액급식비+직무관련수당+(정기상여/12)+(명절휴가비/12)) ÷ 209
+    monthlyTotal =
+      baseMonthlyPay +
+      seniorityAllowance +
+      mealAllowance +
+      jobRelatedAllowance +
+      monthlyRegularBonus +
+      monthlyHolidayBonus;
+    baseHours = 209;
+    dailyHours = 8;
+  } else if (jobType === 'edu_5') {
+    // 교육공무직 단시간 5시간 :contentReference[oaicite:5]{index=5}
+    // 월임금(기본급+근속수당+정액급식비+(정기상여/12)+(명절휴가비/12)) ÷ 130
+    monthlyTotal =
+      baseMonthlyPay +
+      seniorityAllowance +
+      mealAllowance +
+      monthlyRegularBonus +
+      monthlyHolidayBonus;
+    baseHours = 130;
+    dailyHours = 5;
+  } else if (jobType === 'edu_6') {
+    // 교육공무직 단시간 6시간 :contentReference[oaicite:6]{index=6}
+    // 월임금(기본급+근속수당+정액급식비+(정기상여/12)+(명절휴가비/12)) ÷ 156
+    monthlyTotal =
+      baseMonthlyPay +
+      seniorityAllowance +
+      mealAllowance +
+      monthlyRegularBonus +
+      monthlyHolidayBonus;
+    baseHours = 156;
+    dailyHours = 6;
+  } else if (jobType === 'gugyu') {
+    // 구육성회직원 :contentReference[oaicite:7]{index=7}
+    // 월임금(봉급+직급보조비+정액급식비+특수업무수당(학교)+(정근수당총액/12)+정근수당가산금
+    //        +(정기상여금/12)+(명절휴가비/12)) ÷ 209
+    monthlyTotal =
+      baseMonthlyPay +            // 봉급
+      seniorityAllowance +        // 직급보조비
+      mealAllowance +             // 정액급식비
+      jobRelatedAllowance +       // 특수업무수당(학교)
+      monthlyJeonggeun +          // 정근수당 총액/12
+      jeonggeunExtra +            // 정근수당 가산금(월)
+      monthlyRegularBonus +
+      monthlyHolidayBonus;
+    baseHours = 209;
+    dailyHours = 8;
+  } else if (jobType === 'special') {
+    // 특수운영직군 종사자(월급제) :contentReference[oaicite:8]{index=8}
+    // 월임금(기본급+근속수당(2유형)+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 209
+    monthlyTotal =
+      baseMonthlyPay +
+      seniorityAllowance +
+      mealAllowance +
+      monthlyRegularBonus +
+      monthlyHolidayBonus;
+    baseHours = 209;
+    dailyHours = 8;
+  }
+
+  if (baseHours <= 0) return { hourly: 0, daily: 0 };
+
+  const hourly = monthlyTotal / baseHours;
+  const daily = hourly * dailyHours; // 연차수당 등에서 쓰는 1일 통상임금
+  return { hourly, daily };
+}
+
 function calculateAll() {
   // 1. 기본 값들
   const year = numValue('year');
-  const totalDaysNoSat = numValue('totalDaysNoSat'); // 분모에서 토요일 제외 총 일수
-  const excludeDays = numValue('excludeDays');       // 무급 제외기간
-  const semesterWorkDays = numValue('semesterWorkDays'); // 학기 중 유급처리 근로일수
+  const totalDaysNoSat = numValue('totalDaysNoSat');
+  const excludeDays = numValue('excludeDays');
+  const semesterWorkDays = numValue('semesterWorkDays');
 
   // 2. 방학 근무 관련 값
-  const vacationWorkDays = numValue('vacationWorkDays');         // 방학 중 실제 출근일
-  const vacationPaidHolidays = numValue('vacationPaidHolidays'); // 방학 중 유급 주휴일
-  const vacationWageTaxable = numValue('vacationWageTaxable');   // 방학근무 과세 대상 보수 합계
-  const vacationWageNonTax = numValue('vacationWageNonTax');     // 방학근무 비과세 금액
+  const vacationWorkDays = numValue('vacationWorkDays');
+  const vacationPaidHolidays = numValue('vacationPaidHolidays');
+  const vacationWageTaxable = numValue('vacationWageTaxable');
+  const vacationWageNonTax = numValue('vacationWageNonTax');
 
-  const totalVacationPaidDays = vacationWorkDays + vacationPaidHolidays; // 방학의 유급 처리일
+  const totalVacationPaidDays = vacationWorkDays + vacationPaidHolidays;
 
-  // 3. 연차휴가 관련 값
-  const baseAnnualLeave = numValue('baseAnnualLeave');                 // 기본 연차일수
-  const extraLeaveFromVacation = numValue('extraLeaveFromVacation');   // 방학근무로 증가한 연차일수(최대 3일 등)
-  const usedLeaveThisYear = numValue('usedLeaveThisYear');             // 당해 연도 사용 연차
-  const ordinaryDailyWage = numValue('ordinaryDailyWage');             // 통상임금 1일분
+  // 3. 연차·통상임금 관련 값
+  const baseAnnualLeave = numValue('baseAnnualLeave');
+  const extraLeaveFromVacation = numValue('extraLeaveFromVacation');
+  const usedLeaveThisYear = numValue('usedLeaveThisYear');
+
+  // 통상임금(시간당, 1일분) 계산
+  const ordinary = calcOrdinaryWage();
+  const hourlyOrdinary = ordinary.hourly;
+  const ordinaryDailyWage = ordinary.daily;
 
   // 4. 4대보험·세금 관련 값
-  const fourInsTotalRate = numValue('fourInsTotalRate') / 100;   // 총 요율(소수로 변환)
-  const fourInsPersonalRate = numValue('fourInsPersonalRate') / 100; // 개인부담률
-  const taxRate = numValue('taxRate') / 100;                     // 세율(소수)
+  const fourInsTotalRate = numValue('fourInsTotalRate') / 100;
+  const fourInsPersonalRate = numValue('fourInsPersonalRate') / 100;
+  const taxRate = numValue('taxRate') / 100;
 
-  // ===== ① 출근율 및 연차일수 계산 =====
-  // 출근율 산정식(업무편람 기준 요약):
-  // 출근율(%) = { 학기 근무일(토 제외) + 방학의 유급 처리일(토 제외) } × 100
-  //             ÷ { 달력상 총 일수(토요일 제외) - 제외기간 }
-  // 실제로는 학기/방학을 월별로 쪼개서 보지만, 여기서는 연도 단위 간이 계산으로 처리
+  // ===== ① 출근율 및 연차일수 =====
   let attendanceRate = null;
   const denom = totalDaysNoSat - excludeDays;
 
   if (denom > 0) {
-    attendanceRate = ((semesterWorkDays + totalVacationPaidDays) / denom) * 100;
+    attendanceRate =
+      ((semesterWorkDays + totalVacationPaidDays) / denom) * 100;
   }
 
-  const totalAnnualLeave = baseAnnualLeave + extraLeaveFromVacation; // 방학근무 반영 후 총 연차일수
-  const unusedLeave = Math.max(totalAnnualLeave - usedLeaveThisYear, 0); // 미사용 연차일수(0 미만 방지)
-  const unusedLeavePay = unusedLeave * ordinaryDailyWage; // 미사용수당(추가 연차 포함 전체)
+  const totalAnnualLeave = baseAnnualLeave + extraLeaveFromVacation;
+  const unusedLeave = Math.max(totalAnnualLeave - usedLeaveThisYear, 0);
+  const unusedLeavePay = unusedLeave * ordinaryDailyWage;
 
-  // ===== ③ 4대보험료 증가분(추정) =====
-  // 정석은 보수월액·기준소득월액 반영해서 각 보험별로 나눠야 하지만
-  // 여기서는 방학근무 보수에 총 요율을 곱해서 "대략 이만큼 늘어난다" 수준만 본다.
-  const fourInsBase = vacationWageTaxable; // 과세 대상 보수만 기준으로 본다고 가정
+  // ===== ③ 4대보험 증가분(추정) =====
+  const fourInsBase = vacationWageTaxable;
   let fourInsTotal = null;
   let fourInsPersonal = null;
   let fourInsEmployer = null;
@@ -80,15 +175,16 @@ function calculateAll() {
   }
 
   // ===== ④ 연말정산 세금 증가분(추정) =====
-  // 방학근무 보수 중 과세 대상 금액 - 비과세 금액 = 추가 과세소득으로 보고,
-  // 여기에 평균세율을 곱해 대략적인 추가 세액을 본다.
-  const extraTaxableIncome = Math.max(vacationWageTaxable - vacationWageNonTax, 0);
+  const extraTaxableIncome = Math.max(
+    vacationWageTaxable - vacationWageNonTax,
+    0
+  );
   let extraTax = null;
   if (taxRate > 0) {
     extraTax = extraTaxableIncome * taxRate;
   }
 
-  // ===== 화면에 뿌리기 =====
+  // ===== 결과 출력 =====
   const resultAttendance = document.getElementById('result-attendance');
   const resultAnnualpay = document.getElementById('result-annualpay');
   const resultFourins = document.getElementById('result-fourins');
@@ -102,7 +198,7 @@ function calculateAll() {
 
   if (attendanceRate !== null) {
     attendanceHtml += `<p>· 출근율(간이 계산): <strong>${formatPercent(attendanceRate)}</strong></p>`;
-    attendanceHtml += `<p class="muted">※ 실제 출근율 판단은 월·학기 단위로 나눠서 업무편람의 ‘방학중 비상시근로자 ①→②→③→④’ 기준을 다시 봐야 함.</p>`;
+    attendanceHtml += `<p class="muted">※ 실제 출근율 판단은 월·학기 단위로 나눠서, 방학중 비상시근로자 출근율·연차 기준을 다시 확인해야 함.</p>`;
   } else {
     attendanceHtml += `<p>· 출근율: 분모(달력상 총 일수 - 제외기간)가 0 이하라 계산 불가</p>`;
   }
@@ -115,12 +211,13 @@ function calculateAll() {
 
   resultAttendance.innerHTML = attendanceHtml;
 
-  // ② 연차미사용수당
+  // ② 통상임금 · 연차미사용수당
   let annualHtml = '';
-  annualHtml += `<p>· 통상임금 1일분: <strong>${formatMoney(ordinaryDailyWage)}</strong></p>`;
+  annualHtml += `<p>· 시간당 통상임금(명절휴가비 포함): <strong>${formatMoney(hourlyOrdinary)}</strong></p>`;
+  annualHtml += `<p>· 1일 통상임금(시간당 통상임금 × 1일 유급처리시간): <strong>${formatMoney(ordinaryDailyWage)}</strong></p>`;
   annualHtml += `<p>· 미사용 연차일수(추가 연차 포함): <strong>${unusedLeave}일</strong></p>`;
-  annualHtml += `<p>→ 연차미사용수당(추정): <strong>${formatMoney(unusedLeavePay)}</strong></p>`;
-  annualHtml += `<p class="muted">※ 업무편람상 방학근무로 증가한 연차(예: 3일)는 다음 회계연도 3월 임금 지급일에 수당으로 정산하거나, 선지급 동의서를 받은 경우 연차 대신 수당 지급도 가능.</p>`;
+  annualHtml += `<p>→ 연차휴가미사용수당(추정): <strong>${formatMoney(unusedLeavePay)}</strong></p>`;
+  annualHtml += `<p class="muted">※ 2024.12.19. 이후 발생하는 연차휴가미사용수당은 명절휴가비가 포함된 변경된 통상임금으로 계산해야 함.</p>`;
 
   resultAnnualpay.innerHTML = annualHtml;
 
@@ -141,7 +238,7 @@ function calculateAll() {
     fourHtml += `<p>→ 4대보험 총 요율을 입력해야 증가액을 계산할 수 있음.</p>`;
   }
 
-  fourHtml += `<p class="muted">※ 실제로는 다음 연도에 ‘시간외·방학근무수당 정산내역’을 제출하고, 교육지원청에서 4대보험 정산분을 계산 후 학교 부담분을 받는 구조.</p>`;
+  fourHtml += `<p class="muted">※ 실제로는 다음 연도에 ‘시간외·방학근무수당 정산내역’을 제출하고, 교육지원청에서 정산한 금액을 학교 예산에 반영.</p>`;
 
   resultFourins.innerHTML = fourHtml;
 
@@ -154,7 +251,7 @@ function calculateAll() {
 
   if (extraTax !== null) {
     taxHtml += `<p>→ 방학근무 보수로 인한 연말정산 추가 세금 추정: <strong>${formatMoney(extraTax)}</strong></p>`;
-    taxHtml += `<p class="muted">※ 실제 연말정산은 누진세율·각종 공제·보험료 공제까지 모두 반영되므로, 여기 값은 “대략 이 정도 세금이 더 물릴 수 있겠다” 수준의 참고용.</p>`;
+    taxHtml += `<p class="muted">※ 실제 연말정산은 누진세율·각종 공제·4대보험 공제까지 반영되므로, 여기 값은 “대략 이 정도 세금이 더 나올 수 있겠구나” 정도의 참고용.</p>`;
   } else {
     taxHtml += `<p>→ 평균세율을 입력하면 추가 세금을 대략 계산할 수 있음.</p>`;
   }

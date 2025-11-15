@@ -17,6 +17,7 @@
   </header>
 
   <main class="shell">
+    <!-- 1. 기본 정보 -->
     <section class="card">
       <h2>1. 기본 정보</h2>
       <div class="grid two">
@@ -53,6 +54,7 @@
       </div>
     </section>
 
+    <!-- 2. 방학 근무 정보 -->
     <section class="card">
       <h2>2. 방학 중 근무 정보</h2>
       <div class="grid two">
@@ -91,8 +93,11 @@
       </div>
     </section>
 
+    <!-- 3. 연차휴가·통상임금 -->
     <section class="card">
-      <h2>3. 연차휴가 및 연차미사용수당</h2>
+      <h2>3. 연차휴가 · 통상임금(명절휴가비 포함 버전)</h2>
+
+      <!-- 3-1. 연차 기본 정보 -->
       <div class="grid two">
         <div>
           <label for="baseAnnualLeave">기본 연차휴가일수(방학 근무 반영 전, 일)</label>
@@ -119,15 +124,86 @@
           </p>
         </div>
         <div>
-          <label for="ordinaryDailyWage">연차수당 단가(통상임금 1일분, 원)</label>
-          <input id="ordinaryDailyWage" type="number" />
+          <label for="jobType">직종 / 근로형태 (통상임금 산정)</label>
+          <select id="jobType">
+            <option value="edu_full">교육공무직(월급제, 전일제 8시간)</option>
+            <option value="edu_5">교육공무직(월급제, 단시간 5시간)</option>
+            <option value="edu_6">교육공무직(월급제, 단시간 6시간)</option>
+            <option value="gugyu">구육성회직원</option>
+            <option value="special">특수운영직군 종사자(월급제)</option>
+          </select>
           <p class="muted">
-            통상임금 산정 후 1일분 금액(업무편람 통상임금 산식 기준으로 계산한 값 입력)
+            통상임금 산정식이 직종별로 조금씩 다르므로, 가장 가까운 유형 선택
           </p>
         </div>
       </div>
+
+      <!-- 3-2. 통상임금 산정용 임금항목 -->
+      <h3>3-2. 통상임금 산정용 임금항목(월/연 단위)</h3>
+      <div class="grid two">
+        <div>
+          <label for="baseMonthlyPay">기본급(월, 원)</label>
+          <input id="baseMonthlyPay" type="number" />
+        </div>
+        <div>
+          <label for="seniorityAllowance">근속수당 또는 직급보조비(월, 원)</label>
+          <input id="seniorityAllowance" type="number" />
+          <p class="muted">
+            교육공무직: 근속수당 / 구육성회: 직급보조비 / 특수운영직군: 근속수당(2유형)
+          </p>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div>
+          <label for="mealAllowance">정액급식비(월, 원)</label>
+          <input id="mealAllowance" type="number" />
+        </div>
+        <div>
+          <label for="jobRelatedAllowance">직무관련·특수업무수당 등 월 합계(원)</label>
+          <input id="jobRelatedAllowance" type="number" />
+          <p class="muted">
+            교육공무직: 위험·급식운영·기술정보·특수업무·면허가산·특수교육지원·직무수당 등<br />
+            구육성회: 특수업무수당(학교) 등
+          </p>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <div>
+          <label for="annualRegularBonus">정기상여금 총액(연간, 원)</label>
+          <input id="annualRegularBonus" type="number" />
+          <p class="muted">연 단위 정기상여금 총액(예: 기본급 × n개월분)</p>
+        </div>
+        <div>
+          <label for="annualHolidayBonus">명절휴가비 총액(연간, 원)</label>
+          <input id="annualHolidayBonus" type="number" />
+          <p class="muted">
+            설·추석 등 명절휴가비 총액<br />
+            ※ 통상임금 산정 시, 명절휴가비를 12로 나누어 월 임금에 포함(지급을 못받았어도 포함). :contentReference[oaicite:1]{index=1}
+          </p>
+        </div>
+      </div>
+
+      <!-- 구육성회 특수항목 (있으면 넣고, 아니면 0) -->
+      <div class="grid two">
+        <div>
+          <label for="annualJeonggeun">정근수당 총액(연간, 원) [구육성회만 해당]</label>
+          <input id="annualJeonggeun" type="number" value="0" />
+        </div>
+        <div>
+          <label for="jeonggeunExtra">정근수당 가산금(월, 원) [구육성회만 해당]</label>
+          <input id="jeonggeunExtra" type="number" value="0" />
+        </div>
+      </div>
+
+      <p class="muted">
+        ※ 위 항목들을 기준으로 시간당 통상임금을 자동 산출하고, 1일 유급처리시간(8h/5h/6h)에 곱해
+        연차휴가미사용수당에 들어갈 1일 통상임금을 계산합니다. :contentReference[oaicite:2]{index=2}
+      </p>
     </section>
 
+    <!-- 4. 4대보험 및 세금 -->
     <section class="card">
       <h2>4. 4대보험 및 연말정산 세금 영향(간이)</h2>
       <div class="grid two">
@@ -162,6 +238,7 @@
       </div>
     </section>
 
+    <!-- 5. 결과 -->
     <section class="card">
       <h2>5. 계산 결과</h2>
       <button type="button" onclick="calculateAll()">계산하기</button>
@@ -169,7 +246,7 @@
       <h3>① 출근율 및 연차일수</h3>
       <div id="result-attendance" class="muted"></div>
 
-      <h3>② 연차미사용수당(추가 연차 포함)</h3>
+      <h3>② 통상임금 · 연차미사용수당</h3>
       <div id="result-annualpay" class="muted"></div>
 
       <h3>③ 방학근무 보수로 인한 4대보험료 증가 추정</h3>
@@ -183,7 +260,8 @@
   <footer class="site-footer">
     <div class="shell">
       <p class="muted">
-        ※ 실제 연차일수·연차미사용수당·4대보험·세금 처리는 매년 업무편람·보수업무요령·관할 지원청 지침을 다시 확인해야 합니다.
+        ※ 실제 연차일수·연차미사용수당·4대보험·세금 처리는 매년 업무편람·보수업무요령·관할 지원청 지침 및
+        통상임금 관련 최신 지침(명절휴가비 포함 여부 등)을 다시 확인해야 합니다. :contentReference[oaicite:3]{index=3}
       </p>
     </div>
   </footer>
@@ -191,3 +269,4 @@
   <script src="script.js"></script>
 </body>
 </html>
+
