@@ -29,9 +29,19 @@
           1일 유급처리시간(시간)
           <input type="number" id="paidHoursPerDay" value="8" step="0.1" />
         </label>
+
+        <label>
+          근무 시작일(최초 임용일 기준)
+          <input type="date" id="startDate" />
+        </label>
+        <div>
+          <strong>근속연수(해당 연도 3월 1일 기준)</strong><br />
+          <span id="serviceYears">0</span> 년
+        </div>
+
         <label>
           직종 구분 (설명용 메모)
-          <input type="text" id="jobMemo" placeholder="예: 전일제 조리종사원, 5시간 직종 등" />
+          <input type="text" id="jobMemo" placeholder="예: 방학중 비상시 조리종사원" />
         </label>
         <label>
           비고 메모
@@ -40,6 +50,7 @@
       </div>
       <p class="muted">
         · 회계연도만 선택해도 달력에서 토요일 제외 일수를 자동으로 잡아준다.<br />
+        · 근무 시작일을 넣으면 해당 회계연도 3월 1일 기준 근속연수·기본 연차일수를 자동 산출한다(방학중 비상시근로자 기준, 대략적인 참고용).<br />
         · 1일 유급처리시간은 연차미사용수당 계산에서 쓰인다(보통 8시간, 5시간, 6시간 등).
       </p>
     </section>
@@ -94,27 +105,57 @@
       </div>
     </section>
 
-    <!-- 4. 방학 기간 및 학기중 근무일수 -->
+    <!-- 4. 방학 기간(여름·겨울) 및 학기중 근무일수 -->
     <section class="card">
-      <h2>4. 방학 기간 및 학기중 근무일수</h2>
+      <h2>4. 방학 기간(여름·겨울) 및 학기중 근무일수</h2>
       <p class="muted">
-        · 방학 기간을 달력으로 넣으면 그 구간을 제외하고 <strong>학기중 근무일수(토요일 제외)</strong>를 계산한다.<br />
-        · 방학이 두 번 이상이면, 일단 한 번만 넣고 참고값으로 쓰거나, 연도 쪼개서 따로 돌려도 된다.
+        · 여름방학 / 겨울방학 두 구간을 각각 달력으로 넣으면,<br />
+        → 두 방학 기간의 <strong>토요일 제외 일수 합계</strong>를 구하고,<br />
+        → 그걸 빼서 <strong>학기중 근무일수(토요일 제외)</strong>를 계산한다.
       </p>
+
+      <h3>4-1. 여름방학 기간</h3>
       <div class="grid two">
         <label>
-          방학 시작일
-          <input type="date" id="vacStart" />
+          여름방학 시작일
+          <input type="date" id="vac1Start" />
         </label>
         <label>
-          방학 종료일
-          <input type="date" id="vacEnd" />
+          여름방학 종료일
+          <input type="date" id="vac1End" />
         </label>
       </div>
 
-      <div class="grid three" style="margin-top: 16px;">
+      <div class="grid two" style="margin-top: 8px;">
         <div>
-          <strong>방학 기간 총 일수(토요일 제외)</strong><br />
+          <strong>여름방학 일수(토요일 제외)</strong><br />
+          <span id="vac1DaysNoSat">0</span> 일
+        </div>
+      </div>
+
+      <h3 style="margin-top: 16px;">4-2. 겨울방학 기간</h3>
+      <div class="grid two">
+        <label>
+          겨울방학 시작일
+          <input type="date" id="vac2Start" />
+        </label>
+        <label>
+          겨울방학 종료일
+          <input type="date" id="vac2End" />
+        </label>
+      </div>
+
+      <div class="grid two" style="margin-top: 8px;">
+        <div>
+          <strong>겨울방학 일수(토요일 제외)</strong><br />
+          <span id="vac2DaysNoSat">0</span> 일
+        </div>
+      </div>
+
+      <h3 style="margin-top: 16px;">4-3. 합계 및 학기중 근무일수</h3>
+      <div class="grid three" style="margin-top: 8px;">
+        <div>
+          <strong>두 방학 합계(토요일 제외)</strong><br />
           <span id="vacDaysNoSat">0</span> 일
         </div>
         <div>
@@ -165,38 +206,91 @@
       </div>
     </section>
 
-    <!-- 6. 전년도 방학 근무 관련 참고값 (추가 연차일수 입력) -->
+    <!-- 6. 전년도 방학 근무 관련(자동 계산 + 연차 추가 입력) -->
     <section class="card">
-      <h2>6. 전년도 방학 근무 관련(참고 입력)</h2>
+      <h2>6. 전년도 방학 근무 관련(자동 계산 + 연차 추가 입력)</h2>
       <p class="muted">
-        · 전년도 방학 근무로 인해 기본 연차일수가 12일 → 15일로 바뀌는 사례가 있다(최대 +3일).:contentReference[oaicite:0]{index=0}<br />
-        · 정확한 추가일수는 <strong>업무편람 기준</strong>으로 따로 계산해서, 아래 칸에 “결과값만” 넣는 구조로 했다.
+        · 전년도도 현재 연도와 똑같이, 여름·겨울 방학 두 구간을 넣으면<br />
+        → 전년도 달력 총 일수·토요일 제외 일수·학기 총 일수·출근율(참고용)을 자동 계산한다.<br />
+        · 전년도 방학근무로 인한 실제 연차 추가일수는 편람 기준으로 따로 계산해서, 아래 칸에 “결과값만” 넣는 구조.
       </p>
 
       <div class="grid three">
+        <div>
+          <strong>전년도(자동)</strong><br />
+          <span id="prevYearLabel">-</span> 년
+        </div>
+        <div>
+          <strong>전년도 달력상 총 일수</strong><br />
+          <span id="prevYearTotalDays">-</span> 일
+        </div>
+        <div>
+          <strong>전년도 달력상 총 일수(토요일 제외)</strong><br />
+          <span id="prevYearDaysNoSat">-</span> 일
+        </div>
+      </div>
+
+      <h3 style="margin-top: 12px;">6-1. 전년도 여름방학 기간</h3>
+      <div class="grid two">
         <label>
-          전년도 학기 총 일수(토요일 제외, 참고용)
-          <input type="number" id="prevTermTotalDays" placeholder="예: 243" />
+          전년도 여름방학 시작일
+          <input type="date" id="prevVac1Start" />
         </label>
         <label>
-          전년도 학기 중 실제 근무일수(토요일 제외, 참고용)
-          <input type="number" id="prevTermWorkDays" />
+          전년도 여름방학 종료일
+          <input type="date" id="prevVac1End" />
+        </label>
+      </div>
+      <div class="grid two" style="margin-top: 8px;">
+        <div>
+          <strong>전년도 여름방학 일수(토요일 제외)</strong><br />
+          <span id="prevVac1DaysNoSat">0</span> 일
+        </div>
+      </div>
+
+      <h3 style="margin-top: 16px;">6-2. 전년도 겨울방학 기간</h3>
+      <div class="grid two">
+        <label>
+          전년도 겨울방학 시작일
+          <input type="date" id="prevVac2Start" />
         </label>
         <label>
-          전년도 방학의 유급 처리일수(토요일 제외, 주휴 포함 여부는 메모)
-          <input type="number" id="prevVacPaidDays" />
+          전년도 겨울방학 종료일
+          <input type="date" id="prevVac2End" />
         </label>
+      </div>
+      <div class="grid two" style="margin-top: 8px;">
+        <div>
+          <strong>전년도 겨울방학 일수(토요일 제외)</strong><br />
+          <span id="prevVac2DaysNoSat">0</span> 일
+        </div>
+      </div>
+
+      <h3 style="margin-top: 16px;">6-3. 전년도 학기 총 일수 및 출근율(참고용)</h3>
+      <div class="grid three" style="margin-top: 8px;">
+        <div>
+          <strong>전년도 방학 합계(토요일 제외)</strong><br />
+          <span id="prevVacDaysNoSat">0</span> 일
+        </div>
+        <div>
+          <strong>전년도 학기 총 일수(토요일 제외)</strong><br />
+          <span id="prevTermDaysNoSat">0</span> 일
+        </div>
+        <div>
+          <strong>전년도 출근율(참고용)</strong><br />
+          <span id="prevAttendanceRate">-</span> %
+        </div>
       </div>
 
       <div class="grid two" style="margin-top: 16px;">
-        <div>
-          <strong>참고용 전년도 출근율</strong><br />
-          <span id="prevAttendanceRate">-</span> %
-        </div>
         <label>
           전년도 방학근무로 추가된 연차일수(0~3일, 편람 기준 직접 입력)
           <input type="number" id="annualExtraFromPrevVac" value="0" step="0.1" />
         </label>
+        <p class="muted">
+          · 실제 추가 연차일수는 전년도 출근율·방학근무일수·학기중 근무일수 등을 따져서 편람 기준으로 계산해야 한다.<br />
+          · 이 계산기는 “전년도 달력 구조와 방학 길이”를 자동으로 보여주는 참고용.
+        </p>
       </div>
     </section>
 
@@ -204,22 +298,30 @@
     <section class="card">
       <h2>7. 연차휴가 일수 및 연차미사용수당</h2>
       <p class="muted">
-        · 기본 연차일수 + 계속근로 가산일수 + 전년도 방학근무로 추가된 일수를 합쳐 총 부여일수를 만든다.:contentReference[oaicite:1]{index=1}<br />
-        · 사용 연차는 전일·반일·지각·외출·조퇴를 모두 <strong>연차일수로 환산</strong>해서 계산한다.
+        · 기본 연차일수 + 계속근로 가산일수 + 전년도 방학근무로 추가된 일수를 합쳐 총 부여일수를 만든다.<br />
+        · 근무 시작일을 넣으면 방학중 비상시근로자 표 기준으로 <strong>자동 기본 연차일수</strong>가 산출되며,<br />
+        · 아래 칸의 “기본 연차일수(수동 조정)”이 0이면 자동값을 사용, 0보다 크면 입력한 값을 우선으로 쓴다.
       </p>
 
       <div class="grid three">
         <label>
-          기본 연차일수(직종별 기본 11/12일 등)
-          <input type="number" id="annualBase" value="12" step="0.1" />
+          기본 연차일수(수동 조정, 0이면 자동값 사용)
+          <input type="number" id="annualBase" value="0" step="0.1" />
         </label>
         <label>
-          계속근로 가산일수(3년 이상 등)
+          계속근로 가산일수(3년 이상, 매 2년 1일씩 등)
           <input type="number" id="annualExtraSeniority" value="0" step="0.1" />
         </label>
         <div>
           <strong>총 부여 연차일수</strong><br />
           <span id="annualTotalDays">-</span> 일
+        </div>
+      </div>
+
+      <div class="grid three" style="margin-top: 8px;">
+        <div>
+          <strong>자동 기본 연차일수(근속연수 기준)</strong><br />
+          <span id="autoAnnualBase">-</span> 일
         </div>
       </div>
 
@@ -254,7 +356,7 @@
         </div>
       </div>
       <p class="muted">
-        · 계산식: 미사용일수 × 시간당 통상임금 × 1일 유급처리시간.:contentReference[oaicite:2]{index=2}<br />
+        · 계산식: 미사용일수 × 시간당 통상임금 × 1일 유급처리시간.<br />
         · 통상임금은 아래 8번 통상임금 계산 결과를 사용한다.
       </p>
     </section>
@@ -263,12 +365,12 @@
     <section class="card">
       <h2>8. 통상임금 계산 (교육공무직 통상임금 변경사항 반영)</h2>
       <p class="muted">
-        · 기관·학교 근무자 통상임금 산정 변경사항에 따라, 시간당 통상임금을 자동 계산한다.:contentReference[oaicite:3]{index=3}<br />
+        · 통상임금 변경사항(정기상여금·명절휴가비 12분할 포함)을 반영해서 시간당 통상임금을 자동 계산한다.<br />
         · 전일제 / 5시간 직종 / 6시간 직종에 따라 분모 시간을 다르게 잡는다.
       </p>
 
       <div class="grid three">
-        <div>
+        <div class="worktype-group">
           <strong>근로 형태 선택</strong><br />
           <label><input type="radio" name="workType" value="full" checked /> 전일제</label><br />
           <label><input type="radio" name="workType" value="part5" /> 단시간 5시간 직종</label><br />
@@ -312,8 +414,8 @@
         </div>
       </div>
       <p class="muted">
-        · 전일제: (기본급+근속수당+정액급식비+직무관련수당+(정기상여금/12)+(명절휴가비/12)) ÷ 209시간.:contentReference[oaicite:4]{index=4}<br />
-        · 단시간 5시간: (기본급+근속수당+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 130시간.:contentReference[oaicite:5]{index=5}<br />
+        · 전일제: (기본급+근속수당+정액급식비+직무관련수당+(정기상여금/12)+(명절휴가비/12)) ÷ 209시간<br />
+        · 단시간 5시간: (기본급+근속수당+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 130시간<br />
         · 단시간 6시간: 같은 산식 ÷ 156시간.
       </p>
     </section>
@@ -455,7 +557,7 @@
       </div>
 
       <p class="muted">
-        · 법령·요율은 계속 바뀌니, 실제 지급·정산 시에는 반드시 최신 <strong>업무편람·보수 등 업무처리 요령·고시</strong>를 다시 확인해야 한다.:contentReference[oaicite:6]{index=6}<br />
+        · 법령·요율은 계속 바뀌니, 실제 지급·정산 시에는 반드시 최신 업무편람·보수 등 업무처리 요령·고시를 다시 확인해야 한다.<br />
         · 이 계산기는 “방학근무를 얼마나 시켰더니 대략 이 정도 영향이 생기겠구나” 감 잡는 용도로 보는 게 마음이 편하다.
       </p>
     </section>
