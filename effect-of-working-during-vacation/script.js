@@ -1,3 +1,6 @@
+// 바이브 코딩 감성 스크립트
+// 방학중 비상시근로자 괴물 계산기
+
 // 숫자 파싱 공통 함수
 function num(val) {
   const n = parseFloat(val);
@@ -53,6 +56,34 @@ function calcYearDays(year) {
     d.setDate(d.getDate() + 1);
   }
   return { total, noSat };
+}
+
+// 근속연수 계산(해당 연도 3월 1일 기준, 완료 연수 기준)
+function calcServiceYears(startValue, year) {
+  const start = parseDate(startValue);
+  const y = parseInt(year, 10);
+  if (!start || isNaN(y)) return { years: 0 };
+
+  // 학교 기준: 해당 연도 3월 1일
+  const ref = new Date(y, 2, 1); // 월은 0부터 시작 → 2가 3월
+  if (start > ref) return { years: 0 };
+
+  let years = ref.getFullYear() - start.getFullYear();
+  const mDiff = ref.getMonth() - start.getMonth();
+
+  if (mDiff < 0 || (mDiff === 0 && ref.getDate() < start.getDate())) {
+    years--;
+  }
+  if (years < 0) years = 0;
+
+  return { years };
+}
+
+// 근속연수 → 방학중 비상시근로자 기본 연차일수(2023.3.1. 이후 기준, 최대 25일)
+function calcBaseAnnualFromService(serviceYears) {
+  if (serviceYears <= 0) return 0;
+  const days = 12 + Math.floor((serviceYears - 1) / 2);
+  return Math.min(25, days);
 }
 
 // 제외기간 행 추가
@@ -188,16 +219,22 @@ function calcOrdinaryWage() {
 
   const hourly = denom > 0 ? monthly / denom : 0;
 
-  document.getElementById("owMonthly").textContent = Math.round(monthly).toLocaleString();
-  document.getElementById("owHourly").textContent = Math.round(hourly).toLocaleString();
+  document.getElementById("owMonthly").textContent =
+    Math.round(monthly).toLocaleString();
+  document.getElementById("owHourly").textContent =
+    Math.round(hourly).toLocaleString();
 
   return { monthly, hourly };
 }
 
-// 연차 관련 계산
-function calcAnnual(hourlyOrdinary) {
+// 연차 관련 계산 (자동 기본연차 반영)
+function calcAnnual(hourlyOrdinary, autoBase) {
   const paidHoursPerDay = numById("paidHoursPerDay");
-  const base = numById("annualBase");
+
+  // 수동 입력이 0보다 크면 그 값을 우선, 아니면 자동값 사용
+  const baseInput = numById("annualBase");
+  const base = baseInput > 0 ? baseInput : autoBase;
+
   const extraSeniority = numById("annualExtraSeniority");
   const extraPrevVac = numById("annualExtraFromPrevVac");
 
@@ -219,25 +256,22 @@ function calcAnnual(hourlyOrdinary) {
       : 0;
 
   // 화면 반영
-  document.getElementById("annualTotalDays").textContent = totalAnnual.toFixed(2);
-  document.getElementById("annualUsedDaysConv").textContent = usedDaysConv.toFixed(2);
-  document.getElementById("annualUnusedDays").textContent = unused.toFixed(2);
-  document.getElementById("annualUnusedPay").textContent = Math.round(unusedPay).toLocaleString();
+  document.getElementById("annualTotalDays").textContent =
+    totalAnnual.toFixed(2);
+  document.getElementById("annualUsedDaysConv").textContent =
+    usedDaysConv.toFixed(2);
+  document.getElementById("annualUnusedDays").textContent =
+    unused.toFixed(2);
+  document.getElementById("annualUnusedPay").textContent =
+    Math.round(unusedPay).toLocaleString();
 
-  return { totalAnnual, usedDaysConv, unused, unusedPay };
-}
-
-// 전년도 출근율 계산(참고용)
-function calcPrevAttendance() {
-  const termTotal = numById("prevTermTotalDays");
-  const termWork = numById("prevTermWorkDays");
-  const vacPaid = numById("prevVacPaidDays");
-
-  if (termTotal <= 0) return 0;
-
-  const rate = ((termWork + vacPaid) / termTotal) * 100;
-  document.getElementById("prevAttendanceRate").textContent = rate.toFixed(1);
-  return rate;
+  return {
+    totalAnnual,
+    usedDaysConv,
+    unused,
+    unusedPay,
+    baseEffective: base,
+  };
 }
 
 // 4대보험 계산
@@ -262,9 +296,12 @@ function calcSocialInsurance(baseFor4ins) {
   const indTotal = npIndAmt + hiIndAmt + uiIndAmt;
   const grandTotal = empTotal + indTotal;
 
-  document.getElementById("siEmpTotal").textContent = Math.round(empTotal).toLocaleString();
-  document.getElementById("siIndTotal").textContent = Math.round(indTotal).toLocaleString();
-  document.getElementById("siGrandTotal").textContent = Math.round(grandTotal).toLocaleString();
+  document.getElementById("siEmpTotal").textContent =
+    Math.round(empTotal).toLocaleString();
+  document.getElementById("siIndTotal").textContent =
+    Math.round(indTotal).toLocaleString();
+  document.getElementById("siGrandTotal").textContent =
+    Math.round(grandTotal).toLocaleString();
 
   return { empTotal, indTotal, grandTotal };
 }
@@ -276,90 +313,194 @@ function calcTax(baseForTax) {
   const localTax = incomeTax * 0.1;
   const total = incomeTax + localTax;
 
-  document.getElementById("incomeTax").textContent = Math.round(incomeTax).toLocaleString();
-  document.getElementById("localTax").textContent = Math.round(localTax).toLocaleString();
-  document.getElementById("taxTotal").textContent = Math.round(total).toLocaleString();
+  document.getElementById("incomeTax").textContent =
+    Math.round(incomeTax).toLocaleString();
+  document.getElementById("localTax").textContent =
+    Math.round(localTax).toLocaleString();
+  document.getElementById("taxTotal").textContent =
+    Math.round(total).toLocaleString();
 
   return { incomeTax, localTax, total };
 }
 
 // 메인 재계산 함수
 function recalcAll() {
-  const year = document.getElementById("year").value;
+  const yearVal = document.getElementById("year").value;
+  const year = parseInt(yearVal, 10);
 
-  // 1) 연도별 달력 일수
+  // 1) 현재 연도 달력 일수
   const yearInfo = calcYearDays(year);
-  document.getElementById("calendarTotalDays").textContent = yearInfo.total;
-  document.getElementById("calendarDaysNoSat").textContent = yearInfo.noSat;
+  document.getElementById("calendarTotalDays").textContent =
+    yearInfo.total;
+  document.getElementById("calendarDaysNoSat").textContent =
+    yearInfo.noSat;
+
+  // 1-1) 근속연수 및 자동 기본 연차일수
+  const startDateVal = document.getElementById("startDate").value;
+  const service = calcServiceYears(startDateVal, year);
+  const serviceSpan = document.getElementById("serviceYears");
+  if (serviceSpan) {
+    serviceSpan.textContent = service.years || 0;
+  }
+
+  let autoBase = 0;
+  if (service.years > 0) {
+    autoBase = calcBaseAnnualFromService(service.years);
+    const autoBaseSpan = document.getElementById("autoAnnualBase");
+    if (autoBaseSpan) {
+      autoBaseSpan.textContent = autoBase.toString();
+    }
+  } else {
+    const autoBaseSpan = document.getElementById("autoAnnualBase");
+    if (autoBaseSpan) {
+      autoBaseSpan.textContent = "-";
+    }
+  }
 
   // 2) 제외기간
   const excludeTotal = calcExcludeTotal();
-  document.getElementById("excludeTotalDays").textContent = excludeTotal.toFixed(1);
+  document.getElementById("excludeTotalDays").textContent =
+    excludeTotal.toFixed(1);
 
   const workable = Math.max(0, yearInfo.noSat - excludeTotal);
-  document.getElementById("workableDays").textContent = workable.toFixed(1);
+  document.getElementById("workableDays").textContent =
+    workable.toFixed(1);
 
-  // 3) 방학 기간 / 학기중 근무일수
-  const vacStart = document.getElementById("vacStart").value;
-  const vacEnd = document.getElementById("vacEnd").value;
-  const vacDaysNoSat = countDaysWithoutSaturday(vacStart, vacEnd);
-  document.getElementById("vacDaysNoSat").textContent = vacDaysNoSat;
+  // 3) 현재 연도 방학 기간(여름·겨울) / 학기중 근무일수
+  const vac1Start = document.getElementById("vac1Start").value;
+  const vac1End = document.getElementById("vac1End").value;
+  const vac2Start = document.getElementById("vac2Start").value;
+  const vac2End = document.getElementById("vac2End").value;
+
+  const vac1DaysNoSat = countDaysWithoutSaturday(vac1Start, vac1End);
+  const vac2DaysNoSat = countDaysWithoutSaturday(vac2Start, vac2End);
+  const vacDaysNoSat = vac1DaysNoSat + vac2DaysNoSat;
+
+  document.getElementById("vac1DaysNoSat").textContent =
+    vac1DaysNoSat;
+  document.getElementById("vac2DaysNoSat").textContent =
+    vac2DaysNoSat;
+  document.getElementById("vacDaysNoSat").textContent =
+    vacDaysNoSat;
 
   const termDaysNoSat = Math.max(0, yearInfo.noSat - vacDaysNoSat);
-  document.getElementById("termDaysNoSat").textContent = termDaysNoSat;
+  document.getElementById("termDaysNoSat").textContent =
+    termDaysNoSat;
 
   const termAttendanceRate =
     yearInfo.noSat > 0 ? (termDaysNoSat / yearInfo.noSat) * 100 : 0;
-  document.getElementById("termAttendanceRate").textContent = yearInfo.noSat
-    ? termAttendanceRate.toFixed(1)
-    : "-";
+  document.getElementById("termAttendanceRate").textContent =
+    yearInfo.noSat ? termAttendanceRate.toFixed(1) : "-";
 
-  // 4) 방학근무 보수
+  // 4) 전년도 달력 및 방학(여름·겨울)
+  let prevYear = null;
+  if (!isNaN(year)) prevYear = year - 1;
+
+  const prevYearInfo = calcYearDays(prevYear);
+  if (prevYear) {
+    document.getElementById("prevYearLabel").textContent = prevYear;
+  } else {
+    document.getElementById("prevYearLabel").textContent = "-";
+  }
+  document.getElementById("prevYearTotalDays").textContent =
+    prevYearInfo.total || "-";
+  document.getElementById("prevYearDaysNoSat").textContent =
+    prevYearInfo.noSat || "-";
+
+  const prevVac1Start = document.getElementById("prevVac1Start").value;
+  const prevVac1End = document.getElementById("prevVac1End").value;
+  const prevVac2Start = document.getElementById("prevVac2Start").value;
+  const prevVac2End = document.getElementById("prevVac2End").value;
+
+  const prevVac1DaysNoSat = countDaysWithoutSaturday(
+    prevVac1Start,
+    prevVac1End
+  );
+  const prevVac2DaysNoSat = countDaysWithoutSaturday(
+    prevVac2Start,
+    prevVac2End
+  );
+  const prevVacDaysNoSat = prevVac1DaysNoSat + prevVac2DaysNoSat;
+  const prevTermDaysNoSat = Math.max(
+    0,
+    prevYearInfo.noSat - prevVacDaysNoSat
+  );
+
+  document.getElementById("prevVac1DaysNoSat").textContent =
+    prevVac1DaysNoSat;
+  document.getElementById("prevVac2DaysNoSat").textContent =
+    prevVac2DaysNoSat;
+  document.getElementById("prevVacDaysNoSat").textContent =
+    prevVacDaysNoSat;
+  document.getElementById("prevTermDaysNoSat").textContent =
+    isNaN(prevTermDaysNoSat) ? 0 : prevTermDaysNoSat;
+
+  const prevAttendanceRate =
+    prevYearInfo.noSat > 0
+      ? (prevTermDaysNoSat / prevYearInfo.noSat) * 100
+      : 0;
+  document.getElementById("prevAttendanceRate").textContent =
+    prevYearInfo.noSat ? prevAttendanceRate.toFixed(1) : "-";
+
+  // 5) 방학근무 보수
   const wageTotals = calcWageTotals();
-  document.getElementById("wageTotal").textContent = wageTotals.total.toLocaleString();
-  document.getElementById("wageTaxable").textContent = wageTotals.taxable.toLocaleString();
-  document.getElementById("wageNonTaxable").textContent = wageTotals.nontax.toLocaleString();
-
-  // 5) 전년도 출근율(참고용)
-  calcPrevAttendance();
+  document.getElementById("wageTotal").textContent =
+    wageTotals.total.toLocaleString();
+  document.getElementById("wageTaxable").textContent =
+    wageTotals.taxable.toLocaleString();
+  document.getElementById("wageNonTaxable").textContent =
+    wageTotals.nontax.toLocaleString();
 
   // 6) 통상임금
   const ow = calcOrdinaryWage();
 
-  // 7) 연차·연차수당
-  const annual = calcAnnual(ow.hourly);
+  // 7) 연차·연차수당 (자동 기본연차 반영)
+  const annual = calcAnnual(ow.hourly, autoBase);
 
   // 8) 4대보험 기준금액 (방학근무 과세분 + (선택 시) 연차미사용수당)
-  const includeUnused = document.getElementById("includeUnusedIn4ins").checked;
-  const siBase = wageTotals.taxable + (includeUnused ? annual.unusedPay : 0);
-  document.getElementById("siBase").textContent = Math.round(siBase).toLocaleString();
+  const includeUnused =
+    document.getElementById("includeUnusedIn4ins").checked;
+  const siBase =
+    wageTotals.taxable + (includeUnused ? annual.unusedPay : 0);
+  document.getElementById("siBase").textContent =
+    Math.round(siBase).toLocaleString();
 
   const si = calcSocialInsurance(siBase);
 
   // 9) 연말정산 세금 기준금액 (방학근무 과세분 + 연차미사용수당)
   const taxBase = wageTotals.taxable + annual.unusedPay;
-  document.getElementById("taxBase").textContent = Math.round(taxBase).toLocaleString();
+  document.getElementById("taxBase").textContent =
+    Math.round(taxBase).toLocaleString();
 
   const tax = calcTax(taxBase);
 
   // 10) 종합 요약 섹션 반영
-  document.getElementById("sumAnnualTotal").textContent = annual.totalAnnual
-    ? annual.totalAnnual.toFixed(2)
-    : document.getElementById("annualTotalDays").textContent;
-  document.getElementById("sumAnnualUsed").textContent = annual.usedDaysConv.toFixed(2);
-  document.getElementById("sumAnnualUnused").textContent = annual.unused.toFixed(2);
+  document.getElementById("sumAnnualTotal").textContent =
+    annual.totalAnnual.toFixed(2);
+  document.getElementById("sumAnnualUsed").textContent =
+    annual.usedDaysConv.toFixed(2);
+  document.getElementById("sumAnnualUnused").textContent =
+    annual.unused.toFixed(2);
   document.getElementById("sumAnnualUnusedPay").textContent =
     Math.round(annual.unusedPay).toLocaleString();
 
-  document.getElementById("sumWageTotal").textContent = wageTotals.total.toLocaleString();
-  document.getElementById("sumWageTaxable").textContent = wageTotals.taxable.toLocaleString();
-  document.getElementById("sumOwHourly").textContent = Math.round(ow.hourly).toLocaleString();
-  document.getElementById("sumPaidHoursPerDay").textContent = numById("paidHoursPerDay").toFixed(1);
+  document.getElementById("sumWageTotal").textContent =
+    wageTotals.total.toLocaleString();
+  document.getElementById("sumWageTaxable").textContent =
+    wageTotals.taxable.toLocaleString();
+  document.getElementById("sumOwHourly").textContent =
+    Math.round(ow.hourly).toLocaleString();
+  document.getElementById("sumPaidHoursPerDay").textContent =
+    numById("paidHoursPerDay").toFixed(1);
 
-  document.getElementById("sumSiEmp").textContent = Math.round(si.empTotal).toLocaleString();
-  document.getElementById("sumSiInd").textContent = Math.round(si.indTotal).toLocaleString();
-  document.getElementById("sumIncomeTax").textContent = Math.round(tax.incomeTax).toLocaleString();
-  document.getElementById("sumLocalTax").textContent = Math.round(tax.localTax).toLocaleString();
+  document.getElementById("sumSiEmp").textContent =
+    Math.round(si.empTotal).toLocaleString();
+  document.getElementById("sumSiInd").textContent =
+    Math.round(si.indTotal).toLocaleString();
+  document.getElementById("sumIncomeTax").textContent =
+    Math.round(tax.incomeTax).toLocaleString();
+  document.getElementById("sumLocalTax").textContent =
+    Math.round(tax.localTax).toLocaleString();
 }
 
 // 이벤트 세팅
@@ -381,12 +522,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 동적 삭제 버튼들 - 이벤트 위임
-  document.getElementById("excludeBody").addEventListener("click", (e) => {
-    if (e.target.classList.contains("btn-remove-exclude")) {
-      e.target.closest("tr").remove();
-      recalcAll();
-    }
-  });
+  document
+    .getElementById("excludeBody")
+    .addEventListener("click", (e) => {
+      if (e.target.classList.contains("btn-remove-exclude")) {
+        e.target.closest("tr").remove();
+        recalcAll();
+      }
+    });
 
   document.getElementById("wageBody").addEventListener("click", (e) => {
     if (e.target.classList.contains("btn-remove-wage")) {
@@ -396,8 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // 메인 입력들 변경 시마다 재계산
-  document.body.addEventListener("input", (e) => {
-    // 대충 전체 input 변경에 반응해도 계산량이 부담될 정도는 아니라 그냥 통으로 처리
+  document.body.addEventListener("input", () => {
     recalcAll();
   });
 
