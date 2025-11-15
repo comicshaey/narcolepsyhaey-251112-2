@@ -14,19 +14,27 @@ html,body{
 
 a{text-decoration:none;color:inherit}
 
-/* 페이지 기본 레이아웃 */
+/* 페이지 기본 레이아웃 컨테이너 (계산기 등) */
 .shell{
   max-width:1100px;
   margin:0 auto;
   padding:20px;
 }
 
+/* 메인 영역 공통 레이아웃 (메인/개발자노트/학습일지 등) */
+main{
+  max-width:880px;
+  margin:0 auto;
+  padding:24px 16px;
+}
+
+/* 헤더 */
 .site-header{background:#fff;border-bottom:1px solid #e8e8ef}
 .site-header h1{margin:0;font-size:28px}
 .sub{margin:.25rem 0 0;color:#000;font-size:14px}
 .site-footer{padding:24px 0;color:#000;border-top:1px solid #eee}
 
-/* 박스 */
+/* 카드 박스 (계산기 카드 등) */
 .card{
   background:#fff;
   border:1px solid #e6e6f0;
@@ -103,7 +111,7 @@ small{
 .between{justify-content:space-between}
 .gap{gap:8px}
 
-/* 좁은 화면 기준으로 버튼 세로 정렬 */
+/* 버튼 기본 스타일 */
 .btn{
   display:block;
   width:100%;
@@ -159,6 +167,18 @@ h1 {
   font-size: clamp(1.5rem, 4vw, 28px);
   margin: 0 0 12px;
   text-align: center;
+}
+
+/* 본문 기본 단락 + muted 텍스트 */
+p{
+  line-height:1.65;
+  margin:10px 0;
+  color:#333;
+}
+
+.muted{
+  color:#666;
+  font-size:0.9rem;
 }
 
 /* 테이블 */
@@ -229,7 +249,6 @@ tfoot td{background:#fafafb;font-weight:700}
   .card{padding:16px;}
   footer{text-align:center;font-size:0.9rem;padding:0 10px;}
 }
-
 
 /* 251113목 방학중 인건비 추가 - 계산기 공통 컴포넌트 */
 
@@ -302,7 +321,7 @@ tfoot td{background:#fafafb;font-weight:700}
   font-size:11px;
 }
 
-
+/* 세그먼트형 입력 레이아웃 */
 .segment-header {
   display: grid;
   grid-template-columns: 1.4fr 1.4fr 1.2fr 2fr;
@@ -323,4 +342,26 @@ tfoot td{background:#fafafb;font-weight:700}
 .segment-row input[type="number"],
 .segment-row select {
   font-size: 13px;
+}
+
+/* 섹션 박스: 메인/개발자노트/학습일지 공통 카드 스타일 */
+.section{
+  border:1px solid #e5e5e5;
+  border-radius:12px;
+  padding:16px 18px;
+  margin:18px 0;
+}
+
+/* 구분선 */
+hr{
+  border:none;
+  border-top:1px solid #ddd;
+  margin:28px 0;
+}
+
+/* footer 태그 기본 (사이트 공통) */
+footer{
+  margin:40px 0 20px;
+  color:#333;
+  font-size:0.9rem;
 }

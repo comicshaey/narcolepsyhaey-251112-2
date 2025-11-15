@@ -7,111 +7,136 @@
   <link rel="icon" href="/static/favicon.ico" />
   <link rel="stylesheet" href="/static/style.css" />
   <style>
+    /* 전체 레이아웃: 메인 index와 동일한 감각 */
+    body{
+      color:#111;
+      background:#fff;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR","맑은 고딕",sans-serif;
+    }
+    main{
+      max-width:880px;
+      margin:0 auto;
+      padding:24px 16px; /* 메인 index와 동일 */
+    }
 
-    body{color:#111;background:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR","맑은 고딕",sans-serif}
-    main{max-width:800px;margin:0 auto;padding:32px 18px}
-    h1{font-size:1.7rem;margin-bottom:8px}
-    h2{font-size:1.2rem;margin-top:28px;color:#222}
+    /* 섹션 박스 통일 */
+    .section{
+      border:1px solid #e5e5e5;
+      border-radius:12px;
+      padding:16px 18px;
+      margin:18px 0; /* 메인 index와 동일 */
+    }
+
+    h1{font-size:1.75rem;margin:18px 0 8px}
+    h2{font-size:1.2rem;margin:0 0 12px;color:#222}
     p{line-height:1.65;margin:10px 0;color:#333}
     .muted{color:#666;font-size:0.9rem}
-    a.btn{display:inline-block;margin-top:16px;padding:10px 16px;border:1px solid #222;border-radius:12px;text-decoration:none;color:#111;font-weight:600}
+
+    a.btn{
+      display:inline-block;
+      margin-top:16px;
+      padding:10px 16px;
+      border:1px solid #222;
+      border-radius:12px;
+      text-decoration:none;
+      color:#111;
+      font-weight:600;
+    }
+
     footer{margin:40px 0 20px;color:#333;font-size:0.9rem}
+
     hr{border:none;border-top:1px solid #ddd;margin:28px 0}
 
-    /* 만화 이미지 파일 */
+    /* 만화 이미지 */
     .comic-wrap{margin-top:8px}
     figure{margin:18px 0}
     .comic{width:100%;height:auto;display:block;border:1px solid #e5e5e5;border-radius:12px}
     figcaption{font-size:0.92rem;color:#444;margin-top:6px}
     .link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
-    .link-row .btn{border-color:#116; }
   </style>
 </head>
+
 <body>
   <main>
     <h1>개발자 노트</h1>
-    <p class="muted">2025.11.9.(일) · 씩씩하고 귀여운 고주무관 · 업무 효율화 웹페이지 개발 프로젝트</p>
+    <p class="muted">·인간의 고통을 진주로 바꾸는 과정에 대하여.</p>
     <hr />
 
-    <h2>프로젝트 작업 배경</h2>
-    <p>
-      아직은 효율화 목적 자체보다는, 힘든 시기를 버티기 위한 수단입니다. 
-      쉽고 재밌는 거 하면서 숨통 좀 트고 지속적으로 상해왔던 자존심도 조금 주물러 주고 싶었습니다.
-      당장 업무는 1인분을 못하고 있어도 다른 거 잘 하는 거 하나 있다고 생각하고 싶어서요. <br /> <br />  
-    </p>
-    
+    <section class="section">
+      <h2>프로젝트 작업 배경</h2>
+      <p>
+        아직은 효율화 목적 자체보다는, 힘든 시기를 버티기 위한 수단입니다.
+        쉽고 재밌는 거 하면서 숨통 좀 트고, 지속적으로 느껴왔던 열패감과 분노, 갈증, 슬픔을 해소할 것이 필요했습니다. <br />
+        당장 업무는 1인분을 못하고 있어도 다른 거 잘 하는 거 하나 있다고 생각하고 싶어서요. <br /><br />
+      </p>
+    </section>
 
-    <h2>계획·목표</h2>
-    <p>
-      그래도 언젠가는 본격적으로 사이트 개발해서 유용하게 쓰이면 좋겠습니다. 
-      개인 작업이 공익으로 확장되는 것도 의미 있는 일이니까요. <br /> 
-      배포를 염두에 두고 접근성이 좋은 웹페이지로 만들고 있습니다. 
-      기존에 C++로 만들어 테스트용으로 배포했던 실행파일(exe)은 접근성이 많이 떨어지는 듯합니다. 
-      <br /> <br /> 
+    <section class="section">
+      <h2>계획·목표</h2>
+      <p>
+        그래도 언젠가는 본격적으로 사이트 개발해서 유용하게 쓰이면 좋겠습니다.
+        개인 작업이 공익으로 확장되는 것도 의미 있는 일이니까요. <br />
+        배포를 염두에 두고 접근성이 좋은 웹페이지로 만들고 있습니다.
+        기존에 C++로 만들었던 실행파일(exe)은 접근성이 많이 떨어지는 듯합니다.
+        <br /><br />
+        번거로운 계산과 노가다성 업무를 자동화하여 시간 소모를 줄일 수 있다면,
+        질환 등으로 인해 남들보다 느린 속도로 일하는 사람도
+        좌절하고 포기하지 않고 조금씩이라도 계속 앞으로 나아갈 수 있을 것입니다. <br /><br />
+      </p>
+    </section>
 
-      번거로운 계산과 노가다성 업무를 자동화하여 시간 소모를 줄일 수 있다면, 
-      질환 등으로 인해 남들보다 느린 속도로 일하는 사람도
-      좌절하고 포기하지 않고 조금씩이라도 계속 앞으로 나아갈 수 있을 것입니다. <br />  <br /> 
-    </p> 
+    <section class="section">
+      <h2>정상성과 울타리 밖의 구성원</h2>
+      <p>
+        <b>주 상병명: 발작수면 및 허탈발작 (Narcolepsy and Cataplexy, 기면증) / 질병코드: G47.4</b><br />
+        증상: 상시 졸리며 갑자기 잠듭니다. 근육이 멋대로 풀려 넘어지기도 합니다. <br />
+        각성과 수면을 조절하는 뇌내 스위치가 제멋대로 딸깍거린다고 이해하시면 됩니다.  
+        기면증약(각성제)를 먹어도 온전한 각성은 불가능합니다.<br />
+        원인: 뇌의 기질적인 손상. 완치 가능성은 없으며 약물 치료로 증상 강도를 줄입니다. <br />
+        <br />
+        기면증으로 인한 이질적인 요소 외에, 애초에 사람 자체도 이상하고 일반적이지 않다, 나쁜 의미로 튄다는 평가가 지속적으로 들립니다.<br /> 
+<br />
+        근데 어차피 무난한 사회성을 가지고 있더라도 기면증과 다른 뇌신경계 질환들이 있는 한 계속 그렇게 공동체 밖에서 겉돌겁니다. <br /> 
+        조직 내에서 절대다수를 차지하는 <b>보통의 일반적인 사람들</b>께서 정한 <b>정상성의 범주</b>에서 벗어난다고 여길테니, 
+        <b>"저 사람은 우리와 다르다, 이상하다"</b>라고 계속 구분지어질 것입니다. <br /> 
+        <br /> 
+        왜냐하면 그건 관찰이 아니라 회피의 언어이기 때문입니다. 복잡한 문제를 라벨 하나로 요약해서 이마에 붙여놓고 퉁치면 에너지 소비가 훨씬 적거든요.<br /> 
+        그래서 저는 울타리 바깥에서 스스로 만든 길을 걸어갈 것입니다. 이상하다라는 말로 규정하는 집단의 한계를 뛰어넘어 일하고 만들고 표현하겠습니다. <br /> 
+        <br /> 
+      </p>
+    </section>
 
-    <h2>정상성과 울타리 밖의 구성원</h2>
-    <p>
-    주 상병명: 발작수면 및 허탈발작 (Narcolepsy and Cataplexy, 기면증)/ 질병코드: G47.4 <br />
-    증상: 상시 졸리며 갑자기 잠듭니다. 근육이 멋대로 풀려 넘어지기도 합니다. <br /> 
-      각성과 수면을 조절하는 뇌내 스위치가 제멋대로 딸깍거린다고 이해하시면 됩니다. 기면증약(각성제)를 먹어도 완전한 각성은 불가능합니다.  <br /> 
-    원인: 뇌의 기질적인 손상. 치료 불가. <br /> 
-      <br /> 
-    기면증 외에 사람 자체도 이상하고 일반적이지 않다 나쁜 의미로 튄다는 평가를 지속적으로 받고 있는데, 
-      어차피 무난한 사회성을 가지고 있더라도 기면증이 있는 한 계속 그렇게 공동체 밖에서 겉돌겁니다.  <br /> 
-      조직 내에서 절대다수를 차지하는 <b>"보통의 일반적인 사람들"</b>이 정한 <b>정상성의 범주</b>에서 벗어난다고 여길테니, 
-      <b>"저 사람은 우리와 다르다"</b>라고 계속 구분지어질 것입니다. <br />
-      <br /> 
-    </p>
-    
+    <section class="section">
+      <h2 id="comics">만화: 기면증 일기</h2>
+      <p class="muted">
+        ·『교직원을 위한 희귀질환 안내서 홍보 만화』<br />
+        ·『인류 최강의 인간』
+      </p>
 
-    <h2>인간의 고통을 진주로 바꾸는 방법에 대하여</h2>
-    <p>(작성중)</p>
+      <div class="comic-wrap">
+        <div class="link-row">
+          <a class="btn"
+            href="https://www.kord.or.kr/bbs/board.php?bo_table=0604&wr_id=207"
+            target="_blank" rel="noopener noreferrer"
+            style="background:#3b82f6; color:white; border:none; font-weight:600; padding:12px 20px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+             희귀질환 안내서 다운로드 바로가기 (질병관리청 링크)
+          </a>
+        </div>
 
-
-
-    
-    <h2 id="comics">만화: 기면증 일기</h2>
-    <p class="muted">
-      ·『교직원을 위한 희귀질환 안내서 홍보 만화』<br />
-      ·『인류 최강의 인간』
-    </p>
-
-    <!-- 희귀질환 안내서 홍보 만화 -->
-    <div class="comic-wrap">
-      <!-- 눌러서 바로 다운/안내 페이지로 이동 -->
-      <div class="link-row">
-        <!-- 새 창 열림 + 보안 rel -->
-        <a class="btn"
-          href="https://www.kord.or.kr/bbs/board.php?bo_table=0604&wr_id=207" target="_blank" rel="noopener noreferrer"
-          style="background:#3b82f6; color:white; border:none; font-weight:600; padding:12px 20px; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,0.15);">
-           희귀질환 안내서 다운로드 바로가기 (질병관리청 링크)
-        </a>
-
+        <figure>
+          <img class="comic" src="./img/rare-guide-comic.jpg" alt="희귀질환 안내서 홍보 만화" loading="lazy">
+        </figure>
       </div>
-      <figure>
-        <!-- 경로: dev-notes/img/rare-guide-comic.jpg -->
-        <img class="comic" src="./img/rare-guide-comic.jpg" alt="희귀질환 안내서 홍보 만화" loading="lazy">
-      </figure>
-    </div>
-
-     <br />
-     <br />
     
 
-    <!-- 인류 최강의 인간 -->
     <div class="comic-wrap">
       <figure>
         <img class="comic" src="./img/strongest-human.jpg" alt="인류 최강의 인간" loading="lazy">
       </figure>
     </div>
+      </section>
 
-
-    <a href="/" class="btn">← 메인으로 돌아가기</a>
+    <a href="/" class="btn">메인으로 돌아가기</a>
 
     <footer style="text-align:center; margin-top:15px; color:#444;">
       제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.

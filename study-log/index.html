@@ -8,67 +8,93 @@
   <link rel="stylesheet" href="/static/style.css" />
   <style>
 
-    body{color:#111;background:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR","맑은 고딕",sans-serif}
-    main{max-width:800px;margin:0 auto;padding:32px 18px}
-    h1{font-size:1.7rem;margin-bottom:8px}
-    h2{font-size:1.2rem;margin-top:28px;color:#222}
+    body{
+      color:#111;
+      background:#fff;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR","맑은 고딕",sans-serif;
+    }
+
+    main{
+      max-width:880px;
+      margin:0 auto;
+      padding:24px 16px; /* 메인 index와 동일 */
+    }
+
+    .section{
+      border:1px solid #e5e5e5;
+      border-radius:12px;
+      padding:16px 18px;
+      margin:18px 0; /* 메인 index와 동일 */
+    }
+
+    h1{font-size:1.75rem;margin:18px 0 8px}
+    h2{font-size:1.2rem;margin:0 0 12px;color:#222}
     p{line-height:1.65;margin:10px 0;color:#333}
     .muted{color:#666;font-size:0.9rem}
-    a.btn{display:inline-block;margin-top:16px;padding:10px 16px;border:1px solid #222;border-radius:12px;text-decoration:none;color:#111;font-weight:600}
+
+    a.btn{
+      display:inline-block;
+      margin-top:16px;
+      padding:10px 16px;
+      border:1px solid #222;
+      border-radius:12px;
+      text-decoration:none;
+      color:#111;
+      font-weight:600;
+    }
+
     footer{margin:40px 0 20px;color:#333;font-size:0.9rem}
+
     hr{border:none;border-top:1px solid #ddd;margin:28px 0}
 
   </style>
 </head>
+
 <body>
   <main>
     <h1>업무 학습 일지</h1>
     <p class="muted">·과원배치 남은 기간: 2025.11.12.(수)~2025.12.31.(수)</p>
     <hr />
 
-    <h2>업무 관련 주요 편람 목록</h2>
-    <p>
-      ·학교행정 업무 편람 <br />
-      ·너를 위한 충전기 <br />
-      ·급여 처음이라도 괜찮아 <br />
-      ·학교회계 예산편성 기본 지침 <br />
-      ·급여 실무 A to Z 총망라 <br />
-      ·계약제교원 운영 지침 (+주요 개정내용) <br />
-      ·교육공무직 보수 등 업무처리 요령 <br />
-      ·교육공무직원 업무편람 <br />
-      ·지방공무원보수업무 등 처리 지침 <br />
-      ·늘봄학교 운영 길라잡이 <br />
-      ·에듀파인 사용 매뉴얼 (세무 관리, 예산 관리 등) <br />
-    </p>
+    <section class="section">
+      <h2>업무 관련 주요 편람 목록</h2>
+      <p>
+        ·학교행정 업무 편람 <br />
+        ·너를 위한 충전기 <br />
+        ·급여 처음이라도 괜찮아 <br />
+        ·학교회계 예산편성 기본 지침 <br />
+        ·급여 실무 A to Z 총망라 <br />
+        ·계약제교원 운영 지침 (+주요 개정내용) <br />
+        ·교육공무직 보수 등 업무처리 요령 <br />
+        ·교육공무직원 업무편람 <br />
+        ·지방공무원보수업무 등 처리 지침 <br />
+        ·늘봄학교 운영 길라잡이 <br />
+        ·에듀파인 사용 매뉴얼 <br />
+      </p>
+    </section>
 
-    
-    <h2>2025년 11월 업무 학습 내역</h2>
-    <p>
-      <b>2025.11.12.(수)</b><br /> 오늘부터 기록 예정   
-    </p>
+    <section class="section">
+      <h2>2025년 11월 업무 학습 내역</h2>
+      <p class="muted">·과원배치 남은 기간: 2025.11.12.(수)~2025.12.31.(수)</p>
 
-    
+      <p>2025.11.15.(금)</p>
+      <p class="muted">·유치원 시간제근무 기간제교사 사업 운영계획 재확인: 계약서에 보수 관련 명시하지 않은 부분 발견함.</p>
+    </section>
 
-    <h2>2025년 12월 업무 학습 내역</h2>
-    <p>
-      (작성 예정) 
-      <br /> <br /> 
+    <section class="section">
+      <h2>2025년 12월 업무 학습 내역</h2>
+      <p>(작성 예정)<br/><br/></p>
+    </section>
 
-    </p> 
+    <section class="section">
+      <h2>2026년 1월 업무 학습 내역</h2>
+      <p>(작성 예정)<br/><br/></p>
+    </section>
 
-    <h2>2026년 1월 업무 학습 내역</h2>
-    <p>
-      (작성 예정) 
-      <br /> <br /> 
-    </p>
-    
-
-    <h2>2026년 2월 업무 학습 내역여</h2>
-    <p>
-      (작성 예정) 
-      <br /> <br /> 
-    </p>
-    
+    <section class="section">
+      <h2>2026년 2월 업무 학습 내역</h2>
+      <p>(작성 예정)<br/><br/></p>
+    </section>
 
     <a href="/" class="btn">메인으로 돌아가기</a>
 
