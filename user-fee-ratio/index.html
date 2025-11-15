@@ -32,13 +32,16 @@
         </div>
       </div>
 
-      <button id="calcBtn" class="btn-primary" type="button">계산하기</button>
+      <!-- 버튼에서 바로 handleCalculate 호출 -->
+      <button id="calcBtn" class="btn-primary" type="button" onclick="handleCalculate()">
+        계산하기
+      </button>
       <p class="muted small" style="margin-top:8px">
-        · 비율은 2024년 기준 대략값으로 넣어둔 거라, 실제 학교 산출내역과 차이가 나면 나중에 script.js 상단 비율만 수정해서 쓰면 됨.
+        · 비율은 대략값이라, 실제 산출내역과 다르면 나중에 script.js 상단 비율만 수정해서 쓰면 됩니다.
       </p>
     </section>
 
-    <section class="card">
+    <section class="card" style="overflow-x:auto;">
       <h2>결과</h2>
       <p id="iterInfo" class="muted small">아직 계산 전입니다.</p>
 
@@ -48,6 +51,7 @@
             <th>총 징수금</th>
             <td id="totalCollected">0원</td>
           </tr>
+
           <tr>
             <th>국민연금 (근로자)</th>
             <td id="pensionEmp">0원</td>
@@ -56,6 +60,7 @@
             <th>국민연금 (기관부담)</th>
             <td id="pensionOrg">0원</td>
           </tr>
+
           <tr>
             <th>건강보험 (근로자)</th>
             <td id="healthEmp">0원</td>
@@ -64,18 +69,30 @@
             <th>건강보험 (기관부담)</th>
             <td id="healthOrg">0원</td>
           </tr>
+
           <tr>
-            <th>장기요양보험</th>
-            <td id="longterm">0원</td>
+            <th>장기요양보험 (근로자)</th>
+            <td id="longtermEmp">0원</td>
+          </tr>
+          <tr>
+            <th>장기요양보험 (기관부담)</th>
+            <td id="longtermOrg">0원</td>
+          </tr>
+
+          <tr>
+            <th>고용보험 (근로자)</th>
+            <td id="employEmp">0원</td>
           </tr>
           <tr>
             <th>고용보험 (기관부담)</th>
             <td id="employOrg">0원</td>
           </tr>
+
           <tr>
             <th>산재보험 (기관부담)</th>
             <td id="accidentOrg">0원</td>
           </tr>
+
           <tr>
             <th>퇴직적립금</th>
             <td id="retirement">0원</td>
@@ -84,6 +101,7 @@
             <th>연차수당 증가분</th>
             <td id="annualLeave">0원</td>
           </tr>
+
           <tr>
             <th>공제합계</th>
             <td id="totalDeductions">0원</td>
@@ -100,8 +118,8 @@
       <h2>메모</h2>
       <p class="muted small">
         · 구조는 “<strong>징수금 = 실수령액 + 4대보험(개인+기관) + 연차수당 증가분 + 퇴직적립금</strong>” 순환식을
-        반복계산으로 깨는 방식이다.<br />
-        · 반복계산 로직은 script.js에 다 들어있고, 비율·산출기준만 네 학교 실제 산출내역에 맞게 조정하면 된다.
+        반복계산으로 푼 것입니다.<br />
+        · 비율과 산출 기준은 각 시·도교육청/학교 실제 산출내역에 맞춰서 조정해 사용하세요.
       </p>
     </section>
   </main>
