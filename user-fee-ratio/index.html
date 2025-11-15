@@ -11,7 +11,7 @@
     <div class="shell">
       <h1>학교운동부 지도자 수익자부담금 예산 분배기</h1>
       <p class="sub">
-        학생 1인당 징수금에서 사회보험료·연차수당·퇴직적립금을 떼고 강사 실수령액 근사치 구하기
+        학생 1인당 징수금에서 사회보험료·연차수당·퇴직적립금을 제외한 실수령액(근사치) 계산
       </p>
     </div>
   </header>
@@ -19,25 +19,24 @@
   <main class="shell">
     <section class="card">
       <h2>기본 입력</h2>
+
       <div class="grid two">
         <div>
           <label for="students">학생 수</label>
           <input id="students" type="number" min="0" step="1" value="8" />
-          <p class="muted small">테니스부 학생 수 (예: 8명)</p>
+          <p class="muted small">예: 8명</p>
         </div>
+
         <div>
           <label for="unitFee">1인당 징수 금액</label>
           <input id="unitFee" type="number" min="0" step="10000" value="200000" />
-          <p class="muted small">학생 1인당 월 징수 금액 (기본값: 200,000원)</p>
+          <p class="muted small">기본: 200,000원</p>
         </div>
       </div>
 
-      <!-- 버튼에서 바로 handleCalculate 호출 -->
-      <button id="calcBtn" class="btn-primary" type="button" onclick="handleCalculate()">
-        계산하기
-      </button>
-      <p class="muted small" style="margin-top:8px">
-        · 비율은 대략값이라, 실제 산출내역과 다르면 나중에 script.js 상단 비율만 수정해서 쓰면 됩니다.
+      <button class="btn-primary" type="button" onclick="handleCalculate()">계산하기</button>
+      <p class="muted small" style="margin-top:6px">
+        · 비율은 표준값 기준. 실제 산출내역과 다르면 script.js의 비율만 조정해서 사용하세요.
       </p>
     </section>
 
@@ -47,69 +46,27 @@
 
       <table class="simple-table">
         <tbody>
-          <tr>
-            <th>총 징수금</th>
-            <td id="totalCollected">0원</td>
-          </tr>
+          <tr><th>총 징수금</th> <td id="totalCollected">0원</td></tr>
 
-          <tr>
-            <th>국민연금 (근로자)</th>
-            <td id="pensionEmp">0원</td>
-          </tr>
-          <tr>
-            <th>국민연금 (기관부담)</th>
-            <td id="pensionOrg">0원</td>
-          </tr>
+          <tr><th>국민연금 (근로자)</th> <td id="pensionEmp">0원</td></tr>
+          <tr><th>국민연금 (기관부담)</th> <td id="pensionOrg">0원</td></tr>
 
-          <tr>
-            <th>건강보험 (근로자)</th>
-            <td id="healthEmp">0원</td>
-          </tr>
-          <tr>
-            <th>건강보험 (기관부담)</th>
-            <td id="healthOrg">0원</td>
-          </tr>
+          <tr><th>건강보험 (근로자)</th> <td id="healthEmp">0원</td></tr>
+          <tr><th>건강보험 (기관부담)</th> <td id="healthOrg">0원</td></tr>
 
-          <tr>
-            <th>장기요양보험 (근로자)</th>
-            <td id="longtermEmp">0원</td>
-          </tr>
-          <tr>
-            <th>장기요양보험 (기관부담)</th>
-            <td id="longtermOrg">0원</td>
-          </tr>
+          <tr><th>장기요양보험 (근로자)</th> <td id="longtermEmp">0원</td></tr>
+          <tr><th>장기요양보험 (기관부담)</th> <td id="longtermOrg">0원</td></tr>
 
-          <tr>
-            <th>고용보험 (근로자)</th>
-            <td id="employEmp">0원</td>
-          </tr>
-          <tr>
-            <th>고용보험 (기관부담)</th>
-            <td id="employOrg">0원</td>
-          </tr>
+          <tr><th>고용보험 (근로자)</th> <td id="employEmp">0원</td></tr>
+          <tr><th>고용보험 (기관부담)</th> <td id="employOrg">0원</td></tr>
 
-          <tr>
-            <th>산재보험 (기관부담)</th>
-            <td id="accidentOrg">0원</td>
-          </tr>
+          <tr><th>산재보험 (기관)</th> <td id="accidentOrg">0원</td></tr>
 
-          <tr>
-            <th>퇴직적립금</th>
-            <td id="retirement">0원</td>
-          </tr>
-          <tr>
-            <th>연차수당 증가분</th>
-            <td id="annualLeave">0원</td>
-          </tr>
+          <tr><th>퇴직적립금</th> <td id="retirement">0원</td></tr>
+          <tr><th>연차수당 증가분</th> <td id="annualLeave">0원</td></tr>
 
-          <tr>
-            <th>공제합계</th>
-            <td id="totalDeductions">0원</td>
-          </tr>
-          <tr>
-            <th>강사 실수령액 (근사)</th>
-            <td id="netPay">0원</td>
-          </tr>
+          <tr><th>공제합계</th> <td id="totalDeductions">0원</td></tr>
+          <tr><th>강사 실수령액(근사)</th> <td id="netPay">0원</td></tr>
         </tbody>
       </table>
     </section>
@@ -117,9 +74,9 @@
     <section class="card">
       <h2>메모</h2>
       <p class="muted small">
-        · 구조는 “<strong>징수금 = 실수령액 + 4대보험(개인+기관) + 연차수당 증가분 + 퇴직적립금</strong>” 순환식을
-        반복계산으로 푼 것입니다.<br />
-        · 비율과 산출 기준은 각 시·도교육청/학교 실제 산출내역에 맞춰서 조정해 사용하세요.
+        · 순환식(공제액 ↔ 실수령액)을 반복 계산 방식으로 근사한 값입니다.  
+        · 10원 단위 절사(round10) 방식 적용.  
+        · 실제 예산편성 시 반드시 기관 산출내역과 대조하세요.
       </p>
     </section>
   </main>
@@ -127,7 +84,7 @@
   <footer class="site-footer">
     <div class="shell">
       <p class="muted small">
-        개인 토이 프로젝트용 계산기입니다. 실제 예산 편성 시에는 반드시 담당 기관 산출내역과 대조해서 사용하세요.
+        귀여운 고주무관 업무효율화 프로젝트 · 수익자부담금 자동화 도구
       </p>
     </div>
   </footer>
