@@ -1,6 +1,3 @@
-// 바이브 코딩 감성 스크립트
-// 방학중 비상시근로자 괴물 계산기
-
 // 숫자 파싱 공통 함수
 function num(val) {
   const n = parseFloat(val);
@@ -552,3 +549,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // 첫 계산
   recalcAll();
 });
+
