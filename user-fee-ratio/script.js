@@ -1,5 +1,4 @@
-
-// 10원 단위 절사용 함수
+// 원단위 절삭 (지금은 10원 단위 절삭으로 사용)
 function round10(v) {
   const n = Number(v) || 0;
   return Math.floor(n / 10) * 10;
@@ -17,38 +16,36 @@ function formatWon(v) {
 }
 
 // ------------------------
-//     비율 설정 구간
-//    (실제 산출내역에 맞게 조정 가능)
+//   비율 설정 (조정 가능)
 // ------------------------
 
-// 국민연금 9% → 근로자 4.5 + 기관 4.5
+// 국민연금 9% (기관:개인=1:1)
 const R_PENSION_EMP = 0.045;
 const R_PENSION_ORG = 0.045;
 
-// 건강보험 7.09% → 근로자 3.545 + 기관 3.545
+// 건강보험 7.09% (기관:개인=1:1)
 const R_HEALTH_EMP = 0.03545;
 const R_HEALTH_ORG = 0.03545;
 
-// 장기요양보험: 건강보험료의 12.95% (개인·기관 각각)
+// 장기요양보험: 건강보험료의 12.95% (기관:개인=1:1)
 const R_LONGTERM_EMP = 0.1295;
 const R_LONGTERM_ORG = 0.1295;
 
-// 고용보험: 개인·기관 모두 있는 버전으로 가정
+// 고용보험: 근로자 실업급여 0.9%, 사업주 실업급여 0.9%, 사업주 고안직능 0.75% → 기관부담 1.75%
 const R_EMPLOY_EMP = 0.009;
-const R_EMPLOY_ORG = 0.009;
+const R_EMPLOY_ORG = 0.0175;
 
-// 산재보험: 기관부담만
+// 산재보험: 기관부담만 0.966%
 const R_ACCIDENT_ORG = 0.00966;
 
-// 퇴직적립금: 보수월액의 1/12 근사
+// 퇴직적립금: 보수월액의 1/12 근사치
 const R_RETIRE = 1 / 12;
 
-// 연차수당 증가분 비율(통상임금 변동에 따른 대략값)
-// 실제 학교 산식과 다르면 이 값만 손보면 된다.
+// 연차수당 증가분 비율 (통상임금 변동에 따른 대략값)
 const R_ANNUAL_LEAVE = 0.12;
 
 // ------------------------
-//   순환식 반복 계산 로직
+//   순환식 반복 계산
 // ------------------------
 
 function calcCoachDistribution(studentCount, unitFee) {
@@ -97,7 +94,7 @@ function calcCoachDistribution(studentCount, unitFee) {
   for (let i = 0; i < maxIter; i++) {
     iterations = i + 1;
 
-    // 기준 보수월액: 일단 netPay 기준으로 단순화
+    // 기준 보수월액: 일단 실수령액 기준으로 단순화
     const base = netPay;
 
     // 국민연금
@@ -108,15 +105,15 @@ function calcCoachDistribution(studentCount, unitFee) {
     healthEmp = round10(base * R_HEALTH_EMP);
     healthOrg = round10(base * R_HEALTH_ORG);
 
-    // 장기요양보험 (개인/기관 각각, 건강보험료 기준)
+    // 장기요양보험 (건강보험료를 기준으로)
     longtermEmp = round10(healthEmp * R_LONGTERM_EMP);
     longtermOrg = round10(healthOrg * R_LONGTERM_ORG);
 
-    // 고용보험 (개인/기관)
+    // 고용보험
     employEmp = round10(base * R_EMPLOY_EMP);
     employOrg = round10(base * R_EMPLOY_ORG);
 
-    // 산재보험 (기관부담)
+    // 산재보험
     accidentOrg = round10(base * R_ACCIDENT_ORG);
 
     // 퇴직적립금
@@ -125,14 +122,14 @@ function calcCoachDistribution(studentCount, unitFee) {
     // 연차수당 증가분
     annualLeave = round10(base * R_ANNUAL_LEAVE);
 
-    // 개인부담 합계
+    // 개인부담금 합계 (사회보험 개인부담)
     sumEmp =
       pensionEmp +
       healthEmp +
       longtermEmp +
       employEmp;
 
-    // 기관부담 합계 (산재 포함)
+    // 기관부담금 합계 (사회보험 + 산재)
     sumOrg =
       pensionOrg +
       healthOrg +
@@ -140,7 +137,7 @@ function calcCoachDistribution(studentCount, unitFee) {
       employOrg +
       accidentOrg;
 
-    // 공제합계 = 개인부담 + 기관부담 + 퇴직 + 연차
+    // 공제합계 = 개인부담금 + 기관부담금 + 퇴직적립금 + 연차 미사용수당 증가분
     totalDeductions =
       sumEmp +
       sumOrg +
@@ -180,7 +177,7 @@ function calcCoachDistribution(studentCount, unitFee) {
 }
 
 // ------------------------
-//      화면 갱신
+//     화면 갱신
 // ------------------------
 
 function updateView(result) {
@@ -212,7 +209,7 @@ function updateView(result) {
   $("iterInfo").textContent =
     result.iterations > 0
       ? `반복 계산 ${result.iterations}회 수행 (10원 단위 수렴)`
-      : "아직 계산 전입니다. (버튼을 눌러 계산하세요)";
+      : "계산하기 버튼 눌러야 결과 나옴";
 }
 
 // ------------------------
