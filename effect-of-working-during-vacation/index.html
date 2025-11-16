@@ -3,15 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>방학중 비상시근로자 방학중 근무로 인한 종합 영향 계산기</title>
+  <title>방학중 비상시근로자 방학중 근무로 인한 영향 계산기</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header class="site-header">
     <div class="shell">
-      <h1>방학중 비상시근로자 방학중 근무로 인한 종합 영향 계산기</h1>
+      <h1>방학중 비상시근로자 방학중 근무로 인한 영향 계산기</h1>
       <p class="sub">
-        ·출근율 산정, 연차 일수 부여 및 미사용 수당, 사회보험료 증가분, 연말정산 등 
+        ·출근율 산정, 연차 유급휴가 추가 부여 일수, 사회보험료 증가분, 연말정산 관련 등 
       </p>
     </div>
   </header>
@@ -22,7 +22,7 @@
       <h2>1. 기본 정보</h2>
       <div class="grid two">
         <label>
-          회계연도
+          학년도 (예: 2025 → 2025.3.1.~2026.2.말 근무분)
           <input type="number" id="year" value="2025" />
         </label>
         <label>
@@ -35,7 +35,7 @@
           <input type="date" id="startDate" />
         </label>
         <div>
-          <strong>근속연수 (3.1.일자 기준)</strong><br />
+          <strong>근속연수 (해당 학년도 3.1. 기준)</strong><br />
           <span id="serviceYears">0</span> 년
         </div>
 
@@ -49,17 +49,18 @@
         </label>
       </div>
       <p class="muted">
-        ·회계연도 입력하면 토요일 제외 일수 자동 산정됨.<br />
-        ·최초 임용일 입력하면 앞서 입력한 회계연도의 3.1.일자를 기준으로 현재 근속연수 및 기본 연차일수 자동 산출함.<br />
+        ·학년도 입력하면 토요일 제외 일수 자동 산정됨.<br />
+        ·최초 임용일 입력하면 해당 학년도 3.1. 기준 근속연수 및 기본 연차일수 자동 산출함.<br />
         ·휴게시간 제외 1일 소정 근로시간: 8시간, 6시간, 5시간 등.
       </p>
+      <p class="note" id="academicExplain">-</p>
     </section>
 
     <!-- 2. 달력 기준 근무일수 (토요일 제외) -->
     <section class="card">
       <h2>2. 달력상 총 일수 (토요일 제외)</h2>
       <p>
-        ·상단에 입력한 회계연도 기준으로 토요일을 제외한 달력상 총 일수 자동 산출
+        ·상단에 입력한 학년도 기준(3.1.~다음해 2.말)으로 토요일을 제외한 달력상 총 일수 자동 산출
       </p>
       <div class="grid two">
         <div>
@@ -81,17 +82,19 @@
         ·사유와 무관하게 제외기간은 총 일수로 합산됨. 
       </p>
 
-      <table class="grid-table">
-        <thead>
-          <tr>
-            <th style="width: 40%;">제외 사유</th>
-            <th style="width: 30%;">제외 일수 (토요일 제외)</th>
-            <th style="width: 30%;">삭제</th>
-          </tr>
-        </thead>
-        <tbody id="excludeBody"></tbody>
-      </table>
-      <button type="button" id="addExcludeBtn">행 추가</button>
+      <div class="table-wrap">
+        <table class="grid-table">
+          <thead>
+            <tr>
+              <th style="width: 40%;">제외 사유</th>
+              <th style="width: 30%;">제외 일수 (토요일 제외)</th>
+              <th style="width: 30%;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="excludeBody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" id="addExcludeBtn">행 추가</button>
 
       <div class="grid two" style="margin-top: 16px;">
         <div>
@@ -109,8 +112,8 @@
     <section class="card">
       <h2>4. 방학 기간 입력 및 학기중 근무일수 산정</h2>
       <p class="muted">
-        ·여름방학 및 겨울방학 시작·종료일자 입력하쇼. <br />
-        ·방학기간 중에 토요일 제외 일수 계산하고, 그걸 반영해서 학기중 근무일수 계산함.
+        ·여름방학 및 겨울방학 시작·종료일자 입력.<br />
+        ·방학기간 중 토요일 제외 일수 계산하고, 학기중 근무일수 및 출근율(참고용) 계산함.
       </p>
 
       <h3>4-1. 여름방학 기간</h3>
@@ -120,7 +123,7 @@
           <input type="date" id="vac1Start" />
         </label>
         <label>
-          여름방학 종료일자자
+          여름방학 종료일자
           <input type="date" id="vac1End" />
         </label>
       </div>
@@ -154,7 +157,7 @@
       <h3 style="margin-top: 16px;">4-3. 방학 일수로 학기중 일수 계산하기</h3>
       <div class="grid three" style="margin-top: 8px;">
         <div>
-          <strong>여름방학 및 겨울방학 일수 합계 (토요일 제외)</strong><br />
+          <strong>여름·겨울 방학 일수 합계 (토요일 제외)</strong><br />
           <span id="vacDaysNoSat">0</span> 일
         </div>
         <div>
@@ -162,8 +165,19 @@
           <span id="termDaysNoSat">-</span> 일
         </div>
         <div>
-          <strong>학기중 출근율 산정 (제외기간 미반영)</strong><br />
+          <strong>학기중 출근율 (참고용)</strong><br />
           <span id="termAttendanceRate">-</span> %
+        </div>
+      </div>
+
+      <div class="grid two" style="margin-top: 8px;">
+        <label>
+          방학 중 실제 유급 근무일수 (토요일 제외, 예: 방학 10일 근무 시 10)
+          <input type="number" id="vacWorkDays" value="0" step="0.1" />
+        </label>
+        <div>
+          <strong>출근율 80% 기준 판정</strong><br />
+          <span id="attendance80Judge">-</span>
         </div>
       </div>
     </section>
@@ -173,21 +187,23 @@
       <h2>5. 방학중 근무로 인한 보수 지급 내역</h2>
       <p class="muted">
         ·방학중 비상시근로자의 방학 근무로 인해 발생한 보수 항목별로 입력.<br />
-        ·비과세에 체크하면 사회보험료 및 (지방)소득세 계산에서 자동 제외됨됨.
+        ·비과세 체크 시 사회보험료 및 (지방)소득세 계산에서 자동 제외됨.
       </p>
 
-      <table class="grid-table">
-        <thead>
-          <tr>
-            <th style="width: 40%;">보수 지급 항목명</th>
-            <th style="width: 25%;">지급 금액 (원 단위)</th>
-            <th style="width: 15%;">비과세 금액</th>
-            <th style="width: 20%;">삭제</th>
-          </tr>
-        </thead>
-        <tbody id="wageBody"></tbody>
-      </table>
-      <button type="button" id="addWageBtn">행 추가</button>
+      <div class="table-wrap">
+        <table class="grid-table">
+          <thead>
+            <tr>
+              <th style="width: 40%;">보수 지급 항목명</th>
+              <th style="width: 25%;">지급 금액 (원 단위)</th>
+              <th style="width: 15%;">비과세 금액 여부</th>
+              <th style="width: 20%;">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="wageBody"></tbody>
+        </table>
+      </div>
+      <button type="button" class="btn" id="addWageBtn">행 추가</button>
 
       <div class="grid three" style="margin-top: 16px;">
         <div>
@@ -207,16 +223,14 @@
 
     <!-- 6. 전년도 방학 근무 관련(자동 계산 + 연차 추가 입력) -->
     <section class="card">
-      <h2>6. 전년도 방학 근무 관련(자동 계산 + 연차 추가 입력)</h2>
+      <h2>6. 전년도 방학근무 관련</h2>
       <p class="muted">
-        · 전년도도 현재 연도와 똑같이, 여름·겨울 방학 두 구간을 넣으면<br />
-        → 전년도 달력 총 일수·토요일 제외 일수·학기 총 일수·출근율(참고용)을 자동 계산한다.<br />
-        · 전년도 방학근무로 인한 실제 연차 추가일수는 편람 기준으로 따로 계산해서, 아래 칸에 “결과값만” 넣는 구조.
+        ·전년도 학년도도 방학 일자 입력하면 자동 계산됨
       </p>
 
       <div class="grid three">
         <div>
-          <strong>전년도(자동)</strong><br />
+          <strong>전년도 학년도</strong><br />
           <span id="prevYearLabel">-</span> 년
         </div>
         <div>
@@ -224,7 +238,7 @@
           <span id="prevYearTotalDays">-</span> 일
         </div>
         <div>
-          <strong>전년도 달력상 총 일수(토요일 제외)</strong><br />
+          <strong>전년도 달력상 총 일수 (토요일 제외)</strong><br />
           <span id="prevYearDaysNoSat">-</span> 일
         </div>
       </div>
@@ -232,17 +246,17 @@
       <h3 style="margin-top: 12px;">6-1. 전년도 여름방학 기간</h3>
       <div class="grid two">
         <label>
-          전년도 여름방학 시작일
+          전년도 여름방학 시작일자
           <input type="date" id="prevVac1Start" />
         </label>
         <label>
-          전년도 여름방학 종료일
+          전년도 여름방학 종료일자
           <input type="date" id="prevVac1End" />
         </label>
       </div>
       <div class="grid two" style="margin-top: 8px;">
         <div>
-          <strong>전년도 여름방학 일수(토요일 제외)</strong><br />
+          <strong>전년도 여름방학 일수 (토요일 제외)</strong><br />
           <span id="prevVac1DaysNoSat">0</span> 일
         </div>
       </div>
@@ -250,160 +264,168 @@
       <h3 style="margin-top: 16px;">6-2. 전년도 겨울방학 기간</h3>
       <div class="grid two">
         <label>
-          전년도 겨울방학 시작일
+          전년도 겨울방학 시작일자
           <input type="date" id="prevVac2Start" />
         </label>
         <label>
-          전년도 겨울방학 종료일
+          전년도 겨울방학 종료일자
           <input type="date" id="prevVac2End" />
         </label>
       </div>
       <div class="grid two" style="margin-top: 8px;">
         <div>
-          <strong>전년도 겨울방학 일수(토요일 제외)</strong><br />
+          <strong>전년도 겨울방학 일수 (토요일 제외)</strong><br />
           <span id="prevVac2DaysNoSat">0</span> 일
         </div>
       </div>
 
-      <h3 style="margin-top: 16px;">6-3. 전년도 학기 총 일수 및 출근율(참고용)</h3>
+      <h3 style="margin-top: 16px;">6-3. 전년도 학기 총 일수 및 출근율</h3>
       <div class="grid three" style="margin-top: 8px;">
         <div>
-          <strong>전년도 방학 합계(토요일 제외)</strong><br />
+          <strong>전년도 방학 일수 합계 (토요일 제외)</strong><br />
           <span id="prevVacDaysNoSat">0</span> 일
         </div>
         <div>
-          <strong>전년도 학기 총 일수(토요일 제외)</strong><br />
+          <strong>전년도 학기 총 일수 (토요일 제외)</strong><br />
           <span id="prevTermDaysNoSat">0</span> 일
         </div>
         <div>
-          <strong>전년도 출근율(참고용)</strong><br />
+          <strong>전년도 출근율 </strong><br />
           <span id="prevAttendanceRate">-</span> %
         </div>
       </div>
 
       <div class="grid two" style="margin-top: 16px;">
         <label>
-          전년도 방학근무로 추가된 연차일수(0~3일, 편람 기준 직접 입력)
+          전년도 방학근무로 추가된 연차일수 (0~3일 중 직접 입력)
           <input type="number" id="annualExtraFromPrevVac" value="0" step="0.1" />
         </label>
         <p class="muted">
-          · 실제 추가 연차일수는 전년도 출근율·방학근무일수·학기중 근무일수 등을 따져서 편람 기준으로 계산해야 한다.<br />
-          · 이 계산기는 “전년도 달력 구조와 방학 길이”를 자동으로 보여주는 참고용.
+          ·우선 참고용으로만 사용 (정확한 법령 검증은 별도 필요)
         </p>
       </div>
     </section>
 
     <!-- 7. 연차휴가 사용 / 연차미사용수당 -->
     <section class="card">
-      <h2>7. 연차휴가 일수 및 연차미사용수당</h2>
+      <h2>7. 연차 유급휴가 일수 및 연차 미사용 수당</h2>
       <p class="muted">
-        · 기본 연차일수 + 계속근로 가산일수 + 전년도 방학근무로 추가된 일수를 합쳐 총 부여일수를 만든다.<br />
-        · 근무 시작일을 넣으면 방학중 비상시근로자 표 기준으로 <strong>자동 기본 연차일수</strong>가 산출되며,<br />
-        · 아래 칸의 “기본 연차일수(수동 조정)”이 0이면 자동값을 사용, 0보다 크면 입력한 값을 우선으로 쓴다.
+        ·연차 일수 총 합산 내역: 기본 연차일수 +계속근로 가산일수 +전년도 방학근무로 추가된 일수<br />
+        ·최초 임용일자 입력하면 기본 연차일수 산출됨.<br />
+        ·수기입력한 기본 연차일수가 0보다 크면 그 값을 우선 사용.
       </p>
 
       <div class="grid three">
         <label>
-          기본 연차일수(수동 조정, 0이면 자동값 사용)
+          기본 연차일수 
           <input type="number" id="annualBase" value="0" step="0.1" />
         </label>
         <label>
-          계속근로 가산일수(3년 이상, 매 2년 1일씩 등)
+          계속근로 가산일수
           <input type="number" id="annualExtraSeniority" value="0" step="0.1" />
         </label>
         <div>
-          <strong>총 부여 연차일수</strong><br />
+          <strong>연차 유급휴가 총 부여 일수</strong><br />
           <span id="annualTotalDays">-</span> 일
         </div>
       </div>
 
       <div class="grid three" style="margin-top: 8px;">
         <div>
-          <strong>자동 기본 연차일수(근속연수 기준)</strong><br />
+          <strong>최초 임용일에 따른 기본 연차일수 (자동 계산)</strong><br />
           <span id="autoAnnualBase">-</span> 일
         </div>
       </div>
 
-      <h3>연차 사용내역 입력</h3>
+      <h3>연차 사용 내역 입력</h3>
       <div class="grid three">
         <label>
-          사용 연차(전일 기준 일수)
+          연차 사용 내역 (일 단위)
           <input type="number" id="annualUsedFull" value="0" step="0.1" />
         </label>
         <label>
-          반일연가 사용일수
+          반일연가 사용 내역
           <input type="number" id="annualUsedHalf" value="0" step="0.1" />
         </label>
         <label>
-          지각·외출·조퇴 합계(시간)
+          지각·외출·조퇴 합계 (시간 단위)
           <input type="number" id="annualUsedHours" value="0" step="0.1" />
         </label>
       </div>
 
       <div class="grid three" style="margin-top: 16px;">
         <div>
-          <strong>연차 사용일수(환산)</strong><br />
+          <strong>연차 사용 일수 (환산)</strong><br />
           <span id="annualUsedDaysConv">-</span> 일
         </div>
         <div>
-          <strong>연차 미사용일수</strong><br />
+          <strong>연차 미사용 일수</strong><br />
           <span id="annualUnusedDays">-</span> 일
         </div>
         <div>
-          <strong>연차미사용수당(추정)</strong><br />
+          <strong>연차 미사용 수당</strong><br />
           <span id="annualUnusedPay">0</span> 원
         </div>
       </div>
       <p class="muted">
-        · 계산식: 미사용일수 × 시간당 통상임금 × 1일 유급처리시간.<br />
-        · 통상임금은 아래 8번 통상임금 계산 결과를 사용한다.
+        ·계산식: 연차 미사용 일수 × 통상임금(시간당) × 1일 소정 근무시간<br />
+        ·통상임금은 아래 8번 항목 입력 시 자동 산출됨.
       </p>
     </section>
 
-    <!-- 8. 통상임금 계산 (업데이트된 산식) -->
+    <!-- 8. 통상임금 계산  -->
     <section class="card">
       <h2>8. 통상임금 계산 (교육공무직 통상임금 변경사항 반영)</h2>
       <p class="muted">
-        · 통상임금 변경사항(정기상여금·명절휴가비 12분할 포함)을 반영해서 시간당 통상임금을 자동 계산한다.<br />
-        · 전일제 / 5시간 직종 / 6시간 직종에 따라 분모 시간을 다르게 잡는다.
+        ·통상임금 계산식 참고<br />
+        ·소정 근로시간에 따라 자동 계산: 전일제, 6시간, 5시간 등
       </p>
 
       <div class="grid three">
         <div class="worktype-group">
-          <strong>근로 형태 선택</strong><br />
-          <label><input type="radio" name="workType" value="full" checked /> 전일제</label><br />
-          <label><input type="radio" name="workType" value="part5" /> 단시간 5시간 직종</label><br />
-          <label><input type="radio" name="workType" value="part6" /> 단시간 6시간 직종</label>
+          <strong>소정 근로시간 유형 선택</strong><br />
+          <label>
+            <input type="checkbox" class="workType" value="full" checked />
+            전일제 (8시간)
+          </label><br />
+          <label>
+            <input type="checkbox" class="workType" value="part5" />
+            단시간 (5시간)
+          </label><br />
+          <label>
+            <input type="checkbox" class="workType" value="part6" />
+            단시간 (6시간)
+          </label>
         </div>
         <div>
           <label>
-            기본급 (월)
-            <input type="number" id="owBasic" value="0" step="1000" />
+            기본급 (월 단위)
+            <input type="number" id="owBasic" value="2066000" step="1000" />
           </label>
           <label>
-            근속수당 (월)
-            <input type="number" id="owSeniority" value="0" step="1000" />
+            근속수당 (월 단위)
+            <input type="number" id="owSeniority" value="40000" step="1000" />
           </label>
           <label>
-            정액급식비 (월)
-            <input type="number" id="owMeal" value="0" step="1000" />
+            정액급식비 (월 단위)
+            <input type="number" id="owMeal" value="150000" step="1000" />
           </label>
           <label>
-            직무관련수당 (월, 전일제만 포함)
+            직무관련수당 (월 단위)
             <input type="number" id="owJob" value="0" step="1000" />
           </label>
         </div>
         <div>
           <label>
             정기상여금 (연간 총액)
-            <input type="number" id="owBonusYear" value="0" step="1000" />
+            <input type="number" id="owBonusYear" value="1000000" step="1000" />
           </label>
           <label>
             명절휴가비 (연간 총액)
-            <input type="number" id="owHolidayYear" value="0" step="1000" />
+            <input type="number" id="owHolidayYear" value="1700000" step="1000" />
           </label>
           <div style="margin-top: 8px;">
-            <strong>월 통상임금(추정)</strong><br />
+            <strong>월 통상임금</strong><br />
             <span id="owMonthly">0</span> 원
           </div>
           <div style="margin-top: 8px;">
@@ -413,18 +435,17 @@
         </div>
       </div>
       <p class="muted">
-        · 전일제: (기본급+근속수당+정액급식비+직무관련수당+(정기상여금/12)+(명절휴가비/12)) ÷ 209시간<br />
-        · 단시간 5시간: (기본급+근속수당+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 130시간<br />
-        · 단시간 6시간: 같은 산식 ÷ 156시간.
+        ·전일제: (기본급+근속수당+정액급식비+직무관련수당+(정기상여금/12)+(명절휴가비/12)) ÷ 209시간 <br />
+        ·6시간: (기본급+근속수당+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 156시간 <br />
+        ·5시간: (기본급+근속수당+정액급식비+(정기상여금/12)+(명절휴가비/12)) ÷ 130시간 <br />
       </p>
     </section>
 
-    <!-- 9. 4대 사회보험료 영향 -->
+    <!-- 9. 사회보험료 영향 -->
     <section class="card">
-      <h2>9. 4대 사회보험료 영향(추정)</h2>
+      <h2>9. 사회보험료 증가분</h2>
       <p class="muted">
-        · 방학근무 과세 보수와 연차미사용수당을 기준으로 <strong>추가 부담분</strong>을 대략 계산한다.<br />
-        · 실제 적용 요율과 기준소득월액은 매년 고시값을 확인해야 한다(이 계산기는 참고용).
+        ·방학근무 과세 대상 보수와 연차 미사용 수당 등으로 인한 상승분 (대략 추정치)<br />
       </p>
 
       <div class="grid three">
@@ -433,16 +454,16 @@
           <span id="siBase">0</span> 원
         </div>
         <label>
-          연차미사용수당도 4대보험 기준금액에 포함
+          연차 미사용 수당도 연간 보수총액 산정 내역에 포함
           <input type="checkbox" id="includeUnusedIn4ins" checked />
         </label>
         <label>
-          비고(예: 기준소득월액 조정 여부)
+          비고 (메모용)
           <input type="text" id="siMemo" />
         </label>
       </div>
 
-      <h3>요율 설정(필요시 수정)</h3>
+      <h3>사회보험료 요율 설정</h3>
       <div class="grid three">
         <div>
           <h4>국민연금</h4>
@@ -458,60 +479,60 @@
           <h4>고용·산재보험</h4>
           <label>고용보험 기관부담율(%) <input type="number" id="uiRateEmp" value="1.75" step="0.01" /></label>
           <label>고용보험 개인부담율(%) <input type="number" id="uiRateInd" value="0.9" step="0.01" /></label>
-          <label>산재보험 기관부담율(%) <input type="number" id="ciRateEmp" value="0.7" step="0.01" /></label>
+          <label>산재보험 기관부담율(%) <input type="number" id="ciRateEmp" value="0.966" step="0.01" /></label>
         </div>
       </div>
 
       <div class="grid three" style="margin-top: 16px;">
         <div>
-          <strong>기관부담 4대보험 합계</strong><br />
+          <strong>사회보험료 기관부담금 합계</strong><br />
           <span id="siEmpTotal">0</span> 원
         </div>
         <div>
-          <strong>개인부담 4대보험 합계</strong><br />
+          <strong>사회보험료 개인부담금 합계</strong><br />
           <span id="siIndTotal">0</span> 원
         </div>
         <div>
-          <strong>기관+개인 총 부담(참고)</strong><br />
+          <strong>사회보험료 총 합계 (기관+개인)</strong><br />
           <span id="siGrandTotal">0</span> 원
         </div>
       </div>
     </section>
 
-    <!-- 10. 연말정산 세금 영향(단순 추정) -->
+    <!-- 10. 연말정산 세금 영향 -->
     <section class="card">
-      <h2>10. 연말정산 소득세·지방소득세 영향(단순 추정)</h2>
+      <h2>10. 연말정산 (지방)소득세 영향 (대충 추정값)</h2>
       <p class="muted">
-        · 방학근무 과세 보수 + 연차미사용수당만 따로 떼어서, <strong>“평균 세율”</strong>을 곱하는 구조다.<br />
-        · 실제 연말정산은 누진세율, 공제 등 때문에 훨씬 복잡하므로 이건 “감” 잡는 용도.
+        ·산정식: (방학근무로 인한 과세 대상 금액 + 연차 미사용 수당) × 세율<br />
+        ·누진세, 각종 공제 등은 반영하지 않은 러프한 추정치
       </p>
 
       <div class="grid three">
         <div>
-          <strong>연말정산 기준 추가 과세소득</strong><br />
+          <strong>과세 대상 금액</strong><br />
           <span id="taxBase">0</span> 원
         </div>
         <label>
-          추정 평균 소득세율(%)
-          <input type="number" id="avgTaxRate" value="6.6" step="0.1" />
+          평균 소득세율(%) (누진·공제 감안한 체감세율 입력)
+          <input type="number" id="avgTaxRate" value="6" step="0.1" />
         </label>
         <div>
-          <strong>지방소득세율(소득세의 10%)</strong><br />
+          <strong>지방 소득세율 (소득세의 10%)</strong><br />
           10% (고정)
         </div>
       </div>
 
       <div class="grid three" style="margin-top: 16px;">
         <div>
-          <strong>추가 소득세(추정)</strong><br />
+          <strong>추가 발생 소득세</strong><br />
           <span id="incomeTax">0</span> 원
         </div>
         <div>
-          <strong>추가 지방소득세(추정)</strong><br />
+          <strong>추가 발생 지방소득세</strong><br />
           <span id="localTax">0</span> 원
         </div>
         <div>
-          <strong>추가 세금 합계</strong><br />
+          <strong>추가 발생 세금 합계</strong><br />
           <span id="taxTotal">0</span> 원
         </div>
       </div>
@@ -519,58 +540,56 @@
 
     <!-- 11. 종합 요약 -->
     <section class="card">
-      <h2>11. 종합 요약</h2>
+      <h2>11. 결과 모음</h2>
       <p>
-        이 구간은 계산 결과를 한눈에 모아보는 구간이다.  
-        방학근무가 <strong>연차일수·연차미사용수당·4대보험·연말정산</strong>에 어떤 영향을 주는지 정리해준다.
+        ·계산 결과 한눈에 보기 <br/> 
+        ·귀찮은 건 계산기한테 다 떠넘겨버리기 
       </p>
 
-      <div class="grid three">
-        <div>
-          <h3>연차·연차수당</h3>
-          <p>
-            총 부여 연차일수: <strong><span id="sumAnnualTotal">-</span> 일</strong><br />
-            사용(환산): <strong><span id="sumAnnualUsed">-</span> 일</strong><br />
-            미사용: <strong><span id="sumAnnualUnused">-</span> 일</strong><br />
-            연차미사용수당: <strong><span id="sumAnnualUnusedPay">0</span> 원</strong>
-          </p>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-label strong">연차 일수 및 연차 미사용 수당</div>
+          <div class="result-value">
+            연차 부여 일수: <strong><span id="sumAnnualTotal">-</span> 일</strong><br />
+            연차 사용 일수: <strong><span id="sumAnnualUsed">-</span> 일</strong><br />
+            연차 미사용 일수: <strong><span id="sumAnnualUnused">-</span> 일</strong><br />
+            연차 미사용 수당: <strong><span id="sumAnnualUnusedPay">0</span> 원</strong>
+          </div>
         </div>
-        <div>
-          <h3>방학근무·통상임금</h3>
-          <p>
-            방학 근무 보수(총액): <strong><span id="sumWageTotal">0</span> 원</strong><br />
-            그 중 과세분: <strong><span id="sumWageTaxable">0</span> 원</strong><br />
+        <div class="result-item">
+          <div class="result-label strong">통상임금 · 방학근무 보수</div>
+          <div class="result-value">
+            방학근무 보수: <strong><span id="sumWageTotal">0</span> 원</strong><br />
+            과세 대상 금액: <strong><span id="sumWageTaxable">0</span> 원</strong><br />
             시간당 통상임금: <strong><span id="sumOwHourly">0</span> 원</strong><br />
-            1일 유급시간: <strong><span id="sumPaidHoursPerDay">0</span> 시간</strong>
-          </p>
+            1일 소정 근무시간: <strong><span id="sumPaidHoursPerDay">0</span> 시간</strong>
+          </div>
         </div>
-        <div>
-          <h3>4대보험·세금</h3>
-          <p>
-            4대보험 기관부담: <strong><span id="sumSiEmp">0</span> 원</strong><br />
-            4대보험 개인부담: <strong><span id="sumSiInd">0</span> 원</strong><br />
-            추가 소득세: <strong><span id="sumIncomeTax">0</span> 원</strong><br />
-            추가 지방소득세: <strong><span id="sumLocalTax">0</span> 원</strong>
-          </p>
+        <div class="result-item">
+          <div class="result-label strong">추가 발생 사회보험료 및 세금</div>
+          <div class="result-value">
+            사회보험료 기관부담금: <strong><span id="sumSiEmp">0</span> 원</strong><br />
+            사회보험료 개인부담금: <strong><span id="sumSiInd">0</span> 원</strong><br />
+            소득세: <strong><span id="sumIncomeTax">0</span> 원</strong><br />
+            지방소득세: <strong><span id="sumLocalTax">0</span> 원</strong>
+          </div>
         </div>
       </div>
 
       <p class="muted">
-        · 법령·요율은 계속 바뀌니, 실제 지급·정산 시에는 반드시 최신 업무편람·보수 등 업무처리 요령·고시를 다시 확인해야 한다.<br />
-        · 이 계산기는 “방학근무를 얼마나 시켰더니 대략 이 정도 영향이 생기겠구나” 감 잡는 용도로 보는 게 마음이 편하다.
+        ·2025년 교육공무직 업무 편람, 교육공무직 보수 등 업무처리 요령, 통상임금 산정 변경 내역 안내 참고
       </p>
     </section>
 
-
-<p><a class="btn" href="../index.html">메인으로 돌아가기</a></p>
-
+    <p>
+      <a class="btn" href="../index.html">메인으로 돌아가기</a>
+    </p>
+  </main>
 
   <footer style="text-align:center; margin-top:15px; color:#444;">
-  제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
-</footer>
+    제작자: 씩씩하고 귀여운 고주무관 · Contact: edusproutcomics@naver.com · 개인적인 토이 프로젝트입니다.
+  </footer>
 
   <script src="script.js"></script>
 </body>
 </html>
-
-
