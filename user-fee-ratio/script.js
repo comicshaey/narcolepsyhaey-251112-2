@@ -1,4 +1,4 @@
-// 원단위 절삭 (지금은 10원 단위 절삭으로 사용)
+// 원단위 절삭
 function round10(v) {
   const n = Number(v) || 0;
   return Math.floor(n / 10) * 10;
